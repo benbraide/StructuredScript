@@ -13,34 +13,27 @@ namespace StructuredScript{
 			TOKEN_TYPE_HEXADECIMAL_INTEGER,
 			TOKEN_TYPE_OCTAL_INTEGER,
 			TOKEN_TYPE_BINARY_INTEGER,
-			TOKEN_TYPE_NUMBER,
+			TOKEN_TYPE_REAL_NUMBER,
 			TOKEN_TYPE_EXPONENTIATED_NUMBER,
 			TOKEN_TYPE_DOUBLE_QUOTED_STRING,
+			TOKEN_TYPE_DOUBLE_QUOTED_RAW_STRING,
 			TOKEN_TYPE_SINGLY_QUOTED_STRING,
 			TOKEN_TYPE_BACK_QUOTED_STRING,
 			TOKEN_TYPE_IDENTIFIER,
-			TOKEN_TYPE_LEFT_UNARY_OPERATOR,
-			TOKEN_TYPE_RIGHT_UNARY_OPERATOR,
-			TOKEN_TYPE_BINARY_OPERATOR,
-			TOKEN_TYPE_TYPENAME,
-			TOKEN_TYPE_PRAGMA,
-			TOKEN_TYPE_INCLUDE,
-			TOKEN_TYPE_DEFINE,
-			TOKEN_TYPE_BEGIN,
-			TOKEN_TYPE_END,
-			TOKEN_TYPE_OPERATOR,
+			TOKEN_TYPE_SYMBOL,
 			TOKEN_TYPE_GROUP,
 			TOKEN_TYPE_INDEX,
 			TOKEN_TYPE_BLOCK,
 			TOKEN_TYPE_ANGLE,
+			TOKEN_TYPE_BLANK,
+			TOKEN_TYPE_SINGLE_LINE_COMMENT,
+			TOKEN_TYPE_MULTI_LINE_COMMENT,
 			TOKEN_TYPE_ERROR
 		};
 
 		enum TokenGroup{
 			TOKEN_GROUP_NUMBER,
 			TOKEN_GROUP_STRING,
-			TOKEN_GROUP_IDENTIFIER,
-			TOKEN_GROUP_OPERATOR,
 			TOKEN_GROUP_GROUP
 		};
 
@@ -65,26 +58,6 @@ namespace StructuredScript{
 		bool tokenIsStringType(TokenType type);
 
 		//************************************
-		// Method:    tokenIsIdentifierType
-		// FullName:  StructuredScript::Scanner::tokenIsIdentifierType
-		// Access:    public 
-		// Returns:   bool
-		// Qualifier:
-		// Parameter: TokenType type
-		//************************************
-		bool tokenIsIdentifierType(TokenType type);
-
-		//************************************
-		// Method:    tokenIsOperatorType
-		// FullName:  StructuredScript::Scanner::tokenIsOperatorType
-		// Access:    public 
-		// Returns:   bool
-		// Qualifier:
-		// Parameter: TokenType type
-		//************************************
-		bool tokenIsOperatorType(TokenType type);
-
-		//************************************
 		// Method:    tokenIsGroupType
 		// FullName:  StructuredScript::Scanner::tokenIsGroupType
 		// Access:    public 
@@ -96,8 +69,28 @@ namespace StructuredScript{
 
 		class Token{
 		public:
-			Token(TokenType type, const std::string &value)
-				: type_(type), value_(value){}
+			Token(TokenType type, const std::string &value, const std::string &prefix = "", const std::string &postfix = "")
+				: type_(type), value_(value), prefix_(prefix), postfix_(postfix){}
+
+			//************************************
+			// Method:    operator==
+			// FullName:  StructuredScript::Scanner::Token::operator==
+			// Access:    public 
+			// Returns:   bool
+			// Qualifier: const
+			// Parameter: const Token & right
+			//************************************
+			bool operator ==(const Token &right) const;
+
+			//************************************
+			// Method:    operator!=
+			// FullName:  StructuredScript::Scanner::Token::operator!=
+			// Access:    public 
+			// Returns:   bool
+			// Qualifier: const
+			// Parameter: const Token & right
+			//************************************
+			bool operator !=(const Token &right) const;
 
 			//************************************
 			// Method:    getType
@@ -154,18 +147,20 @@ namespace StructuredScript{
 			//************************************
 			bool isError() const;
 
-		private:
 			//************************************
-			// Method:    getTypeString_
-			// FullName:  StructuredScript::Scanner::Token::getTypeString_
-			// Access:    private 
-			// Returns:   std::string
+			// Method:    isValid
+			// FullName:  StructuredScript::Scanner::Token::isValid
+			// Access:    public 
+			// Returns:   bool
 			// Qualifier: const
 			//************************************
-			std::string getTypeString_() const;
+			bool isValid() const;
 
+		private:
 			TokenType type_;
 			std::string value_;
+			std::string prefix_;
+			std::string postfix_;
 		};
 	}
 }
