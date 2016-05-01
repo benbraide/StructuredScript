@@ -1,11 +1,11 @@
 #include "../../../CppUnitLite/TestHarness.h"
 
-#include "Number.h"
+#include "RealNumber.h"
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
-	TEST(Number, Test){
-		Scanner::Plugins::Number number;
+	TEST(RealNumber, Test){
+		Scanner::Plugins::RealNumber number;
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("4518.279"), mcw_4("9e+90"), mcw_5("9e36"), mcw_6("72ll"), mcw_7(".279"),
 			mcw_8("0.279"), mcw_9("81."), mcw_10("072"), mcw_11("45fab"), mcw_12("45fab"), mcw_13("45.18.279"), mcw_14("9e"), mcw_15("9e+-90");
 
@@ -52,9 +52,9 @@ namespace StructuredScript{
 		CHECK(mcw_8.dump() == "");
 
 		CHECK(number.matches(mcw_9));
-		CHECK(number.get(mcw_9) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_REAL_NUMBER, "81."));
+		CHECK(number.get(mcw_9) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER, "81"));
 		mcw_9.commit();
-		CHECK(mcw_9.dump() == "");
+		CHECK(mcw_9.dump() == ".");
 
 		CHECK(!number.matches(mcw_10));
 		CHECK(number.get(mcw_10) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_NONE, ""));
@@ -74,9 +74,9 @@ namespace StructuredScript{
 		CHECK(mcw_12.dump() == "");
 
 		CHECK(number.matches(mcw_13));
-		CHECK(number.get(mcw_13) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "45.18.279"));
+		CHECK(number.get(mcw_13) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_REAL_NUMBER, "45.18"));
 		mcw_13.commit();
-		CHECK(mcw_13.dump() == "");
+		CHECK(mcw_13.dump() == ".279");
 
 		CHECK(number.matches(mcw_14));
 		CHECK(number.get(mcw_14) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "9e"));

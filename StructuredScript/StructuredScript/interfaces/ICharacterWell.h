@@ -33,6 +33,8 @@ namespace StructuredScript{
 
 			virtual void revert() = 0;
 
+			virtual void discard() = 0;
+
 			virtual void merge() = 0;
 
 			virtual std::string dump() = 0;

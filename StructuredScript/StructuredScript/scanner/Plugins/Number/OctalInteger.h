@@ -10,8 +10,8 @@ namespace StructuredScript{
 		namespace Plugins{
 			class OctalInteger : public IScannerPlugin{
 			public:
-				explicit OctalInteger(IScannerPlugin &numberPlugin)
-					: numberPlugin_(&numberPlugin){}
+				explicit OctalInteger(const IScannerPlugin &realNumberPlugin)
+					: realNumberPlugin_(&realNumberPlugin){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
@@ -20,7 +20,7 @@ namespace StructuredScript{
 				virtual TokenType type() const override;
 
 			private:
-				IScannerPlugin *numberPlugin_;
+				const IScannerPlugin *realNumberPlugin_;
 			};
 		}
 	}

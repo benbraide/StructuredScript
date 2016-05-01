@@ -13,12 +13,15 @@ namespace StructuredScript{
 			TOKEN_TYPE_HEXADECIMAL_INTEGER,
 			TOKEN_TYPE_OCTAL_INTEGER,
 			TOKEN_TYPE_BINARY_INTEGER,
+			TOKEN_TYPE_RADIX_INTEGER,
 			TOKEN_TYPE_REAL_NUMBER,
 			TOKEN_TYPE_EXPONENTIATED_NUMBER,
-			TOKEN_TYPE_DOUBLE_QUOTED_STRING,
-			TOKEN_TYPE_DOUBLE_QUOTED_RAW_STRING,
+			TOKEN_TYPE_DOUBLY_QUOTED_STRING,
+			TOKEN_TYPE_DOUBLY_QUOTED_RAW_STRING,
 			TOKEN_TYPE_SINGLY_QUOTED_STRING,
+			TOKEN_TYPE_SINGLY_QUOTED_RAW_STRING,
 			TOKEN_TYPE_BACK_QUOTED_STRING,
+			TOKEN_TYPE_BACK_QUOTED_RAW_STRING,
 			TOKEN_TYPE_IDENTIFIER,
 			TOKEN_TYPE_SYMBOL,
 			TOKEN_TYPE_GROUP,
@@ -28,11 +31,14 @@ namespace StructuredScript{
 			TOKEN_TYPE_BLANK,
 			TOKEN_TYPE_SINGLE_LINE_COMMENT,
 			TOKEN_TYPE_MULTI_LINE_COMMENT,
+			TOKEN_TYPE_PREPROCESSOR,
 			TOKEN_TYPE_ERROR
 		};
 
 		enum TokenGroup{
 			TOKEN_GROUP_NUMBER,
+			TOKEN_GROUP_INTEGER,
+			TOKEN_GROUP_REAL,
 			TOKEN_GROUP_STRING,
 			TOKEN_GROUP_GROUP
 		};
@@ -69,8 +75,9 @@ namespace StructuredScript{
 
 		class Token{
 		public:
-			Token(TokenType type, const std::string &value, const std::string &prefix = "", const std::string &postfix = "")
-				: type_(type), value_(value), prefix_(prefix), postfix_(postfix){}
+			Token(TokenType type, const std::string &value, const std::string &prefix = "", const std::string &suffix = "",
+				bool skipValue = false)
+				: type_(type), value_(value), prefix_(prefix), suffix_(suffix), skipValue_(skipValue){}
 
 			//************************************
 			// Method:    operator==
@@ -120,6 +127,24 @@ namespace StructuredScript{
 			std::string str() const;
 
 			//************************************
+			// Method:    getPrefix
+			// FullName:  StructuredScript::Scanner::Token::getPrefix
+			// Access:    public 
+			// Returns:   std::string
+			// Qualifier: const
+			//************************************
+			std::string getPrefix() const;
+
+			//************************************
+			// Method:    getSuffix
+			// FullName:  StructuredScript::Scanner::Token::getSuffix
+			// Access:    public 
+			// Returns:   std::string
+			// Qualifier: const
+			//************************************
+			std::string getSuffix() const;
+
+			//************************************
 			// Method:    getGroup
 			// FullName:  StructuredScript::Scanner::Token::getGroup
 			// Access:    public 
@@ -160,7 +185,8 @@ namespace StructuredScript{
 			TokenType type_;
 			std::string value_;
 			std::string prefix_;
-			std::string postfix_;
+			std::string suffix_;
+			bool skipValue_;
 		};
 	}
 }

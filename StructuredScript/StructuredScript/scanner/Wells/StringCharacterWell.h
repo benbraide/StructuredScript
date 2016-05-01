@@ -38,6 +38,8 @@ namespace StructuredScript{
 
 			virtual void revert() override;
 
+			virtual void discard() override;
+
 			virtual void merge() override;
 
 			virtual std::string dump() override;

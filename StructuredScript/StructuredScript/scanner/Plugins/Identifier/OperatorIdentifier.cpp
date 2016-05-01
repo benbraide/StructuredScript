@@ -33,8 +33,10 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	well.fork();
 	
 	auto blank = skip_(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR){
+		well.merge();
 		return blank;
+	}
 
 	auto token = identifierPlugin_->get(well, filter);
 	well.merge();

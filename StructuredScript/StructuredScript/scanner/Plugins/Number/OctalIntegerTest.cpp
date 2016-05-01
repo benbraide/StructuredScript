@@ -1,13 +1,13 @@
 #include "../../../CppUnitLite/TestHarness.h"
 
-#include "Number.h"
+#include "RealNumber.h"
 #include "OctalInteger.h"
 
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	TEST(OctalInteger, Test){
-		Scanner::Plugins::Number number;
+		Scanner::Plugins::RealNumber number;
 		Scanner::Plugins::OctalInteger oct(number);
 
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("04572"), mcw_4("0000"), mcw_5("0117"), mcw_6("0819"), mcw_7("04572ll");

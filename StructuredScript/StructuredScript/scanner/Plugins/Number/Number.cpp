@@ -1,74 +1,26 @@
 #include "Number.h"
 
-StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::Number::get_(ICharacterWell &well, FilterType filter) const{
-	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
-		return TokenType::TOKEN_TYPE_NONE;
-
-	auto next = well.next();
-	auto filterState = (filter == nullptr) ? IScannerPlugin::NONE : filter(next);
-
-	auto hasErrors = false, isReal = false, pointRead = false, eRead = false;
-	while (next == '.' || next == 'e' || next == 'E' || ::isdigit(next) || filterState != IScannerPlugin::NONE){
-		if (filterState == IScannerPlugin::EXCLUDE)
-			break;
-
-		if (!hasErrors && filterState == IScannerPlugin::FAIL)
-			hasErrors = true;
-
-		if (!hasErrors && !eRead){//No errors & Number is not fully formed
-			if (next == 'e' || next == 'E'){
-				next = well.peek();
-				if (next == '+' || next == '-')
-					well.step(1);
-
-				well.fork();
-				auto right = get_(well, filter);
-				well.merge();
-
-				if (right == TokenType::TOKEN_TYPE_ERROR || right == TokenType::TOKEN_TYPE_NONE)
-					return TokenType::TOKEN_TYPE_ERROR;
-
-				eRead = true;
-			}
-			else if (next == '.'){
-				if (pointRead){//Multiple decimal points encountered
-					if (!hasErrors)
-						hasErrors = true;
-				}
-				else
-					pointRead = true;
-			}
-		}
-		else if (!hasErrors)
-			hasErrors = true;
-
-		next = well.next();
-		filterState = (filter == nullptr) ? IScannerPlugin::NONE : filter(next);
-	}
-
-	if (next != '\0')//Move back to exclude character
-		well.step(-1);
-
-	if (hasErrors)
-		return TokenType::TOKEN_TYPE_ERROR;
-
-	if (eRead)
-		return TokenType::TOKEN_TYPE_EXPONENTIATED_NUMBER;
-
-	if (pointRead)
-		return TokenType::TOKEN_TYPE_REAL_NUMBER;
-
-	return TokenType::TOKEN_TYPE_DECIMAL_INTEGER;
-}
-
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Number::get(ICharacterWell &well, FilterType filter) const{
-	auto type = get_(well, filter);
-	return Token(type, well.get());
+	if (!matches(well))
+		return Token(TokenType::TOKEN_TYPE_NONE, "");
+
+	auto token = binaryInteger_.get(well, filter);
+	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+		return token;
+
+	token = hexadecimalInteger_.get(well, filter);
+	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+		return token;
+
+	token = octalInteger_.get(well, filter);
+	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+		return token;
+
+	return realNumber_.get(well, filter);
 }
 
 bool StructuredScript::Scanner::Plugins::Number::matches(const ICharacterWell &well) const{
-	auto next = well.peek();
-	return (next == '.' || (next != '0' && ::isdigit(next)) || well.peek(2) == "0.");
+	return (binaryInteger_.matches(well) || hexadecimalInteger_.matches(well) || octalInteger_.matches(well) || realNumber_.matches(well));
 }
 
 StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::Number::type() const{

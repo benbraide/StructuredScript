@@ -7,7 +7,13 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalIntege
 	well.step(1);//Skip '0'
 	well.fork();
 
-	auto token = numberPlugin_->get(well, [filter](char next) -> unsigned short{
+	auto token = realNumberPlugin_->get(well, [filter](char next) -> unsigned short{
+		if (filter != nullptr){
+			auto state = filter(next);
+			if (state != IScannerPlugin::NONE)
+				return state;
+		}
+
 		if (next == '0')
 			return IScannerPlugin::INCLUDE;
 

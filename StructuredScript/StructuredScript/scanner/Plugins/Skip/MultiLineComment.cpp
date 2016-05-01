@@ -30,7 +30,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::MultiLineCo
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 	}
 
-	well.step(-2);
+	well.step(-1);
 	auto value = well.get();
 
 	well.step(2);

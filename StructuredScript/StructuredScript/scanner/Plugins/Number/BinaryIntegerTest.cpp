@@ -1,13 +1,13 @@
 #include "../../../CppUnitLite/TestHarness.h"
 
-#include "Number.h"
+#include "RealNumber.h"
 #include "BinaryInteger.h"
 
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	TEST(BinaryInteger, Test){
-		Scanner::Plugins::Number number;
+		Scanner::Plugins::RealNumber number;
 		Scanner::Plugins::BinaryInteger bin(number);
 
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("0b101"), mcw_4("0b000"), mcw_5("0b111"), mcw_6("0b45"), mcw_7("0b1010ll");

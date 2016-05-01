@@ -3,13 +3,19 @@
 #ifndef STRUCTURED_SCRIPT_NUMBER_SCANNER_PLUGIN_H
 #define STRUCTURED_SCRIPT_NUMBER_SCANNER_PLUGIN_H
 
-#include "../../../Interfaces/IScannerPlugin.h"
+#include "BinaryInteger.h"
+#include "HexadecimalInteger.h"
+#include "OctalInteger.h"
+#include "RealNumber.h"
 
 namespace StructuredScript{
 	namespace Scanner{
 		namespace Plugins{
 			class Number : public IScannerPlugin{
 			public:
+				Number()
+					: binaryInteger_(realNumber_), hexadecimalInteger_(realNumber_), octalInteger_(realNumber_){}
+
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
 				virtual bool matches(const ICharacterWell &well) const override;
@@ -17,7 +23,10 @@ namespace StructuredScript{
 				virtual TokenType type() const override;
 
 			private:
-				TokenType get_(ICharacterWell &well, FilterType filter = nullptr) const;
+				BinaryInteger binaryInteger_;
+				HexadecimalInteger hexadecimalInteger_;
+				OctalInteger octalInteger_;
+				RealNumber realNumber_;
 			};
 		}
 	}

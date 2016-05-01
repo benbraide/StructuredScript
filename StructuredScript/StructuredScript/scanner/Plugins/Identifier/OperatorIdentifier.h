@@ -11,7 +11,7 @@ namespace StructuredScript{
 		namespace Plugins{
 			class OperatorIdentifier : public IScannerPlugin{
 			public:
-				OperatorIdentifier(IScannerPlugin &identifierPlugin, IScannerPlugin &symbolPlugin, IScannerPlugin &skipPlugin)
+				OperatorIdentifier(const IScannerPlugin &identifierPlugin, const IScannerPlugin &symbolPlugin, const IScannerPlugin &skipPlugin)
 					: identifierPlugin_(&identifierPlugin), symbolPlugin_(&symbolPlugin), skipPlugin_(&skipPlugin){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
@@ -27,9 +27,9 @@ namespace StructuredScript{
 
 				Token skip_(ICharacterWell &well) const;
 
-				IScannerPlugin *identifierPlugin_;
-				IScannerPlugin *symbolPlugin_;
-				IScannerPlugin *skipPlugin_;
+				const IScannerPlugin *identifierPlugin_;
+				const IScannerPlugin *symbolPlugin_;
+				const IScannerPlugin *skipPlugin_;
 			};
 
 			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 1> LeftUnaryOperatorTokenType;

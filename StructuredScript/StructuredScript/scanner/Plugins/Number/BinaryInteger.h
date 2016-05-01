@@ -10,8 +10,8 @@ namespace StructuredScript{
 		namespace Plugins{
 			class BinaryInteger : public IScannerPlugin{
 			public:
-				explicit BinaryInteger(IScannerPlugin &numberPlugin)
-					: numberPlugin_(&numberPlugin){}
+				explicit BinaryInteger(const IScannerPlugin &realNumberPlugin)
+					: realNumberPlugin_(&realNumberPlugin){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
@@ -20,7 +20,7 @@ namespace StructuredScript{
 				virtual TokenType type() const override;
 
 			private:
-				IScannerPlugin *numberPlugin_;
+				const IScannerPlugin *realNumberPlugin_;
 			};
 		}
 	}

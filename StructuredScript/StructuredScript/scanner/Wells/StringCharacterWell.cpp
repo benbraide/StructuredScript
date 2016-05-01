@@ -54,6 +54,14 @@ void StructuredScript::Scanner::StringCharacterWell::fork(){
 
 void StructuredScript::Scanner::StringCharacterWell::revert(){
 	if (!forks_.empty()){//Remove last fork and restore 'start' and 'end'
+		collapse();
+		start_ = *forks_.rbegin();
+		forks_.pop_back();
+	}
+}
+
+void StructuredScript::Scanner::StringCharacterWell::discard(){
+	if (!forks_.empty()){//Remove last fork, and its content, and restore 'start' and 'end'
 		commit();
 		start_ = *forks_.rbegin();
 		forks_.pop_back();

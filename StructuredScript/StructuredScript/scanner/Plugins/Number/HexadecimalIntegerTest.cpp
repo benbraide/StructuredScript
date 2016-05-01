@@ -1,13 +1,13 @@
 #include "../../../CppUnitLite/TestHarness.h"
 
-#include "Number.h"
+#include "RealNumber.h"
 #include "HexadecimalInteger.h"
 
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	TEST(HexadecimalInteger, Test){
-		Scanner::Plugins::Number number;
+		Scanner::Plugins::RealNumber number;
 		Scanner::Plugins::HexadecimalInteger hex(number);
 
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("0x45"), mcw_4("0x45af"), mcw_5("0xafb"), mcw_6("0xafbll"), mcw_7("0x.279"),

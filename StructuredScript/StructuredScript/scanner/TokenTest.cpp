@@ -9,12 +9,12 @@ namespace StructuredScript{
 		CHECK(tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_OCTAL_INTEGER));
 		CHECK(tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_BINARY_INTEGER));
 
-		CHECK(!tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_DOUBLE_QUOTED_STRING));
+		CHECK(!tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_DOUBLY_QUOTED_STRING));
 		CHECK(!tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_IDENTIFIER));
 		CHECK(!tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_SYMBOL));
 		CHECK(!tokenIsNumberType(Scanner::TokenType::TOKEN_TYPE_GROUP));
 
-		CHECK(tokenIsStringType(Scanner::TokenType::TOKEN_TYPE_DOUBLE_QUOTED_STRING));
+		CHECK(tokenIsStringType(Scanner::TokenType::TOKEN_TYPE_DOUBLY_QUOTED_STRING));
 		CHECK(tokenIsStringType(Scanner::TokenType::TOKEN_TYPE_SINGLY_QUOTED_STRING));
 		CHECK(tokenIsStringType(Scanner::TokenType::TOKEN_TYPE_BACK_QUOTED_STRING));
 
@@ -29,7 +29,7 @@ namespace StructuredScript{
 		CHECK(tokenIsGroupType(Scanner::TokenType::TOKEN_TYPE_ANGLE));
 
 		CHECK(!tokenIsGroupType(Scanner::TokenType::TOKEN_TYPE_REAL_NUMBER));
-		CHECK(!tokenIsGroupType(Scanner::TokenType::TOKEN_TYPE_DOUBLE_QUOTED_STRING));
+		CHECK(!tokenIsGroupType(Scanner::TokenType::TOKEN_TYPE_DOUBLY_QUOTED_STRING));
 		CHECK(!tokenIsGroupType(Scanner::TokenType::TOKEN_TYPE_SYMBOL));
 
 		Scanner::Token number(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER, "18");

@@ -17,7 +17,15 @@ std::string StructuredScript::Scanner::Token::getValue() const{
 }
 
 std::string StructuredScript::Scanner::Token::str() const{
-	return (prefix_ + value_ + postfix_);
+	return skipValue_ ? (prefix_ + suffix_) : (prefix_ + value_ + suffix_);
+}
+
+std::string StructuredScript::Scanner::Token::getPrefix() const{
+	return prefix_;
+}
+
+std::string StructuredScript::Scanner::Token::getSuffix() const{
+	return suffix_;
 }
 
 StructuredScript::Scanner::TokenGroup StructuredScript::Scanner::Token::getGroup() const{
@@ -48,14 +56,14 @@ bool StructuredScript::Scanner::tokenIsNumberType(TokenType type){
 				type == TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER	||
 				type == TokenType::TOKEN_TYPE_OCTAL_INTEGER			||
 				type == TokenType::TOKEN_TYPE_BINARY_INTEGER		||
-				type == TokenType::TOKEN_TYPE_REAL_NUMBER				||
+				type == TokenType::TOKEN_TYPE_REAL_NUMBER			||
 				type == TokenType::TOKEN_TYPE_EXPONENTIATED_NUMBER
 			);
 }
 
 bool StructuredScript::Scanner::tokenIsStringType(TokenType type){
 	return  (
-				type == TokenType::TOKEN_TYPE_DOUBLE_QUOTED_STRING	||
+				type == TokenType::TOKEN_TYPE_DOUBLY_QUOTED_STRING	||
 				type == TokenType::TOKEN_TYPE_SINGLY_QUOTED_STRING	||
 				type == TokenType::TOKEN_TYPE_BACK_QUOTED_STRING
 			);
