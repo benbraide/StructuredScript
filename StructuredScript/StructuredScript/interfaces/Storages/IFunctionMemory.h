@@ -3,7 +3,7 @@
 #ifndef STRUCTURED_SCRIPT_FUNCTION_MEMORY_INTERFACE_H
 #define STRUCTURED_SCRIPT_FUNCTION_MEMORY_INTERFACE_H
 
-#include "IMemory.h"
+#include "../IMemory.h"
 
 namespace StructuredScript{
 	namespace Interfaces{

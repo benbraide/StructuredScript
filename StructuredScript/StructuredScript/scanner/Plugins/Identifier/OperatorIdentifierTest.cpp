@@ -6,12 +6,12 @@
 #include "../Symbol/Symbol.h"
 #include "../Skip/Skip.h"
 
-#include "../../../Common/OperatorSymbols.h"
+#include "../../../Common/Symbols.h"
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	TEST(OperatorIdentifier, Test){
-		OperatorSymbols symbols;
+		Symbols symbols;
 		Scanner::Plugins::Symbol sym(symbols);
 
 		Scanner::Plugins::Skip skip;

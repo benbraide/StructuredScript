@@ -3,7 +3,7 @@
 #ifndef STRUCTURED_SCRIPT_SYMBOL_SCANNER_PLUGIN_H
 #define STRUCTURED_SCRIPT_SYMBOL_SCANNER_PLUGIN_H
 
-#include "../../../Interfaces/IOperatorSymbols.h"
+#include "../../../Interfaces/ISymbols.h"
 #include "../../../Interfaces/IScannerPlugin.h"
 
 namespace StructuredScript{
@@ -11,7 +11,7 @@ namespace StructuredScript{
 		namespace Plugins{
 			class Symbol : public IScannerPlugin{
 			public:
-				Symbol(IOperatorSymbols &symbols)
+				Symbol(ISymbols &symbols)
 					: symbols_(&symbols){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
@@ -21,7 +21,7 @@ namespace StructuredScript{
 				virtual TokenType type() const override;
 
 			private:
-				IOperatorSymbols *symbols_;
+				ISymbols *symbols_;
 			};
 		}
 	}

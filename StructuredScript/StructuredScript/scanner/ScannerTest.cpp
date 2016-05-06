@@ -10,7 +10,7 @@ namespace StructuredScript{
 		Scanner::Scanner scanner;
 		Scanner::StringCharacterWell well("var value = -45 / -45 + 0x72ffb ** 036 ? 0b1001 : 4r320, \"hello\" + @`world` :: operator () === + $ - /*ignore*/ aye;//fin");
 
-		std::string types = "any any<integer> void bool bit byte char unsigned char short unsigned short int unsigned int long; unsigned long;";
+		std::string types = "any void bool bit byte char unsigned char short unsigned short int unsigned int long; unsigned long;";
 		types += "long long unsigned long long float double long double string str unsigned; unsigned float unsigned long double long bit";
 
 		Scanner::StringCharacterWell typeWell(types);
@@ -62,7 +62,6 @@ namespace StructuredScript{
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, ";"));
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_NONE, ""));
 
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ANY)));
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ANY)));
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_VOID)));
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_BOOLEAN)));

@@ -26,14 +26,16 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Symbol::get
 	if (hasErrors)
 		return Token(TokenType::TOKEN_TYPE_ERROR, value);
 
-	auto info = symbols_->find(OperatorInfo{ SymbolType::SYMBOL_TYPE_NONE, value, OperatorSymbol::NONE }, false);
-	if (info.value.empty()){//Operator not defined
+	auto symbol = symbols_->find(value);
+	if (symbol.empty()){//Operator not defined
 		well.collapse();
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 	}
 
-	well.step(static_cast<int>(info.value.size() - value.size()));
-	return Token(TokenType::TOKEN_TYPE_SYMBOL, info.value);
+	//If partial match, ignore unmatched characters
+	well.step(static_cast<int>(symbol.size() - value.size()));
+
+	return Token(TokenType::TOKEN_TYPE_SYMBOL, symbol);
 }
 
 bool StructuredScript::Scanner::Plugins::Symbol::matches(const ICharacterWell &well) const{

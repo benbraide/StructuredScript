@@ -7,11 +7,16 @@
 #include <memory>
 
 #include "../Interfaces/IMemory.h"
-#include "../Interfaces/IFunctionMemory.h"
 #include "../Interfaces/IStorage.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
 
 #include "../Interfaces/IAny.h"
+#include "../Interfaces/Objects/IPrimitiveObject.h"
+
 #include "../Interfaces/INode.h"
+
+#include "../Interfaces/IType.h"
+#include "../Interfaces/Types/IPrimitiveType.h"
 
 namespace StructuredScript{
 	template <class Type>
@@ -19,6 +24,14 @@ namespace StructuredScript{
 	public:
 		typedef std::shared_ptr<Type>	Ptr;
 		typedef std::list<Ptr>			ListType;
+
+		static bool isAnyType(const Type *target){
+			return false;
+		}
+
+		static bool isCompositeType(const Type *target){
+			return false;
+		}
 
 		static bool isEmpty(const Type *target){
 			return false;

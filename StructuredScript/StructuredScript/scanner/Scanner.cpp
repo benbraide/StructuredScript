@@ -129,35 +129,9 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Scanner::extendIdent
 
 	id = typenameIdentifierPlugin_.get(well);//Try typename identifier
 	if (id.getType() != TokenType::TOKEN_TYPE_NONE)
-		return extendTypenameIdentifier_(well, id);
+		return id;
 
 	return token;
-}
-
-StructuredScript::Scanner::Token StructuredScript::Scanner::Scanner::extendTypenameIdentifier_(ICharacterWell &well, const Token &token){
-	if (token.getType() != Plugins::TypenameTokenType::type || static_cast<Typename>(std::stoi(token.getValue())) != Typename::TYPE_NAME_ANY)
-		return token;
-
-	well.fork();
-	if (!open(well, '<', '>')){
-		well.merge();
-		return token;
-	}
-
-	if (!hasMore_(well, false)){
-		openList_.pop_back();
-		closeWith_ = openList_.empty() ? '\0' : *openList_.rbegin();
-		well.merge();
-
-		return token;
-	}
-
-	auto id = identifierPlugin_.get(well);
-	if (!close(well) || id.getType() != TokenType::TOKEN_TYPE_IDENTIFIER)
-		well.collapse();//Rollback
-
-	well.merge();
-	return (id.getType() == TokenType::TOKEN_TYPE_IDENTIFIER) ? Token(token.getType(), token.getValue(), "any<", id.getValue() + ">") : token;
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Scanner::extendDecimalInteger_(ICharacterWell &well, const Token &token){
@@ -271,7 +245,7 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::sk
 	return Token(TokenType::TOKEN_TYPE_NONE, "");
 }
 
-StructuredScript::OperatorSymbols StructuredScript::Scanner::Scanner::operatorSymbols;
+StructuredScript::Symbols StructuredScript::Scanner::Scanner::operatorSymbols;
 
 StructuredScript::Scanner::Plugins::Identifier StructuredScript::Scanner::Scanner::identifierPlugin_;
 

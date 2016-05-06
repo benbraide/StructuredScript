@@ -1,4 +1,4 @@
-#include "Typename.h"
+#include "DeclaredType.h"
 
 bool StructuredScript::DeclaredType::operator ==(const DeclaredType &right) const{
 	return isEqual(right, false);
@@ -16,21 +16,27 @@ bool StructuredScript::DeclaredType::operator !=(const IType *right) const{
 	return !isEqual(right, false);
 }
 
-bool StructuredScript::DeclaredType::isCompatibleWith(const DeclaredType &target) const{
-	if (type_ == nullptr || target.type_ == nullptr || !type_->isCompatibleWith(*target.type_))
-		return false;
-
-	if (state_.isReference() && !target.state_.isReference())
-		return false;
-
-	if (target.state_.isFinal())
-		return (state_.isFinal() || state_.isConstant());
-
-	return (!target.state_.isConstant() || state_.isConstant());
+bool StructuredScript::DeclaredType::isCompatibleWith(const DeclaredType &target, bool family /*= false*/) const{
+	return isCompatibleWith(type_, state_, family);
 }
 
-bool StructuredScript::DeclaredType::isCompatibleWith(const IType *target) const{
-	return (type_ != nullptr && target != nullptr && type_->isCompatibleWith(*target));
+bool StructuredScript::DeclaredType::isCompatibleWith(const IType *type, const MemoryState &state, bool family /*= false*/) const{
+	if (type_ == nullptr || type == nullptr)
+		return false;
+
+	if (state_.isReference()){//Types must be identical
+		if (!state.isReference() || (!type_->isEqual(*type) && !type->isParent(*type_)))
+			return false;
+	}
+	else if (family && !type_->isEqual(*type) && !type->isParent(*type_))
+		return false;
+	else if (!family && !type_->isCompatibleWith(*type))
+		return false;
+
+	if (state.isFinal())
+		return (state_.isFinal() || state_.isConstant());
+
+	return (!state.isConstant() || state_.isConstant());
 }
 
 bool StructuredScript::DeclaredType::isEqual(const DeclaredType &target, bool strictly /*= true*/) const{

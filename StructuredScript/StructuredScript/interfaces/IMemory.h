@@ -3,26 +3,28 @@
 #ifndef STRUCTURED_SCRIPT_MEMORY_INTERFACE_H
 #define STRUCTURED_SCRIPT_MEMORY_INTERFACE_H
 
-#include "../Common/Typename.h"
+#include "../Common/DeclaredType.h"
 
 #include "IType.h"
 #include "IExceptionManager.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
-		class Memory{
+		class Memory : protected std::enable_shared_from_this<Memory>{
 		public:
-			typedef std::shared_ptr<Any> AnyPtr;
+			typedef std::shared_ptr<Memory> Ptr;
 
 			virtual ~Memory(){}
 
-			virtual void setObject(AnyPtr object, ExceptionManager *exception, Node *expr) = 0;
+			virtual Ptr ptr() = 0;
 
-			virtual AnyPtr getObject() = 0;
+			virtual void assign(IAny::Ptr object, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual DeclaredType *getType() = 0;
+			virtual IAny::Ptr object() = 0;
 
-			virtual Storage *getStorage() = 0;
+			virtual DeclaredType *type() = 0;
+
+			virtual Storage *storage() = 0;
 		};
 	}
 

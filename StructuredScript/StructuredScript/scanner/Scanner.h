@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "../Interfaces/IScanner.h"
-#include "../Common/OperatorSymbols.h"
+#include "../Common/Symbols.h"
 
 #include "Plugins/Identifier/Identifier.h"
 #include "Plugins/Identifier/OperatorIdentifier.h"
@@ -43,14 +43,12 @@ namespace StructuredScript{
 
 			virtual const IScannerPlugin *getPlugin(TokenType target) const override;
 
-			static OperatorSymbols operatorSymbols;
+			static Symbols operatorSymbols;
 
 		private:
 			Token get_(ICharacterWell &well, const PluginListType &plugins);
 
 			Token extendIdentifier_(ICharacterWell &well, const Token &token);
-
-			Token extendTypenameIdentifier_(ICharacterWell &well, const Token &token);
 
 			Token extendDecimalInteger_(ICharacterWell &well, const Token &token);
 

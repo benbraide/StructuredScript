@@ -3,21 +3,31 @@
 #ifndef STRUCTURED_SCRIPT_TYPE_INTERFACE_H
 #define STRUCTURED_SCRIPT_TYPE_INTERFACE_H
 
+#include <memory>
+
 #include "IStorage.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
-		class Type{
+		class Type : protected std::enable_shared_from_this<Type>{
 		public:
+			typedef std::shared_ptr<Type> Ptr;
+
 			virtual ~Type(){}
 
-			virtual Storage *getStorage() = 0;
+			virtual Ptr ptr() = 0;
+
+			virtual Storage *storage() = 0;
+
+			virtual bool isEqual(const Type &target) const = 0;
+
+			virtual bool isParent(const Type &target) const = 0;
 
 			virtual bool isCompatibleWith(const Type &target) const = 0;
 
-			virtual bool isPartOf(const std::string &group) const = 0;
+			virtual Ptr getCompatibleType(const Type &target) = 0;
 
-			virtual bool isParent(const Type &target) const = 0;
+			virtual std::string name() const = 0;
 		};
 	}
 

@@ -9,9 +9,7 @@
 
 namespace StructuredScript{
 	namespace Interfaces{
-		class Node;
-		class Memory;
-		class ExceptionManage;
+		class ExceptionManager;
 
 		class Any : protected std::enable_shared_from_this<Any>{
 		public:
@@ -23,11 +21,15 @@ namespace StructuredScript{
 
 			virtual Ptr clone(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
+			virtual Ptr cast(Type::Ptr type, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual Type::Ptr type() = 0;
+
 			virtual void setMemory(Memory *memory) = 0;
 
-			virtual Memory *getMemory() = 0;
+			virtual Memory *memory() = 0;
 
-			virtual Type *getType() = 0;
+			virtual bool truth(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual std::string str(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};

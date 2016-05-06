@@ -3,14 +3,13 @@
 #ifndef STRUCTURED_SCRIPT_NODE_INTERFACE_H
 #define STRUCTURED_SCRIPT_NODE_INTERFACE_H
 
-#include "IAny.h"
+#include "IMemory.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
 		class Node : protected std::enable_shared_from_this<Node>{
 		public:
-			typedef std::shared_ptr<Node>	Ptr;
-			typedef std::shared_ptr<Any>	AnyPtr;
+			typedef std::shared_ptr<Node> Ptr;
 
 			virtual ~Node(){}
 
@@ -18,9 +17,11 @@ namespace StructuredScript{
 
 			virtual Ptr clone() = 0;
 
-			virtual AnyPtr evaluate(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual Any::Ptr evaluate(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual std::string str() = 0;
+
+			virtual bool equals(Node &right) const = 0;
 		};
 	}
 

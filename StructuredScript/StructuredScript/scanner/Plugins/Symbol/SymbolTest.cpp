@@ -1,13 +1,13 @@
 #include "../../../CppUnitLite/TestHarness.h"
 
 #include "Symbol.h"
-#include "../../../Common/OperatorSymbols.h"
+#include "../../../Common/Symbols.h"
 
 #include "../../Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	TEST(Symbol, Test){
-		OperatorSymbols symbols;
+		Symbols symbols;
 		Scanner::Plugins::Symbol sym(symbols);
 
 		symbols.init();
