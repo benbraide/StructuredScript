@@ -11,9 +11,9 @@
 namespace StructuredScript{
 	namespace Objects{
 		template <class ValueType, int Rank>
-		class TypedPrimitive : public Primitive{
+		class TypedPrimitive : public Primitive, public IIndexTarget{
 		public:
-			TypedPrimitive(const ValueType &value)
+			explicit TypedPrimitive(const ValueType &value)
 				: Primitive(IGlobalStorage::globalStorage->getPrimitiveType(Rank)), value_(value){}
 
 			TypedPrimitive(IType::Ptr type, const ValueType &value)
@@ -23,8 +23,29 @@ namespace StructuredScript{
 				return (value_ != static_cast<ValueType>(0));
 			}
 
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override{
+				if (value != "[]")
+					return Primitive::evaluateBinary(value, right, exception, expr);
+
+				if (dynamic_cast<IInteger *>(right->base()) == nullptr)
+					return nullptr;//TODO: Throw exception
+
+				auto index = getIndex(right);
+				if (index >= sizeof value_)
+					return nullptr;//TODO: Throw exception
+
+				if (memory_ == nullptr)
+					return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[index]);
+
+				return PrimitiveFactory::createIndexObject(type_, index, memory_);
+			}
+
 			virtual int rank() override{
 				return Rank;
+			}
+
+			virtual Ptr getIndexValue(unsigned int index) override{
+				return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[index]);
 			}
 
 			void setValue(const ValueType &value){
@@ -35,13 +56,38 @@ namespace StructuredScript{
 				return value_;
 			}
 
+			static unsigned int getIndex(Ptr target){
+				unsigned int value;
+
+				if (getIndex<char, CHAR_RANK>(target, value) || getIndex<unsigned char, UCHAR_RANK>(target, value) ||
+					getIndex<short, SHORT_RANK>(target, value) || getIndex<unsigned short, USHORT_RANK>(target, value) ||
+					getIndex<int, INT_RANK>(target, value) || getIndex<unsigned int, UINT_RANK>(target, value) ||
+					getIndex<long, LONG_RANK>(target, value) || getIndex<unsigned long, ULONG_RANK>(target, value) ||
+					getIndex<long long, LLONG_RANK>(target, value) || getIndex<unsigned long long, ULLONG_RANK>(target, value)){
+					return value;
+				}
+
+				return 0;
+			}
+
+			template <typename TargetType, int TargetRank>
+			static bool getIndex(Ptr target, unsigned int &value){
+				auto object = dynamic_cast<TypedPrimitive<TargetType, TargetRank> *>(target->base());
+				if (object != nullptr){
+					value = static_cast<unsigned int>(object->value());
+					return true;
+				}
+
+				return false;
+			}
+
 		protected:
 			virtual Ptr promote_(Primitive *target) override{
 				return nullptr;
 			}
 
 			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto primitive = dynamic_cast<TypedPrimitive *>(right.get());
+				auto primitive = dynamic_cast<TypedPrimitive *>(right->base());
 				if (primitive == nullptr)
 					return nullptr;//TODO: Throw exception
 
@@ -67,7 +113,7 @@ namespace StructuredScript{
 				if (value == ">")
 					return PrimitiveFactory::createBool(left->value_ > right->value_);
 
-				return nullptr;
+				return nullptr;//TODO: Throw exception
 			}
 
 			ValueType value_;

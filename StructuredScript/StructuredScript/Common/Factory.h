@@ -9,9 +9,15 @@
 namespace StructuredScript{
 	class PrimitiveFactory{
 	public:
+		static IAny::Ptr createUndefined();
+
 		static IAny::Ptr createNaN();
 
 		static IAny::Ptr createBool(bool value);
+
+		static IAny::Ptr createBit(bool value);
+
+		static IAny::Ptr createByte(unsigned char value);
 
 		static IAny::Ptr createChar(char value);
 
@@ -40,6 +46,8 @@ namespace StructuredScript{
 		static IAny::Ptr createLDouble(long double value);
 
 		static IAny::Ptr createString(const std::string &value);
+
+		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IMemory *target);
 
 		static IAny::Ptr create(int rank);
 

@@ -14,11 +14,9 @@ namespace StructuredScript{
 		types += "long long unsigned long long float double long double string str unsigned; unsigned float unsigned long double long bit";
 
 		Scanner::StringCharacterWell typeWell(types);
+		Scanner::Plugins::SignedNumber signedNumber;
 
 		scanner.init();
-		Scanner::Plugins::SignedNumber signedNumber(*scanner.getPlugin(Scanner::TokenType::TOKEN_TYPE_REAL_NUMBER),
-			*scanner.getPlugin(Scanner::TokenType::TOKEN_TYPE_BLANK));
-
 		scanner.operatorSymbols.init();
 
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_IDENTIFIER, "var"));

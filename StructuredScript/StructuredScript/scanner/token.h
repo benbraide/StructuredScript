@@ -54,6 +54,26 @@ namespace StructuredScript{
 		bool tokenIsNumberType(TokenType type);
 
 		//************************************
+		// Method:    tokenIsIntegerType
+		// FullName:  StructuredScript::Scanner::tokenIsIntegerType
+		// Access:    public 
+		// Returns:   bool
+		// Qualifier:
+		// Parameter: TokenType type
+		//************************************
+		bool tokenIsIntegerType(TokenType type);
+
+		//************************************
+		// Method:    tokenIsRealType
+		// FullName:  StructuredScript::Scanner::tokenIsRealType
+		// Access:    public 
+		// Returns:   bool
+		// Qualifier:
+		// Parameter: TokenType type
+		//************************************
+		bool tokenIsRealType(TokenType type);
+
+		//************************************
 		// Method:    tokenIsStringType
 		// FullName:  StructuredScript::Scanner::tokenIsStringType
 		// Access:    public 
@@ -62,6 +82,16 @@ namespace StructuredScript{
 		// Parameter: TokenType type
 		//************************************
 		bool tokenIsStringType(TokenType type);
+
+		//************************************
+		// Method:    tokenIsRawStringType
+		// FullName:  StructuredScript::Scanner::tokenIsRawStringType
+		// Access:    public 
+		// Returns:   bool
+		// Qualifier:
+		// Parameter: TokenType type
+		//************************************
+		bool tokenIsRawStringType(TokenType type);
 
 		//************************************
 		// Method:    tokenIsGroupType
@@ -76,8 +106,8 @@ namespace StructuredScript{
 		class Token{
 		public:
 			Token(TokenType type, const std::string &value, const std::string &prefix = "", const std::string &suffix = "",
-				bool skipValue = false)
-				: type_(type), value_(value), prefix_(prefix), suffix_(suffix), skipValue_(skipValue){}
+				bool skipValue = false, unsigned int prefixOffset = 0)
+				: type_(type), value_(value), prefix_(prefix), suffix_(suffix), skipValue_(skipValue), prefixOffset_(prefixOffset){}
 
 			//************************************
 			// Method:    operator==
@@ -106,7 +136,7 @@ namespace StructuredScript{
 			// Returns:   TokenType
 			// Qualifier: const
 			//************************************
-			TokenType getType() const;
+			TokenType type() const;
 
 			//************************************
 			// Method:    getValue
@@ -115,7 +145,7 @@ namespace StructuredScript{
 			// Returns:   std::string
 			// Qualifier: const
 			//************************************
-			std::string getValue() const;
+			std::string value() const;
 
 			//************************************
 			// Method:    str
@@ -133,7 +163,7 @@ namespace StructuredScript{
 			// Returns:   std::string
 			// Qualifier: const
 			//************************************
-			std::string getPrefix() const;
+			std::string prefix() const;
 
 			//************************************
 			// Method:    getSuffix
@@ -142,7 +172,25 @@ namespace StructuredScript{
 			// Returns:   std::string
 			// Qualifier: const
 			//************************************
-			std::string getSuffix() const;
+			std::string suffix() const;
+
+			//************************************
+			// Method:    skipValue
+			// FullName:  StructuredScript::Scanner::Token::skipValue
+			// Access:    public 
+			// Returns:   bool
+			// Qualifier: const
+			//************************************
+			bool skipValue() const;
+
+			//************************************
+			// Method:    prefixOffset
+			// FullName:  StructuredScript::Scanner::Token::prefixOffset
+			// Access:    public 
+			// Returns:   unsigned int
+			// Qualifier: const
+			//************************************
+			unsigned int prefixOffset() const;
 
 			//************************************
 			// Method:    getGroup
@@ -151,7 +199,7 @@ namespace StructuredScript{
 			// Returns:   StructuredScript::Scanner::TokenGroup
 			// Qualifier: const
 			//************************************
-			TokenGroup getGroup() const;
+			TokenGroup group() const;
 
 			//************************************
 			// Method:    isGroup
@@ -183,10 +231,13 @@ namespace StructuredScript{
 
 		private:
 			TokenType type_;
+
 			std::string value_;
 			std::string prefix_;
 			std::string suffix_;
+
 			bool skipValue_;
+			unsigned int prefixOffset_;
 		};
 	}
 }

@@ -9,7 +9,7 @@ StructuredScript::IStorage *StructuredScript::Type::storage(){
 }
 
 bool StructuredScript::Type::isEqual(const IType &target) const{
-	return (&target == this || Query<IType>::isAnyType(this) || Query<IType>::isAnyType(&target));
+	return (&target == this || Query::Type::isAny(this) || Query::Type::isAny(&target));
 }
 
 bool StructuredScript::Type::isParent(const IType &target) const{
@@ -41,6 +41,26 @@ StructuredScript::IStorage *StructuredScript::Type::findStorage(const std::strin
 	return dynamic_cast<IStorage *>(findType(name, localOnly).get());
 }
 
+std::shared_ptr<StructuredScript::IType> *StructuredScript::Type::addType(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string &name, bool localOnly){
+	auto type = types_.find(name);
+	if (type != types_.end())
+		return type->second;
+
+	if (!localOnly){
+		for (auto parent : parents_){
+			auto type = parent->findType(name, false);
+			if (type != nullptr)
+				return type;
+		}
+	}
+
+	return nullptr;
+}
+
 StructuredScript::IMemory::Ptr *StructuredScript::Type::addMemory(const std::string &name){
 	return nullptr;
 }
@@ -55,22 +75,6 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 			auto object = parent->findMemory(name, false);
 			if (object != nullptr)
 				return object;
-		}
-	}
-
-	return nullptr;
-}
-
-StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string &name, bool localOnly){
-	auto type = types_.find(name);
-	if (type != types_.end())
-		return type->second;
-
-	if (!localOnly){
-		for (auto parent : parents_){
-			auto type = parent->findType(name, false);
-			if (type != nullptr)
-				return type;
 		}
 	}
 

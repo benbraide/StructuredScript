@@ -5,23 +5,23 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::String::get
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
 	auto token = doublyQuotedString_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	token = doublyQuotedRawString_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	token = singlyQuotedString_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	token = singlyQuotedRawString_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	token = backQuotedString_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	return backQuotedRawString_.get(well, filter);

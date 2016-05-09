@@ -10,16 +10,16 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumbe
 	well.fork();
 
 	auto blank = skip_(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR){
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR){
 		well.merge();
-		return Token(TokenType::TOKEN_TYPE_ERROR, sign + blank.getValue());
+		return Token(TokenType::TOKEN_TYPE_ERROR, sign + blank.value());
 	}
 
-	auto token = numberPlugin_->get(well, filter);
+	auto token = numberPlugin_.get(well, filter);
 
 	well.merge();
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
-		return Token(token.getType(), sign + token.getValue());
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
+		return Token(token.type(), sign + token.value(), token.prefix(), token.suffix(), false, 1);
 
 	return Token(TokenType::TOKEN_TYPE_SYMBOL, std::string(1, sign));
 }
@@ -30,20 +30,20 @@ bool StructuredScript::Scanner::Plugins::SignedNumber::matches(const ICharacterW
 }
 
 StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::SignedNumber::type() const{
-	return TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER;
+	return TokenType::TOKEN_TYPE_REAL_NUMBER;
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumber::skip_(ICharacterWell &well) const{
-	auto blank = skipPlugin_->get(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+	auto blank = skipPlugin_.get(well);
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 
-	while (blank.getType() != TokenType::TOKEN_TYPE_NONE){
+	while (blank.type() != TokenType::TOKEN_TYPE_NONE){
 		well.merge();
 		well.fork();
 
-		blank = skipPlugin_->get(well);
-		if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+		blank = skipPlugin_.get(well);
+		if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 			return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 	}
 

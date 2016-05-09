@@ -60,10 +60,14 @@ bool StructuredScript::DeclaredType::isEqual(const IType *target, bool strictly 
 	return (!state_.isFinal() && !state_.isConstant() && !state_.isReference() && !state_.isRValReference());
 }
 
-StructuredScript::DeclaredType::MemoryState &StructuredScript::DeclaredType::getState(){
+StructuredScript::IType *StructuredScript::DeclaredType::type(){
+	return type_;
+}
+
+StructuredScript::DeclaredType::MemoryState &StructuredScript::DeclaredType::state(){
 	return state_;
 }
 
-StructuredScript::DeclaredType::MemoryAttribute &StructuredScript::DeclaredType::getAttribute(){
+StructuredScript::DeclaredType::MemoryAttribute &StructuredScript::DeclaredType::attribute(){
 	return attribute_;
 }

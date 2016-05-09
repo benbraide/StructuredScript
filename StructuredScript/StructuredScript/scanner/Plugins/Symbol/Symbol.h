@@ -11,7 +11,7 @@ namespace StructuredScript{
 		namespace Plugins{
 			class Symbol : public IScannerPlugin{
 			public:
-				Symbol(ISymbols &symbols)
+				explicit Symbol(ISymbols &symbols)
 					: symbols_(&symbols){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;

@@ -10,7 +10,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RadixIntege
 	well.step(1);//Skip 'r'
 	well.fork();
 
-	auto token = realNumberPlugin_->get(well, [this, filter, radix](char next) -> unsigned short{
+	auto token = decimalInteger_.get(well, [this, filter, radix](char next) -> unsigned short{
 		unsigned short state;
 		if (filter != nullptr){
 			state = filter(next);
@@ -32,8 +32,8 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RadixIntege
 	});
 
 	well.merge();
-	if (token.getType() != TokenType::TOKEN_TYPE_DECIMAL_INTEGER && token.getType() != TokenType::TOKEN_TYPE_OCTAL_INTEGER)
-		return Token(TokenType::TOKEN_TYPE_ERROR, radixStr + "r" + token.getValue());
+	if (token.type() != TokenType::TOKEN_TYPE_DECIMAL_INTEGER)
+		return Token(TokenType::TOKEN_TYPE_ERROR, radixStr + "r" + token.value());
 
 	return Token(TokenType::TOKEN_TYPE_RADIX_INTEGER, token.str(), radixStr + "r");
 }
@@ -58,7 +58,7 @@ bool StructuredScript::Scanner::Plugins::RadixInteger::checkAlpha_(char target, 
 	if (radix < 11)
 		return false;
 
-	return (::tolower(target) <= ('a' + (radix - 10)));
+	return (::tolower(target) < ('a' + (radix - 10)));
 }
 
 bool StructuredScript::Scanner::Plugins::RadixInteger::checkDigit_(char target, int radix) const{

@@ -15,7 +15,7 @@ namespace StructuredScript{
 		public:
 			typedef Number<ObjectType, ValueType, Rank> BaseType;
 
-			Real(const ValueType &value)
+			explicit Real(const ValueType &value)
 				: BaseType(value){}
 
 			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override{
@@ -29,13 +29,23 @@ namespace StructuredScript{
 			}
 
 		protected:
+			virtual IAny::Ptr evaluate_(const std::string &value, Number *left, Number *right, IExceptionManager *exception, INode *expr){
+				if (value == "**")
+					return std::make_shared<ObjectType>(std::pow(left->value(), right->value()));
+
+				return BaseType::evaluate_(value, left, right, exception, expr);
+			}
+
 			std::string str_(int precision){
 				std::ostringstream ss;
 
-				ss << std::setprecision(precision);
+				ss << std::fixed << std::setprecision(precision);
 				ss << value_;
 
 				auto value = ss.str();
+				if (value.find('e') < value.size())
+					return value;
+
 				if (value.find('.') >= value.size())//Append decimal point and zero
 					return (value + ".0");
 
@@ -51,7 +61,7 @@ namespace StructuredScript{
 
 		class Float : public Real<Float, float, Primitive::FLOAT_RANK> {
 		public:
-			Float(float value)
+			explicit Float(float value)
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -61,7 +71,7 @@ namespace StructuredScript{
 
 		class Double : public Real<Double, double, Primitive::DOUBLE_RANK> {
 		public:
-			Double(double value)
+			explicit Double(double value)
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -71,7 +81,7 @@ namespace StructuredScript{
 
 		class LDouble : public Real<LDouble, long double, Primitive::LDOUBLE_RANK> {
 		public:
-			LDouble(long double value)
+			explicit LDouble(long double value)
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{

@@ -16,6 +16,8 @@ namespace StructuredScript{
 			virtual Any::Ptr evaluateRightUnary(const std::string &value, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual Any::Ptr evaluateBinary(const std::string &value, Any::Ptr right, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual int rank() = 0;
 		};
 
 		class Void{
@@ -53,6 +55,11 @@ namespace StructuredScript{
 			virtual ~Integer(){}
 		};
 
+		class SignedInteger{
+		public:
+			virtual ~SignedInteger(){}
+		};
+
 		class Real{
 		public:
 			virtual ~Real(){}
@@ -69,6 +76,18 @@ namespace StructuredScript{
 
 			virtual Type::Ptr value() = 0;
 		};
+
+		class IndexObject{
+		public:
+			virtual ~IndexObject(){}
+		};
+
+		class IndexTarget{
+		public:
+			virtual ~IndexTarget(){}
+
+			virtual Any::Ptr getIndexValue(unsigned int index) = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -79,9 +98,12 @@ namespace StructuredScript{
 	typedef Interfaces::NaN				INaN;
 	typedef Interfaces::Number			INumber;
 	typedef Interfaces::Integer			IInteger;
+	typedef Interfaces::SignedInteger	ISignedInteger;
 	typedef Interfaces::Real			IReal;
 	typedef Interfaces::String			IString;
 	typedef Interfaces::TypeObject		ITypeObject;
+	typedef Interfaces::IndexObject		IIndexObject;
+	typedef Interfaces::IndexTarget		IIndexTarget;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

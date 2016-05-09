@@ -12,6 +12,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::cast(ITyp
 	return nullptr;
 }
 
+StructuredScript::IAny *StructuredScript::Objects::Any::base(){
+	return this;
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Any::type(){
 	return type_;
 }

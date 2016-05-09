@@ -5,16 +5,15 @@
 
 #include "../../../Common/Typename.h"
 #include "../../../Common/EnumAdapter.h"
-#include "../../../Interfaces/IScannerPlugin.h"
+
+#include "Identifier.h"
+#include "../Skip/Skip.h"
 
 namespace StructuredScript{
 	namespace Scanner{
 		namespace Plugins{
 			class TypenameIdentifier : public IScannerPlugin{
 			public:
-				TypenameIdentifier(const IScannerPlugin &identifierPlugin, const IScannerPlugin &skipPlugin)
-					: identifierPlugin_(&identifierPlugin), skipPlugin_(&skipPlugin){}
-
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
 				virtual bool matches(const ICharacterWell &well) const override;
@@ -32,8 +31,8 @@ namespace StructuredScript{
 
 				Typename getTypename_(const std::string &value) const;
 
-				const IScannerPlugin *identifierPlugin_;
-				const IScannerPlugin *skipPlugin_;
+				Identifier identifierPlugin_;
+				Skip skipPlugin_;
 			};
 
 			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 4> TypenameTokenType;

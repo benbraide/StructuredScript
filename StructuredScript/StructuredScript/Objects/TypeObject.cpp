@@ -12,6 +12,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::TypeObject::ca
 	return nullptr;
 }
 
+StructuredScript::IAny *StructuredScript::Objects::TypeObject::base(){
+	return this;
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::TypeObject::type(){
 	return type_;
 }

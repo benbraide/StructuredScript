@@ -12,7 +12,7 @@ namespace StructuredScript{
 		public:
 			typedef Number<ObjectType, ValueType, Rank> BaseType;
 
-			Integer(ValueType value)
+			explicit Integer(ValueType value)
 				: BaseType(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -38,6 +38,9 @@ namespace StructuredScript{
 
 		protected:
 			virtual IAny::Ptr evaluate_(const std::string &value, Number *left, Number *right, IExceptionManager *exception, INode *expr){
+				if (value == "**")
+					return PrimitiveFactory::createDouble(std::pow(left->value(), right->value()));
+
 				if (value == "%"){
 					if (right->value() == static_cast<ValueType>(0))
 						return PrimitiveFactory::createNaN();
@@ -81,11 +84,11 @@ namespace StructuredScript{
 		};
 
 		template <class ObjectType, class ValueType, unsigned short Rank>
-		class SignedInteger : public Integer<ObjectType, ValueType, Rank> {
+		class SignedInteger : public Integer<ObjectType, ValueType, Rank>, public ISignedInteger{
 		public:
 			typedef Integer<ObjectType, ValueType, Rank> BaseType;
 
-			SignedInteger(ValueType value)
+			explicit SignedInteger(ValueType value)
 				: BaseType(value){}
 
 			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override{
@@ -101,7 +104,7 @@ namespace StructuredScript{
 
 		class Char : public SignedInteger<Char, char, Primitive::CHAR_RANK> {
 		public:
-			Char(char value)
+			explicit Char(char value)
 				: SignedInteger(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -111,7 +114,7 @@ namespace StructuredScript{
 
 		class UChar : public Integer<UChar, unsigned char, Primitive::UCHAR_RANK> {
 		public:
-			UChar(unsigned char value)
+			explicit UChar(unsigned char value)
 				: Integer(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -121,49 +124,49 @@ namespace StructuredScript{
 
 		class Short : public SignedInteger<Short, short, Primitive::SHORT_RANK> {
 		public:
-			Short(short value)
+			explicit Short(short value)
 				: SignedInteger(value){}
 		};
 
 		class UShort : public Integer<UShort, unsigned short, Primitive::USHORT_RANK> {
 		public:
-			UShort(unsigned short value)
+			explicit UShort(unsigned short value)
 				: Integer(value){}
 		};
 
 		class Int : public SignedInteger<Int, int, Primitive::INT_RANK> {
 		public:
-			Int(int value)
+			explicit Int(int value)
 				: SignedInteger(value){}
 		};
 
 		class UInt : public Integer<UInt, unsigned int, Primitive::UINT_RANK> {
 		public:
-			UInt(unsigned int value)
+			explicit UInt(unsigned int value)
 				: Integer(value){}
 		};
 
 		class Long : public SignedInteger<Long, long, Primitive::LONG_RANK> {
 		public:
-			Long(long value)
+			explicit Long(long value)
 				: SignedInteger(value){}
 		};
 
 		class ULong : public Integer<ULong, unsigned long, Primitive::ULONG_RANK> {
 		public:
-			ULong(unsigned long value)
+			explicit ULong(unsigned long value)
 				: Integer(value){}
 		};
 
 		class LLong : public SignedInteger<LLong, long long, Primitive::LLONG_RANK> {
 		public:
-			LLong(long long value)
+			explicit LLong(long long value)
 				: SignedInteger(value){}
 		};
 
 		class ULLong : public Integer<ULLong, unsigned long long, Primitive::ULLONG_RANK> {
 		public:
-			ULLong(unsigned long long value)
+			explicit ULLong(unsigned long long value)
 				: Integer(value){}
 		};
 	}

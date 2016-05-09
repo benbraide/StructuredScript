@@ -5,11 +5,11 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
 	auto token = get_(well, BinaryOperatorTokenType::type, "operator", filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_IDENTIFIER)
+	if (token.type() != TokenType::TOKEN_TYPE_IDENTIFIER)
 		return token;
 
 	TokenType type;
-	auto value = token.getValue();
+	auto value = token.value();
 	if (value == "left")
 		type = LeftUnaryOperatorTokenType::type;
 	else if (value == "right")
@@ -33,18 +33,18 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	well.fork();
 	
 	auto blank = skip_(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR){
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR){
 		well.merge();
 		return blank;
 	}
 
-	auto token = identifierPlugin_->get(well, filter);
+	auto token = identifierPlugin_.get(well, filter);
 	well.merge();
 
-	if (token.getType() == TokenType::TOKEN_TYPE_ERROR)
+	if (token.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 
-	if (token.getType() == TokenType::TOKEN_TYPE_NONE)//Try symbol
+	if (token.type() == TokenType::TOKEN_TYPE_NONE)//Try symbol
 		return getSymbol_(well, type, prefix, filter);
 
 	return token;
@@ -55,29 +55,29 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	well.fork();
 
 	auto blank = skip_(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return blank;
 
-	auto token = symbolPlugin_->get(well);
+	auto token = symbolPlugin_.get(well);
 	well.merge();
 
-	if (token.getType() != TokenType::TOKEN_TYPE_SYMBOL)//Missing operator symbol
+	if (token.type() != TokenType::TOKEN_TYPE_SYMBOL)//Missing operator symbol
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 
-	return Token(type, token.getValue(), prefix + " ");
+	return Token(type, token.value(), prefix + " ");
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::skip_(ICharacterWell &well) const{
-	auto blank = skipPlugin_->get(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+	auto blank = skipPlugin_.get(well);
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 
-	while (blank.getType() != TokenType::TOKEN_TYPE_NONE){
+	while (blank.type() != TokenType::TOKEN_TYPE_NONE){
 		well.merge();
 		well.fork();
 
-		blank = skipPlugin_->get(well);
-		if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+		blank = skipPlugin_.get(well);
+		if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 			return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 	}
 

@@ -3,16 +3,13 @@
 #ifndef STRUCTURED_SCRIPT_RADIX_INTEGER_SCANNER_PLUGIN_H
 #define STRUCTURED_SCRIPT_RADIX_INTEGER_SCANNER_PLUGIN_H
 
-#include "../../../Interfaces/IScannerPlugin.h"
+#include "DecimalInteger.h"
 
 namespace StructuredScript{
 	namespace Scanner{
 		namespace Plugins{
 			class RadixInteger : public IScannerPlugin{
 			public:
-				explicit RadixInteger(const IScannerPlugin &realNumberPlugin)
-					: realNumberPlugin_(&realNumberPlugin){}
-
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
 				virtual bool matches(const ICharacterWell &well) const override;
@@ -24,7 +21,7 @@ namespace StructuredScript{
 
 				bool checkDigit_(char target, int radix) const;
 
-				const IScannerPlugin *realNumberPlugin_;
+				DecimalInteger decimalInteger_;
 			};
 		}
 	}

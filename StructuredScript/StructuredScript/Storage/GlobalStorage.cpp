@@ -3,10 +3,16 @@
 void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_.clear();
 
+	auto bit = std::make_shared<Type>(this, "bit");
+
+	/**bit->addMemory("zero") = PrimitiveFactory::createBit(false);
+	*bit->addMemory("one") = PrimitiveFactory::createBit(true);*/
+
+	primitives_[Typename::TYPE_NAME_BIT]		= bit;
+
 	primitives_[Typename::TYPE_NAME_ANY]		= std::make_shared<AnyType>();
 	primitives_[Typename::TYPE_NAME_VOID]		= std::make_shared<PrimitiveType>("void", Typename::TYPE_NAME_VOID);
 	primitives_[Typename::TYPE_NAME_BOOLEAN]	= std::make_shared<PrimitiveType>("bool", Typename::TYPE_NAME_BOOLEAN);
-	primitives_[Typename::TYPE_NAME_BIT]		= std::make_shared<PrimitiveType>("bit", Typename::TYPE_NAME_BIT);
 	primitives_[Typename::TYPE_NAME_BYTE]		= std::make_shared<PrimitiveType>("byte", Typename::TYPE_NAME_BYTE);
 	primitives_[Typename::TYPE_NAME_CHAR]		= std::make_shared<PrimitiveType>("char", Typename::TYPE_NAME_CHAR);
 	primitives_[Typename::TYPE_NAME_UCHAR]		= std::make_shared<PrimitiveType>("unsigned char", Typename::TYPE_NAME_UCHAR);

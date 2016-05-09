@@ -8,8 +8,10 @@
 #include "../Interfaces/Storages/IGlobalStorage.h"
 #include "../Objects/Primitive.h"
 
+#include "../Common/Type.h"
 #include "../Common/PrimitiveType.h"
 #include "../Common/CompositePrimitiveType.h"
+#include "../Common/Factory.h"
 
 namespace StructuredScript{
 	namespace Storage{

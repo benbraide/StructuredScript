@@ -35,11 +35,13 @@ namespace StructuredScript{
 
 		virtual IStorage *findStorage(const std::string &name, bool localOnly) override;
 
+		virtual std::shared_ptr<IType> *addType(const std::string &name) override;
+
+		virtual IType::Ptr findType(const std::string &name, bool localOnly) override;
+
 		virtual IMemory::Ptr *addMemory(const std::string &name) override;
 
 		virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
-
-		virtual IType::Ptr findType(const std::string &name, bool localOnly) override;
 
 		virtual bool remove(const IMemory *target) override;
 

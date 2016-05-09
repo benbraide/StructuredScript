@@ -3,6 +3,8 @@
 #ifndef STRUCTURED_SCRIPT_NUMBER_OBJECT_H
 #define STRUCTURED_SCRIPT_NUMBER_OBJECT_H
 
+#include <cmath>
+
 #include "TypedPrimitive.h"
 
 namespace StructuredScript{
@@ -12,7 +14,7 @@ namespace StructuredScript{
 		public:
 			typedef TypedPrimitive<ValueType, Rank> BaseType;
 
-			Number(ValueType value)
+			explicit Number(ValueType value)
 				: BaseType(value){}
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override{
@@ -100,7 +102,7 @@ namespace StructuredScript{
 			}
 
 			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto number = dynamic_cast<Number *>(right.get());
+				auto number = dynamic_cast<Number *>(right->base());
 				if (number == nullptr)
 					return nullptr;//TODO: Throw exception
 

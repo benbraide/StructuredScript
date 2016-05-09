@@ -8,7 +8,7 @@
 namespace StructuredScript{
 	TEST(RadixInteger, Test){
 		Scanner::Plugins::RealNumber number;
-		Scanner::Plugins::RadixInteger rad(number);
+		Scanner::Plugins::RadixInteger rad;
 
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("0r45"), mcw_4("2r11001"), mcw_5("16rafb"), mcw_6("16rafbll"), mcw_7("10r.279"),
 			mcw_8("10r9.279"), mcw_9("8r459"), mcw_10("8r072");
@@ -31,7 +31,7 @@ namespace StructuredScript{
 		CHECK(!rad.matches(mcw_3));
 		CHECK(rad.get(mcw_3) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_NONE, ""));
 		mcw_3.commit();
-		CHECK(mcw_3.dump() == "0r45");
+		CHECK(mcw_3.dump() == "r45");
 
 		number.get(mcw_4);
 		CHECK(rad.matches(mcw_4));
@@ -53,15 +53,15 @@ namespace StructuredScript{
 
 		number.get(mcw_7);
 		CHECK(rad.matches(mcw_7));
-		CHECK(rad.get(mcw_7) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "10r.279"));
+		CHECK(rad.get(mcw_7) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "10r"));
 		mcw_7.commit();
-		CHECK(mcw_7.dump() == "");
+		CHECK(mcw_7.dump() == ".279");
 
 		number.get(mcw_8);
 		CHECK(rad.matches(mcw_8));
-		CHECK(rad.get(mcw_8) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "10r9.279"));
+		CHECK(rad.get(mcw_8) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_RADIX_INTEGER, "9"));
 		mcw_8.commit();
-		CHECK(mcw_8.dump() == "");
+		CHECK(mcw_8.dump() == ".279");
 
 		number.get(mcw_9);
 		CHECK(rad.matches(mcw_9));

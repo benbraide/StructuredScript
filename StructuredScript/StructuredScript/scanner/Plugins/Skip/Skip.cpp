@@ -5,11 +5,11 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Skip::get(I
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
 	auto token = blank_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	token = singleLineComment_.get(well, filter);
-	if (token.getType() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE)
 		return token;
 
 	return multiLineComment_.get(well, filter);

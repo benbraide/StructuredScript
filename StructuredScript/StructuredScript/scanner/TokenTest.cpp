@@ -34,10 +34,10 @@ namespace StructuredScript{
 
 		Scanner::Token number(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER, "18");
 
-		CHECK(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER == number.getType());
-		CHECK(Scanner::TokenGroup::TOKEN_GROUP_NUMBER == number.getGroup());
+		CHECK(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER == number.type());
+		CHECK(Scanner::TokenGroup::TOKEN_GROUP_NUMBER == number.group());
 
-		CHECK("18" == number.getValue());
+		CHECK("18" == number.value());
 		CHECK("18" == number.str());
 
 		CHECK(number.isGroup(Scanner::TokenGroup::TOKEN_GROUP_NUMBER));

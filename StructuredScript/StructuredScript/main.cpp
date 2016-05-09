@@ -1,8 +1,14 @@
+#include <iostream>
+
 #include "CppUnitLite/TestHarness.h"
 
 #include "Storage/GlobalStorage.h"
-#include "Objects/Integer.h"
-#include "Objects/Real.h"
+
+#include "Scanner/Scanner.h"
+#include "Scanner/Wells/StringCharacterWell.h"
+#include "Scanner/Plugins/Number/SignedNumber.h"
+
+#include "Nodes/LiteralNode.h"
 
 StructuredScript::IGlobalStorage *StructuredScript::IGlobalStorage::globalStorage;
 
@@ -15,22 +21,28 @@ int main(){
 
 	globalStorage.init();
 
-	auto s = std::make_shared<StructuredScript::Objects::Short>(9);
-	auto i = std::make_shared<StructuredScript::Objects::LDouble>(18.512345678901234567890);
+	StructuredScript::Scanner::Scanner scanner;
+	StructuredScript::Scanner::Plugins::SignedNumber signedNumber;
 
-	auto r = s->evaluateBinary("-", i, nullptr, nullptr);
-	auto rc = r->clone(nullptr, nullptr, nullptr);
-	auto ra = r->cast(globalStorage.getPrimitiveType(StructuredScript::Typename::TYPE_NAME_INT), nullptr, nullptr, nullptr);
-	auto rb = ra->cast(globalStorage.getPrimitiveType(StructuredScript::Typename::TYPE_NAME_LDOUBLE), nullptr, nullptr, nullptr);
-	auto sb = s->evaluateBinary(">", i, nullptr, nullptr);
+	scanner.init();
+	scanner.operatorSymbols.init();
 
-	auto ss = s->str(nullptr, nullptr, nullptr);
-	auto is = i->str(nullptr, nullptr, nullptr);
-	auto rs = r->str(nullptr, nullptr, nullptr);
-	auto rcs = rc->str(nullptr, nullptr, nullptr);
-	auto ras = ra->str(nullptr, nullptr, nullptr);
-	auto rbs = rb->str(nullptr, nullptr, nullptr);
-	auto sbs = sb->str(nullptr, nullptr, nullptr);
+	std::string input;
+	while (true){
+		std::cout << "> ";
+		std::getline(std::cin, input);
+		StructuredScript::Scanner::StringCharacterWell well(input);
+
+		auto token = scanner.next(well, { &signedNumber });
+		auto literal = std::make_shared<StructuredScript::Nodes::LiteralNode>(token);
+		auto value = literal->evaluate(nullptr, nullptr, nullptr);
+
+		std::cout << literal->str() << "\n";
+		if (value == nullptr)
+			std::cout << "Error!\n";
+		else
+			std::cout << value->str(nullptr, nullptr, nullptr) + token.suffix() << "\n";
+	}
 
 	return 0;
 }

@@ -3,7 +3,8 @@
 #ifndef STRUCTURED_SCRIPT_REAL_NUMBER_SCANNER_PLUGIN_H
 #define STRUCTURED_SCRIPT_REAL_NUMBER_SCANNER_PLUGIN_H
 
-#include "../../../Interfaces/IScannerPlugin.h"
+#include "SignedDecimalInteger.h"
+#include "OctalInteger.h"
 
 namespace StructuredScript{
 	namespace Scanner{
@@ -17,7 +18,9 @@ namespace StructuredScript{
 				virtual TokenType type() const override;
 
 			private:
-				TokenType get_(ICharacterWell &well, FilterType filter = nullptr) const;
+				OctalInteger octalInteger_;
+				DecimalInteger decimalInteger_;
+				SignedDecimalInteger signedDecimalInteger_;
 			};
 		}
 	}

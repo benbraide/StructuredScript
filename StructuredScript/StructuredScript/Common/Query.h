@@ -18,8 +18,48 @@
 #include "../Interfaces/IType.h"
 #include "../Interfaces/Types/IPrimitiveType.h"
 
+#include "../Interfaces/IExceptionManager.h"
+
 namespace StructuredScript{
-	template <class Type>
+	namespace Query{
+		class ExceptionManager{
+		public:
+			static void clear(IExceptionManager *xManager);
+
+			static void set(IExceptionManager *xManager, IAny::Ptr exception);
+
+			static void setOnce(IExceptionManager *xManager);
+
+			static void setExit(IExceptionManager *xManager);
+
+			static void setReturn(IExceptionManager *xManager);
+
+			static void setBreak(IExceptionManager *xManager);
+
+			static void setContinue(IExceptionManager *xManager);
+
+			static IAny::Ptr get(IExceptionManager *xManager);
+
+			static bool has(IExceptionManager *xManager);
+
+			static bool hasOnce(IExceptionManager *xManager);
+
+			static bool hasExit(IExceptionManager *xManager);
+
+			static bool hasReturn(IExceptionManager *xManager);
+
+			static bool hasBreak(IExceptionManager *xManager);
+
+			static bool hasContinue(IExceptionManager *xManager);
+		};
+
+		class Type{
+		public:
+			static bool isAny(const IType *type);
+		};
+	}
+
+	/*template <class Type>
 	class Query{
 	public:
 		typedef std::shared_ptr<Type>	Ptr;
@@ -74,7 +114,7 @@ namespace StructuredScript{
 		static IFunctionMemory *toFunctionMemory(Type *target){
 			return nullptr;
 		}
-	};
+	};*/
 }
 
 #endif /* !STRUCTURED_SCRIPT_QUERY_H */

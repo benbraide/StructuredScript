@@ -33,9 +33,11 @@ namespace StructuredScript{
 
 		bool isEqual(const IType *target, bool strictly = true) const;
 
-		MemoryState &getState();
+		IType *type();
 
-		MemoryAttribute &getAttribute();
+		MemoryState &state();
+
+		MemoryAttribute &attribute();
 
 	private:
 		IType *type_;

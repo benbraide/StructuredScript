@@ -20,8 +20,6 @@ namespace StructuredScript{
 			virtual Any::Ptr evaluate(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual std::string str() = 0;
-
-			virtual bool equals(Node &right) const = 0;
 		};
 	}
 

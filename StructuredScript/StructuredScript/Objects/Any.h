@@ -14,7 +14,7 @@ namespace StructuredScript{
 			typedef std::list<Any *>					ParentListType;
 			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
 
-			Any(IType::Ptr type)
+			explicit Any(IType::Ptr type)
 				: type_(type){}
 
 			virtual ~Any(){}
@@ -24,6 +24,8 @@ namespace StructuredScript{
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual IAny *base() override;
 
 			virtual IType::Ptr type() override;
 

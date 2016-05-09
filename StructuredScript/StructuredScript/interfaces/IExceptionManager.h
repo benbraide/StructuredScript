@@ -11,13 +11,11 @@ namespace StructuredScript{
 	namespace Interfaces{
 		class ExceptionManager{
 		public:
-			typedef std::shared_ptr<Any> AnyPtr;
-
 			virtual ~ExceptionManager(){}
 
 			virtual void clear() = 0;
 
-			virtual void set(AnyPtr exception) = 0;
+			virtual void set(Any::Ptr exception) = 0;
 
 			virtual void setOnce() = 0;
 
@@ -29,7 +27,7 @@ namespace StructuredScript{
 
 			virtual void setContinue() = 0;
 
-			virtual AnyPtr get() const = 0;
+			virtual Any::Ptr get() const = 0;
 
 			virtual bool has() const = 0;
 

@@ -1,9 +1,17 @@
 #include "Factory.h"
 
+#include "../Objects/Undefined.h"
 #include "../Objects/NaN.h"
 #include "../Objects/Bool.h"
+#include "../Objects/Bit.h"
+#include "../Objects/Byte.h"
 #include "../Objects/Integer.h"
 #include "../Objects/Real.h"
+#include "../Objects/IndexObject.h"
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUndefined(){
+	return std::make_shared<Objects::Undefined>();
+}
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNaN(){
 	return std::make_shared<Objects::NaN>();
@@ -11,6 +19,14 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNaN(){
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createBool(bool value){
 	return std::make_shared<Objects::Bool>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createBit(bool value){
+	return std::make_shared<Objects::Bit>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createByte(unsigned char value){
+	return std::make_shared<Objects::Byte>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createChar(char value){
@@ -69,6 +85,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createString(con
 	return nullptr;
 }
 
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){
+	return std::make_shared<Objects::IndexObject>(type, value, target);
+}
+
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::create(int rank){
 	switch (rank){
 	case Objects::Primitive::CHAR_RANK:
@@ -108,6 +128,14 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::create(int rank)
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::create(Typename type){
 	switch (type){
+	case Typename::TYPE_NAME_NAN:
+		return createNaN();
+	case Typename::TYPE_NAME_BOOLEAN:
+		return createBool(false);
+	case Typename::TYPE_NAME_BIT:
+		return createBit(false);
+	case Typename::TYPE_NAME_BYTE:
+		return createByte('\0');
 	case Typename::TYPE_NAME_CHAR:
 		return createChar('\0');
 	case Typename::TYPE_NAME_UCHAR:

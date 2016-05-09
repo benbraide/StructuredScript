@@ -12,6 +12,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::cas
 	return type->isEqual(*type_) ? ptr() : nullptr;
 }
 
+StructuredScript::IAny *StructuredScript::Objects::Primitive::base(){
+	return this;
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Primitive::type(){
 	return type_;
 }
@@ -41,7 +45,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr){
-	auto primitive = dynamic_cast<Primitive *>(right.get());//TODO: Get base object
+	auto primitive = dynamic_cast<Primitive *>(right->base());//TODO: Get base object
 	if (primitive == nullptr)
 		return nullptr;//TODO: Throw exception
 

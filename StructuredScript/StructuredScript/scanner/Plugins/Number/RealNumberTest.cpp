@@ -56,10 +56,10 @@ namespace StructuredScript{
 		mcw_9.commit();
 		CHECK(mcw_9.dump() == ".");
 
-		CHECK(!number.matches(mcw_10));
-		CHECK(number.get(mcw_10) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_NONE, ""));
+		CHECK(number.matches(mcw_10));
+		CHECK(number.get(mcw_10) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_OCTAL_INTEGER, "72"));
 		mcw_10.commit();
-		CHECK(mcw_10.dump() == "072");
+		CHECK(mcw_10.dump() == "");
 
 		CHECK(number.matches(mcw_11));
 		CHECK(number.get(mcw_11) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER, "45"));

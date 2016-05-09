@@ -23,6 +23,8 @@ namespace StructuredScript{
 
 			virtual Ptr cast(Type::Ptr type, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
+			virtual Any *base() = 0;
+
 			virtual Type::Ptr type() = 0;
 
 			virtual void setMemory(Memory *memory) = 0;

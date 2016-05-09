@@ -7,9 +7,7 @@
 
 namespace StructuredScript{
 	TEST(HexadecimalInteger, Test){
-		Scanner::Plugins::RealNumber number;
-		Scanner::Plugins::HexadecimalInteger hex(number);
-
+		Scanner::Plugins::HexadecimalInteger hex;
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("0x45"), mcw_4("0x45af"), mcw_5("0xafb"), mcw_6("0xafbll"), mcw_7("0x.279"),
 			mcw_8("0x9.279"), mcw_9("0x45e9"), mcw_10("072");
 
@@ -46,17 +44,17 @@ namespace StructuredScript{
 		CHECK(mcw_6.dump() == "ll");
 
 		CHECK(hex.matches(mcw_7));
-		CHECK(hex.get(mcw_7) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "0x.279"));
+		CHECK(hex.get(mcw_7) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "0x"));
 		mcw_7.commit();
-		CHECK(mcw_7.dump() == "");
+		CHECK(mcw_7.dump() == ".279");
 
 		CHECK(hex.matches(mcw_8));
-		CHECK(hex.get(mcw_8) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "0x9.279"));
+		CHECK(hex.get(mcw_8) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER, "9"));
 		mcw_8.commit();
-		CHECK(mcw_8.dump() == "");
+		CHECK(mcw_8.dump() == ".279");
 
 		CHECK(hex.matches(mcw_9));
-		CHECK(hex.get(mcw_9) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_ERROR, "0x45e9"));
+		CHECK(hex.get(mcw_9) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER, "45e9"));
 		mcw_9.commit();
 		CHECK(mcw_9.dump() == "");
 

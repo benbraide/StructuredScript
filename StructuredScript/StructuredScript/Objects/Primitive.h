@@ -9,7 +9,7 @@ namespace StructuredScript{
 	namespace Objects{
 		class Primitive : public IAny, public IPrimitiveObject{
 		public:
-			Primitive(IType::Ptr type)
+			explicit Primitive(IType::Ptr type)
 				: type_(type){}
 
 			virtual Ptr ptr() override;
@@ -17,6 +17,8 @@ namespace StructuredScript{
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual IAny *base() override;
 
 			virtual IType::Ptr type() override;
 
@@ -33,8 +35,6 @@ namespace StructuredScript{
 			virtual Ptr evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override;
-
-			virtual int rank() = 0;
 
 			static const int CHAR_RANK		= 0x0000;
 			static const int UCHAR_RANK		= 0x0001;

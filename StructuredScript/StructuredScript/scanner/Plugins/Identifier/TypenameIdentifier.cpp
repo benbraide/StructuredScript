@@ -30,20 +30,20 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	well.fork();
 
 	auto blank = skip_(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR){
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR){
 		well.merge();
 		return blank;
 	}
 
-	return identifierPlugin_->get(well, filter);
+	return identifierPlugin_.get(well, filter);
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getLong_(ICharacterWell &well, FilterType filter) const{
 	auto token = get_(well, filter);
-	if (token.getType() == TokenType::TOKEN_TYPE_ERROR)
-		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.getValue());
+	if (token.type() == TokenType::TOKEN_TYPE_ERROR)
+		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.value());
 
-	auto type = getTypename_(token.getValue());
+	auto type = getTypename_(token.value());
 	if (type == Typename::TYPE_NAME_NONE)
 		well.collapse();//Rollback
 
@@ -55,17 +55,17 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LDOUBLE), "long double", "", true);
 
 	if (type != Typename::TYPE_NAME_NONE)//long *typename" -- ERROR
-		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.getValue());
+		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.value());
 
 	return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LONG), "long", "", true);
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getUnsigned_(ICharacterWell &well, FilterType filter) const{
 	auto token = get_(well, filter);
-	if (token.getType() == TokenType::TOKEN_TYPE_ERROR)
-		return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned " + token.getValue());
+	if (token.type() == TokenType::TOKEN_TYPE_ERROR)
+		return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned " + token.value());
 
-	auto type = getTypename_(token.getValue());
+	auto type = getTypename_(token.value());
 	if (type == Typename::TYPE_NAME_NONE)
 		well.collapse();//Rollback
 
@@ -81,10 +81,10 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 
 	if (type == Typename::TYPE_NAME_LONG){//unsigned (long | long long)
 		token = getLong_(well, filter);
-		if (token.getType() == TokenType::TOKEN_TYPE_ERROR)
-			return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned long " + token.getValue());
+		if (token.type() == TokenType::TOKEN_TYPE_ERROR)
+			return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned long " + token.value());
 
-		auto type = static_cast<Typename>(std::stoi(token.getValue()));
+		auto type = static_cast<Typename>(std::stoi(token.value()));
 		if (type == Typename::TYPE_NAME_LDOUBLE)//unsigned long double -- ERROR
 			return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned long double");
 
@@ -95,22 +95,22 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	}
 
 	if (type != Typename::TYPE_NAME_NONE)//unsigned *typename" -- ERROR
-		return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned " + token.getValue());
+		return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned " + token.value());
 
 	return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned");//unsigned -- ERROR
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::skip_(ICharacterWell &well) const{
-	auto blank = skipPlugin_->get(well);
-	if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+	auto blank = skipPlugin_.get(well);
+	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 
-	while (blank.getType() != TokenType::TOKEN_TYPE_NONE){
+	while (blank.type() != TokenType::TOKEN_TYPE_NONE){
 		well.merge();
 		well.fork();
 
-		blank = skipPlugin_->get(well);
-		if (blank.getType() == TokenType::TOKEN_TYPE_ERROR)
+		blank = skipPlugin_.get(well);
+		if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 			return Token(TokenType::TOKEN_TYPE_ERROR, well.get());
 	}
 

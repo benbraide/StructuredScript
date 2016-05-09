@@ -14,9 +14,8 @@ namespace StructuredScript{
 		Symbols symbols;
 		Scanner::Plugins::Symbol sym(symbols);
 
-		Scanner::Plugins::Skip skip;
 		Scanner::Plugins::Identifier id;
-		Scanner::Plugins::OperatorIdentifier opId(id, sym, skip);
+		Scanner::Plugins::OperatorIdentifier opId(symbols);
 
 		symbols.init();
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("$4518"), mcw_3("operator +"), mcw_4("operator left ++"),

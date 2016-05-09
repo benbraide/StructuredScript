@@ -22,6 +22,10 @@
 
 namespace StructuredScript{
 	namespace Scanner{
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 5> NaNTokenType;
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 6> TrueTokenType;
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 7> FalseTokenType;
+
 		class Scanner : public IScanner{
 		public:
 			typedef std::list<Token>	TokenListType;
@@ -86,6 +90,16 @@ namespace StructuredScript{
 			static Plugins::String stringPlugin_;
 			static Plugins::Skip skipPlugin_;
 		};
+
+		//************************************
+		// Method:    tokenIsLiteralType
+		// FullName:  StructuredScript::Scanner::tokenIsLiteralType
+		// Access:    public 
+		// Returns:   bool
+		// Qualifier:
+		// Parameter: TokenType type
+		//************************************
+		bool tokenIsLiteralType(TokenType type);
 	}
 }
 

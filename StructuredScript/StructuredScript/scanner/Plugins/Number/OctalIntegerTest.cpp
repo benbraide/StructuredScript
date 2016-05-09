@@ -7,9 +7,7 @@
 
 namespace StructuredScript{
 	TEST(OctalInteger, Test){
-		Scanner::Plugins::RealNumber number;
-		Scanner::Plugins::OctalInteger oct(number);
-
+		Scanner::Plugins::OctalInteger oct;
 		Scanner::StringCharacterWell mcw_1("string"), mcw_2("4518"), mcw_3("04572"), mcw_4("0000"), mcw_5("0117"), mcw_6("0819"), mcw_7("04572ll");
 
 		CHECK(oct.type() == Scanner::TokenType::TOKEN_TYPE_OCTAL_INTEGER);

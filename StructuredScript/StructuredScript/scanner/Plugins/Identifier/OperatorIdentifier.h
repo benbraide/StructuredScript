@@ -4,15 +4,18 @@
 #define STRUCTURED_SCRIPT_OPERATOR_IDENTIFIER_SCANNER_PLUGIN_H
 
 #include "../../../Common/EnumAdapter.h"
-#include "../../../Interfaces/IScannerPlugin.h"
+
+#include "Identifier.h"
+#include "../Symbol/Symbol.h"
+#include "../Skip/Skip.h"
 
 namespace StructuredScript{
 	namespace Scanner{
 		namespace Plugins{
 			class OperatorIdentifier : public IScannerPlugin{
 			public:
-				OperatorIdentifier(const IScannerPlugin &identifierPlugin, const IScannerPlugin &symbolPlugin, const IScannerPlugin &skipPlugin)
-					: identifierPlugin_(&identifierPlugin), symbolPlugin_(&symbolPlugin), skipPlugin_(&skipPlugin){}
+				explicit OperatorIdentifier(ISymbols &symbols)
+					: symbolPlugin_(symbols){}
 
 				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
 
@@ -27,9 +30,9 @@ namespace StructuredScript{
 
 				Token skip_(ICharacterWell &well) const;
 
-				const IScannerPlugin *identifierPlugin_;
-				const IScannerPlugin *symbolPlugin_;
-				const IScannerPlugin *skipPlugin_;
+				Identifier identifierPlugin_;
+				Symbol symbolPlugin_;
+				Skip skipPlugin_;
 			};
 
 			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 1> LeftUnaryOperatorTokenType;

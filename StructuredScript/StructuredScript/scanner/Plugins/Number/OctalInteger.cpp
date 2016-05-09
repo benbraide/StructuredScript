@@ -7,7 +7,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalIntege
 	well.step(1);//Skip '0'
 	well.fork();
 
-	auto token = realNumberPlugin_->get(well, [filter](char next) -> unsigned short{
+	auto token = decimalInteger_.get(well, [filter](char next) -> unsigned short{
 		if (filter != nullptr){
 			auto state = filter(next);
 			if (state != IScannerPlugin::NONE)
@@ -21,10 +21,13 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalIntege
 	});
 
 	well.merge();
-	if (token.getType() != TokenType::TOKEN_TYPE_DECIMAL_INTEGER)
-		return Token(TokenType::TOKEN_TYPE_ERROR, "0" + token.getValue());
+	if (token.type() == TokenType::TOKEN_TYPE_NONE)
+		return Token(TokenType::TOKEN_TYPE_DECIMAL_INTEGER, "0");
 
-	return Token(TokenType::TOKEN_TYPE_OCTAL_INTEGER, token.getValue(), "0");
+	if (token.type() != TokenType::TOKEN_TYPE_DECIMAL_INTEGER)
+		return Token(TokenType::TOKEN_TYPE_ERROR, "0" + token.value());
+
+	return Token(TokenType::TOKEN_TYPE_OCTAL_INTEGER, token.value(), "0");
 }
 
 bool StructuredScript::Scanner::Plugins::OctalInteger::matches(const ICharacterWell &well) const{
