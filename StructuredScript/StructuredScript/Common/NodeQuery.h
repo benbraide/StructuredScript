@@ -11,6 +11,8 @@
 #include "../Interfaces/Nodes/IBlockNode.h"
 #include "../Interfaces/Nodes/IIdentifierNode.h"
 
+#include "../Interfaces/Storages/IGlobalStorage.h"
+
 namespace StructuredScript{
 	namespace Query{
 		class Node{
@@ -38,6 +40,15 @@ namespace StructuredScript{
 			static bool isPlainBlock(const INode *node);
 
 			static void split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary = false);
+
+			static IStorage *resolveAsStorage(INode::Ptr node, IStorage *storage);
+
+			static IType::Ptr resolveAsType(INode::Ptr node, IStorage *storage);
+
+			static IMemory::Ptr resolveAsObject(INode::Ptr node, IStorage *storage);
+
+		private:
+			static bool resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, bool &localOnly);
 		};
 	}
 }

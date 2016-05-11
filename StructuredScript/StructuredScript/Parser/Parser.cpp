@@ -37,6 +37,15 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term_(ICharacterW
 	if (Scanner::tokenIsLiteralType(type))
 		return std::make_shared<Nodes::LiteralNode>(next);
 
+	if (type == Scanner::Plugins::TypenameTokenType::type)
+		return std::make_shared<Nodes::PrimitiveTypeIdentifierNode>(next.prefix(), next.value());
+
+	if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER){
+		//Check plugins...
+
+		return std::make_shared<Nodes::IdentifierNode>(next.value());
+	}
+
 	OperatorInfo::MatchedListType list;
 	operatorInfo.find(next.value(), OperatorType(OperatorType::LEFT_UNARY), list);
 	if (list.empty())

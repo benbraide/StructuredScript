@@ -16,6 +16,16 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (left_ && value_ == "!")
 		return PrimitiveFactory::createBool(!value->truth(storage, exception, expr));
 
+	if (left_ && value_ == "::"){
+		auto memory = Query::Node::resolveAsObject(operand_, storage);
+		if (memory == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+		}
+
+		return memory->object();
+	}
+
 	auto primitive = dynamic_cast<IPrimitiveObject *>(value->base());
 	if (primitive != nullptr)
 		return left_ ? primitive->evaluateLeftUnary(value_, exception, expr) : primitive->evaluateRightUnary(value_, exception, expr);
@@ -45,6 +55,16 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BinaryOperatorN
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (value_ == "::"){
+		auto memory = Query::Node::resolveAsObject(rightOperand_, Query::Node::resolveAsStorage(leftOperand_, storage));
+		if (memory == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+		}
+
+		return memory->object();
+	}
+
 	auto leftValue = leftOperand_->evaluate(storage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
@@ -92,7 +112,7 @@ std::string StructuredScript::Nodes::BinaryOperatorNode::str(){
 	if (value_ == ",")
 		return (leftOperand_->str() + value_ + " " + rightOperand_->str());
 
-	if (value_ == ".")
+	if (value_ == "." || value_ == "::")
 		return (leftOperand_->str() + value_ + rightOperand_->str());
 
 	return (leftOperand_->str() + " " + value_ + " " + rightOperand_->str());

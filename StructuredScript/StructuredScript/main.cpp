@@ -35,7 +35,7 @@ int main(){
 		StructuredScript::Scanner::StringCharacterWell well(input);
 
 		auto node = parser.parse(well, scanner, nullptr);
-		auto value = node->evaluate(nullptr, nullptr, nullptr);
+		auto value = node->evaluate(&globalStorage, nullptr, nullptr);
 
 		std::cout << node->str() << "\n";
 		if (value == nullptr)

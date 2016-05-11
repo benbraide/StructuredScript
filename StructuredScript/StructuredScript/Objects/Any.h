@@ -50,6 +50,14 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
 
+			virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
+
+			virtual IMemory::Ptr findOperatorMemory(const std::string &name, bool localOnly) override;
+
+			virtual IMemory::Ptr *addTypenameOperatorMemory(const std::string &name) override;
+
+			virtual IMemory::Ptr findTypenameOperatorMemory(const std::string &name, bool localOnly) override;
+
 			virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
 
 			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;

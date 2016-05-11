@@ -49,6 +49,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createString(const std::string &value);
 
+		static IAny::Ptr createTypeObject(IType::Ptr value);
+
 		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IMemory *target);
 
 		static IAny::Ptr create(int rank);

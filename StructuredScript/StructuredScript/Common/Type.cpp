@@ -85,6 +85,22 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 	return nullptr;
 }
 
+StructuredScript::IMemory::Ptr *StructuredScript::Type::addOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Type::findOperatorMemory(const std::string &name, bool localOnly){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Type::addTypenameOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Type::findTypenameOperatorMemory(const std::string &name, bool localOnly){
+	return nullptr;
+}
+
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Type::addMemoryAttribute(const std::string &name){
 	return (findMemoryAttribute(name, true) == nullptr) ? &attributes_[name] : nullptr;
 }

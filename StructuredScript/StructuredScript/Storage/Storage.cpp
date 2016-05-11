@@ -37,11 +37,27 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 	if (object != objects_.end())
 		return object->second;
 
-	/*auto type = findType(name, true);
+	auto type = findType(name, true);
 	if (type != nullptr)
-		return dynamic_cast<IStorage *>(type.get());*/
+		return std::make_shared<TempMemory>(this, PrimitiveFactory::createTypeObject(type));
 
 	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemory(name, false);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findOperatorMemory(const std::string &name, bool localOnly){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addTypenameOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameOperatorMemory(const std::string &name, bool localOnly){
+	return nullptr;
 }
 
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Storage::Storage::addMemoryAttribute(const std::string &name){

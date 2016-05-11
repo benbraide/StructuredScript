@@ -33,7 +33,7 @@ bool StructuredScript::Objects::TypeObject::truth(IStorage *storage, IExceptionM
 }
 
 std::string StructuredScript::Objects::TypeObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return "";
+	return value_->name();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::TypeObject::value(){

@@ -7,6 +7,7 @@
 #include "../Objects/Byte.h"
 #include "../Objects/Integer.h"
 #include "../Objects/Real.h"
+#include "../Objects/TypeObject.h"
 #include "../Objects/IndexObject.h"
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUndefined(){
@@ -83,6 +84,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createLDouble(lo
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createString(const std::string &value){
 	return nullptr;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createTypeObject(IType::Ptr value){
+	return std::make_shared<Objects::TypeObject>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){

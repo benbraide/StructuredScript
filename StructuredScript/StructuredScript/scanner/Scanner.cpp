@@ -96,9 +96,6 @@ const StructuredScript::IScannerPlugin *StructuredScript::Scanner::Scanner::getP
 			return plugin;
 	}
 
-	if (operatorIdentifierPlugin_.type() == target)
-		return &operatorIdentifierPlugin_;
-
 	if (skipPlugin_.type() == target)
 		return &skipPlugin_;
 
@@ -132,11 +129,7 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::ge
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Scanner::extendIdentifier_(ICharacterWell &well, const Token &token){
-	auto id = operatorIdentifierPlugin_.get(well);//Try operator identifier
-	if (id.type() != TokenType::TOKEN_TYPE_NONE)
-		return id;
-
-	id = typenameIdentifierPlugin_.get(well);//Try typename identifier
+	auto id = typenameIdentifierPlugin_.get(well);//Try typename identifier
 	if (id.type() != TokenType::TOKEN_TYPE_NONE)
 		return id;
 
@@ -277,7 +270,6 @@ bool StructuredScript::Scanner::tokenIsLiteralType(TokenType type){
 StructuredScript::Symbols StructuredScript::Scanner::Scanner::operatorSymbols;
 
 StructuredScript::Scanner::Plugins::Identifier StructuredScript::Scanner::Scanner::identifierPlugin_;
-StructuredScript::Scanner::Plugins::OperatorIdentifier StructuredScript::Scanner::Scanner::operatorIdentifierPlugin_(Scanner::operatorSymbols);
 StructuredScript::Scanner::Plugins::TypenameIdentifier StructuredScript::Scanner::Scanner::typenameIdentifierPlugin_;
 
 StructuredScript::Scanner::Plugins::Number StructuredScript::Scanner::Scanner::numberPlugin_;

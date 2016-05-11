@@ -9,7 +9,6 @@
 #include "../Common/Symbols.h"
 
 #include "Plugins/Identifier/Identifier.h"
-#include "Plugins/Identifier/OperatorIdentifier.h"
 #include "Plugins/Identifier/TypenameIdentifier.h"
 
 #include "Plugins/Number/Number.h"
@@ -81,7 +80,6 @@ namespace StructuredScript{
 			PluginListType plugins_;
 
 			static Plugins::Identifier identifierPlugin_;
-			static Plugins::OperatorIdentifier operatorIdentifierPlugin_;
 			static Plugins::TypenameIdentifier typenameIdentifierPlugin_;
 
 			static Plugins::Number numberPlugin_;

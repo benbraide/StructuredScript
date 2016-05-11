@@ -22,11 +22,32 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual std::string value() const override;
+
 		private:
 			std::string value_;
 		};
 
-		class PrimitiveTypeIdentifierNode : public IdentifierNode{
+		class OperatorIdentifierNode : public INode, public IIdentifierNode{
+		public:
+			explicit OperatorIdentifierNode(Ptr value)
+				: value_(value){}
+
+			virtual Ptr ptr() override;
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
+
+			virtual std::string value() const override;
+
+		protected:
+			Ptr value_;
+		};
+
+		class PrimitiveTypeIdentifierNode : public IdentifierNode, public ITypeIdentifierNode{
 		public:
 			PrimitiveTypeIdentifierNode(const std::string &name, const std::string &value)
 				: IdentifierNode(value), name_(name){}
@@ -37,6 +58,18 @@ namespace StructuredScript{
 
 		private:
 			std::string name_;
+		};
+
+		class TypenameIdentifierNode : public OperatorIdentifierNode, public ITypeIdentifierNode{
+		public:
+			explicit TypenameIdentifierNode(Ptr value)
+				: OperatorIdentifierNode(value){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
 		};
 	}
 }
