@@ -22,9 +22,9 @@
 
 namespace StructuredScript{
 	namespace Scanner{
-		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 5> NaNTokenType;
-		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 6> TrueTokenType;
-		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 7> FalseTokenType;
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 3> NaNTokenType;
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 4> TrueTokenType;
+		typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 5> FalseTokenType;
 
 		class Scanner : public IScanner{
 		public:
@@ -39,9 +39,11 @@ namespace StructuredScript{
 
 			virtual void save(const Token &token) override;
 
+			virtual bool fork(char closeWith) override;
+
 			virtual bool open(ICharacterWell &well, char target, char closeWith = '\0') override;
 
-			virtual bool close(ICharacterWell &well) override;
+			virtual bool close(ICharacterWell &well, bool force = false) override;
 
 			virtual bool hasMore(ICharacterWell &well) override;
 

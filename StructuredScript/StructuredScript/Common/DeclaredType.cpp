@@ -67,7 +67,3 @@ StructuredScript::IType *StructuredScript::DeclaredType::type(){
 StructuredScript::DeclaredType::MemoryState &StructuredScript::DeclaredType::state(){
 	return state_;
 }
-
-StructuredScript::DeclaredType::MemoryAttribute &StructuredScript::DeclaredType::attribute(){
-	return attribute_;
-}

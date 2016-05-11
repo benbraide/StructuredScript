@@ -8,8 +8,12 @@ StructuredScript::IStorage *StructuredScript::Type::storage(){
 	return storage_;
 }
 
+bool StructuredScript::Type::isAny() const{
+	return false;
+}
+
 bool StructuredScript::Type::isEqual(const IType &target) const{
-	return (&target == this || Query::Type::isAny(this) || Query::Type::isAny(&target));
+	return (&target == this || isAny() || target.isAny());
 }
 
 bool StructuredScript::Type::isParent(const IType &target) const{
@@ -42,7 +46,7 @@ StructuredScript::IStorage *StructuredScript::Type::findStorage(const std::strin
 }
 
 std::shared_ptr<StructuredScript::IType> *StructuredScript::Type::addType(const std::string &name){
-	return nullptr;
+	return (findType(name, true) == nullptr) ? &types_[name] : nullptr;
 }
 
 StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string &name, bool localOnly){
@@ -62,7 +66,7 @@ StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string 
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Type::addMemory(const std::string &name){
-	return nullptr;
+	return (findMemory(name, true) == nullptr) ? &objects_[name] : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::string &name, bool localOnly){
@@ -75,6 +79,26 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 			auto object = parent->findMemory(name, false);
 			if (object != nullptr)
 				return object;
+		}
+	}
+
+	return nullptr;
+}
+
+StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Type::addMemoryAttribute(const std::string &name){
+	return (findMemoryAttribute(name, true) == nullptr) ? &attributes_[name] : nullptr;
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttribute(const std::string &name, bool localOnly){
+	auto attribute = attributes_.find(name);
+	if (attribute != attributes_.end())
+		return attribute->second;
+
+	if (!localOnly){
+		for (auto parent : parents_){
+			auto attribute = parent->findMemoryAttribute(name, false);
+			if (attribute != nullptr)
+				return attribute;
 		}
 	}
 

@@ -11,10 +11,11 @@ namespace StructuredScript{
 	namespace Storage{
 		class Storage : public IStorage{
 		public:
-			typedef std::shared_ptr<IStorage>			Ptr;
-			typedef std::map<std::string, IType::Ptr>	TypeListType;
-			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
-			typedef std::map<std::string, Ptr>			StorageListType;
+			typedef std::shared_ptr<IStorage>						Ptr;
+			typedef std::map<std::string, IType::Ptr>				TypeListType;
+			typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
+			typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
+			typedef std::map<std::string, Ptr>						StorageListType;
 
 			Storage(IStorage *parent)
 				: parent_(parent){}
@@ -31,12 +32,17 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
 
+			virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
+
+			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;
+
 			virtual bool remove(const IMemory *target) override;
 
 		protected:
 			IStorage *parent_;
 			TypeListType types_;
 			MemoryListType objects_;
+			MemoryAttributeListType attributes_;
 			StorageListType storages_;
 		};
 	}

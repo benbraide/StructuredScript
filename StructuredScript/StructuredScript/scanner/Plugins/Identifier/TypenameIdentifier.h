@@ -35,7 +35,7 @@ namespace StructuredScript{
 				Skip skipPlugin_;
 			};
 
-			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 4> TypenameTokenType;
+			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 2> TypenameTokenType;
 		}
 	}
 }

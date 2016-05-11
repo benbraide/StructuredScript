@@ -5,6 +5,13 @@
 
 #include "Storage.h"
 
+#include "Attributes/LockedAttribute.h"
+#include "Attributes/ConcurrentAttribute.h"
+#include "Attributes/OnceAttribute.h"
+#include "Attributes/OverrideAttribute.h"
+#include "Attributes/AssumeTypeAttribute.h"
+#include "Attributes/AssumeConstnessAttribute.h"
+
 #include "../Interfaces/Storages/IGlobalStorage.h"
 #include "../Objects/Primitive.h"
 

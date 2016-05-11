@@ -13,12 +13,14 @@ void StructuredScript::ExceptionManager::setOnce(){
 	code_ = ONCE;
 }
 
-void StructuredScript::ExceptionManager::setExit(){
+void StructuredScript::ExceptionManager::setExit(IAny::Ptr value){
 	code_ = EXIT;
+	exception_ = value;
 }
 
-void StructuredScript::ExceptionManager::setReturn(){
+void StructuredScript::ExceptionManager::setReturn(IAny::Ptr value){
 	code_ = RETURN;
+	exception_ = value;
 }
 
 void StructuredScript::ExceptionManager::setBreak(){

@@ -4,9 +4,7 @@
 #define STRUCTURED_SCRIPT_MEMORY_INTERFACE_H
 
 #include "../Common/DeclaredType.h"
-
-#include "IType.h"
-#include "IExceptionManager.h"
+#include "Storages/IMemoryAttributes.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
@@ -18,11 +16,13 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() = 0;
 
-			virtual void assign(IAny::Ptr object, ExceptionManager *exception, Node *expr) = 0;
+			virtual void assign(Any::Ptr object, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual IAny::Ptr object() = 0;
+			virtual Any::Ptr object() = 0;
 
 			virtual DeclaredType *type() = 0;
+
+			virtual MemoryAttributes *attributes() = 0;
 
 			virtual Storage *storage() = 0;
 		};

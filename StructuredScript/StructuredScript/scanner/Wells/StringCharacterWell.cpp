@@ -38,6 +38,16 @@ void StructuredScript::Scanner::StringCharacterWell::stepToEnd(){
 	end_ = value_.size();
 }
 
+bool StructuredScript::Scanner::StringCharacterWell::stepTo(char target){
+	auto index = value_.find(target, end_);
+	if (index < value_.size()){
+		end_ = static_cast<int>(index);
+		return true;
+	}
+
+	return false;
+}
+
 void StructuredScript::Scanner::StringCharacterWell::collapse(){
 	end_ = start_;
 }

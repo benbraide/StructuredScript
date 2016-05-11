@@ -8,6 +8,15 @@ StructuredScript::IStorage *StructuredScript::CompositeType::storage(){
 	return nullptr;
 }
 
+bool StructuredScript::CompositeType::isAny() const{
+	for (auto type : types_){
+		if (type->isAny())
+			return true;
+	}
+
+	return types_.empty();
+}
+
 bool StructuredScript::CompositeType::isEqual(const IType &target) const{
 	for (auto type : types_){
 		if (type->isEqual(target))

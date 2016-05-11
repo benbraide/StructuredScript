@@ -19,9 +19,9 @@ namespace StructuredScript{
 
 			virtual void setOnce() = 0;
 
-			virtual void setExit() = 0;
+			virtual void setExit(Any::Ptr value) = 0;
 
-			virtual void setReturn() = 0;
+			virtual void setReturn(Any::Ptr value) = 0;
 
 			virtual void setBreak() = 0;
 

@@ -4,20 +4,11 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
-	auto token = get_(well, BinaryOperatorTokenType::type, "operator", filter);
+	auto token = get_(well, OperatorTokenType::type, "operator", filter);
 	if (token.type() != TokenType::TOKEN_TYPE_IDENTIFIER)
 		return token;
 
-	TokenType type;
-	auto value = token.value();
-	if (value == "left")
-		type = LeftUnaryOperatorTokenType::type;
-	else if (value == "right")
-		type = RightUnaryOperatorTokenType::type;
-	else
-		return Token(BinaryOperatorTokenType::type, value, "operator ");
-
-	return get_(well, type, "operator " + value, filter);
+	return Token(OperatorTokenType::type, token.value(), "operator ");
 }
 
 bool StructuredScript::Scanner::Plugins::OperatorIdentifier::matches(const ICharacterWell &well) const{

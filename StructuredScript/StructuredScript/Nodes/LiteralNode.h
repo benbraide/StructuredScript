@@ -5,11 +5,17 @@
 
 #include <cmath>
 
+#include "../Common/ExceptionManagerQuery.h"
+#include "../Common/NodeQuery.h"
 #include "../Common/Factory.h"
-#include "../Interfaces/INode.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Suffix.h"
+
+#include "../Scanner/Plugins/Number/HexadecimalInteger.h"
+#include "../Scanner/Plugins/Number/OctalInteger.h"
+
+#include "../Scanner/Wells/StringCharacterWell.h"
 
 namespace StructuredScript{
 	namespace Nodes{
@@ -32,9 +38,14 @@ namespace StructuredScript{
 			template <typename Type>
 			Type getValue_() const;
 
+			template <typename Type>
+			Type getIntegerValue_(const std::string &value, int base) const;
+
 			long double parseExponent_() const;
 
-			std::string escapeString_() const;
+			std::string escapeString_(IExceptionManager *exception, INode *expr) const;
+
+			char getEscapedCharacter_(char value) const;
 
 			Scanner::Token value_;
 		};
@@ -43,15 +54,15 @@ namespace StructuredScript{
 		Type StructuredScript::Nodes::LiteralNode::getValue_() const{
 			switch (value_.type()){
 			case Scanner::TokenType::TOKEN_TYPE_DECIMAL_INTEGER:
-				return static_cast<Type>(std::stoll(value_.value()));
+				return getIntegerValue_<Type>(value_.value(), 10);
 			case Scanner::TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER:
-				return static_cast<Type>(std::stoll(value_.value(), nullptr, 16));
+				return getIntegerValue_<Type>(value_.value(), 16);
 			case Scanner::TokenType::TOKEN_TYPE_OCTAL_INTEGER:
-				return static_cast<Type>(std::stoll(value_.value(), nullptr, 8));
+				return getIntegerValue_<Type>(value_.value(), 8);
 			case Scanner::TokenType::TOKEN_TYPE_BINARY_INTEGER:
-				return static_cast<Type>(std::stoll(value_.value(), nullptr, 2));
+				return getIntegerValue_<Type>(value_.value(), 2);
 			case Scanner::TokenType::TOKEN_TYPE_RADIX_INTEGER:
-				return static_cast<Type>(std::stoll(value_.value(), nullptr, std::stoi(value_.prefix())));
+				return getIntegerValue_<Type>(value_.value(), std::stoi(value_.prefix()));
 			case Scanner::TokenType::TOKEN_TYPE_EXPONENTIATED_NUMBER:
 				return static_cast<Type>(parseExponent_());
 			default:
@@ -59,6 +70,14 @@ namespace StructuredScript{
 			}
 
 			return static_cast<Type>(std::stold(value_.value()));
+		}
+
+		template <typename Type>
+		Type StructuredScript::Nodes::LiteralNode::getIntegerValue_(const std::string &value, int base) const{
+			if (value.empty() || value[0] == '-')
+				return static_cast<Type>(std::stoll(value_.value(), nullptr, base));
+
+			return static_cast<Type>(std::stoull(value_.value(), nullptr, base));
 		}
 	}
 }

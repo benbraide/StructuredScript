@@ -15,6 +15,8 @@ namespace StructuredScript{
 
 		virtual IStorage *storage() override;
 
+		virtual bool isAny() const override;
+
 		virtual bool isEqual(const IType &target) const override;
 
 		virtual bool isParent(const IType &target) const override;
@@ -40,6 +42,8 @@ namespace StructuredScript{
 	public:
 		AnyType()
 			: PrimitiveType("any", Typename::TYPE_NAME_ANY){}
+
+		virtual bool isAny() const override;
 	};
 }
 

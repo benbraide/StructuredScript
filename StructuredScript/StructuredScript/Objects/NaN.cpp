@@ -30,11 +30,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::evaluateR
 }
 
 int StructuredScript::Objects::NaN::rank(){
-	return -1;
+	return Primitive::NAN_RANK;
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::promote_(Primitive *target){
-	return nullptr;
+	return target->ptr();
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::NaN::evaluate_(const std::string &value, INumber *right, IExceptionManager *exception, INode *expr){

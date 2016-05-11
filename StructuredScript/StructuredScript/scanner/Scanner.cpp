@@ -55,6 +55,15 @@ void StructuredScript::Scanner::Scanner::save(const Token &token){
 		savedTokens_.push_back(token);
 }
 
+bool StructuredScript::Scanner::Scanner::fork(char closeWith){
+	if (closeWith == '\0')
+		return false;
+
+	openList_.push_back(closeWith_ = closeWith);
+
+	return true;
+}
+
 bool StructuredScript::Scanner::Scanner::open(ICharacterWell &well, char target, char closeWith){
 	if (!verifyTarget_(well, target, true))
 		return false;
@@ -67,8 +76,8 @@ bool StructuredScript::Scanner::Scanner::open(ICharacterWell &well, char target,
 	return true;
 }
 
-bool StructuredScript::Scanner::Scanner::close(ICharacterWell &well){
-	if (openList_.empty() || !verifyTarget_(well, closeWith_, false))
+bool StructuredScript::Scanner::Scanner::close(ICharacterWell &well, bool force/* = false*/){
+	if (!force && (openList_.empty() || !verifyTarget_(well, closeWith_, false)))
 		return false;
 
 	openList_.pop_back();

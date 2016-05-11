@@ -37,17 +37,21 @@ std::string StructuredScript::Objects::Primitive::str(IStorage *storage, IExcept
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
-	return nullptr;//TODO: Throw exception
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+		"'" + value + "': Operands mismatch!", expr)));
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr){
-	return nullptr;//TODO: Throw exception
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+		"'" + value + "': Operands mismatch!", expr)));
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr){
-	auto primitive = dynamic_cast<Primitive *>(right->base());//TODO: Get base object
-	if (primitive == nullptr)
-		return nullptr;//TODO: Throw exception
+	auto primitive = dynamic_cast<Primitive *>(right->base());
+	if (primitive == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}
 
 	if (primitive->rank() < rank())
 		return evaluate_(value, false, promote_(primitive), exception, expr);

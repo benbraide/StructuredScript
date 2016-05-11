@@ -3,9 +3,10 @@
 #ifndef STRUCTURED_SCRIPT_ANY_OBJECT_H
 #define STRUCTURED_SCRIPT_ANY_OBJECT_H
 
+#include <list>
 #include <map>
 
-#include "../Common/Query.h"
+#include "../Common/ExceptionManagerQuery.h"
 
 namespace StructuredScript{
 	namespace Objects{
@@ -15,7 +16,7 @@ namespace StructuredScript{
 			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
 
 			explicit Any(IType::Ptr type)
-				: type_(type){}
+				: type_(type), self_(this){}
 
 			virtual ~Any(){}
 
@@ -49,11 +50,21 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
 
+			virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
+
+			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;
+
 			virtual bool remove(const IMemory *target) override;
+
+			void setSelf(Any *self){
+				self_ = self;
+			}
 
 		protected:
 			IType::Ptr type_;
 			IMemory *memory_ = nullptr;
+
+			Any *self_;
 
 			MemoryListType objects_;
 			ParentListType parents_;

@@ -101,15 +101,7 @@ namespace StructuredScript{
 				return nullptr;
 			}
 
-			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto number = dynamic_cast<Number *>(right->base());
-				if (number == nullptr)
-					return nullptr;//TODO: Throw exception
-
-				return reversed ? evaluate_(value, number, this, exception, expr) : evaluate_(value, this, number, exception, expr);
-			}
-
-			virtual IAny::Ptr evaluate_(const std::string &value, Number *left, Number *right, IExceptionManager *exception, INode *expr){
+			virtual IAny::Ptr evaluate_(const std::string &value, BaseType *left, BaseType *right, IExceptionManager *exception, INode *expr) override{
 				if (value == "+")
 					return std::make_shared<ObjectType>(left->value() + right->value());
 

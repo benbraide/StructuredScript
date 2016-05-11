@@ -53,9 +53,27 @@ void StructuredScript::Symbols::init(){
 
 	symbols_.push_back(">");
 
-	symbols_.push_back("|");
-
 	symbols_.push_back("=");
+
+	symbols_.push_back("+=");
+
+	symbols_.push_back("-=");
+
+	symbols_.push_back("*=");
+
+	symbols_.push_back("/=");
+
+	symbols_.push_back("%=");
+
+	symbols_.push_back("&=");
+
+	symbols_.push_back("^=");
+
+	symbols_.push_back("|=");
+
+	symbols_.push_back("<<=");
+
+	symbols_.push_back(">>=");
 
 	symbols_.push_back("?");
 

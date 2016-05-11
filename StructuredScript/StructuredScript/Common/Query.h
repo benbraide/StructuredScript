@@ -14,6 +14,9 @@
 #include "../Interfaces/Objects/IPrimitiveObject.h"
 
 #include "../Interfaces/INode.h"
+#include "../Interfaces/Nodes/IOperatorNode.h"
+#include "../Interfaces/Nodes/IEmptyNode.h"
+#include "../Interfaces/Nodes/IBlockNode.h"
 
 #include "../Interfaces/IType.h"
 #include "../Interfaces/Types/IPrimitiveType.h"
@@ -21,43 +24,7 @@
 #include "../Interfaces/IExceptionManager.h"
 
 namespace StructuredScript{
-	namespace Query{
-		class ExceptionManager{
-		public:
-			static void clear(IExceptionManager *xManager);
-
-			static void set(IExceptionManager *xManager, IAny::Ptr exception);
-
-			static void setOnce(IExceptionManager *xManager);
-
-			static void setExit(IExceptionManager *xManager);
-
-			static void setReturn(IExceptionManager *xManager);
-
-			static void setBreak(IExceptionManager *xManager);
-
-			static void setContinue(IExceptionManager *xManager);
-
-			static IAny::Ptr get(IExceptionManager *xManager);
-
-			static bool has(IExceptionManager *xManager);
-
-			static bool hasOnce(IExceptionManager *xManager);
-
-			static bool hasExit(IExceptionManager *xManager);
-
-			static bool hasReturn(IExceptionManager *xManager);
-
-			static bool hasBreak(IExceptionManager *xManager);
-
-			static bool hasContinue(IExceptionManager *xManager);
-		};
-
-		class Type{
-		public:
-			static bool isAny(const IType *type);
-		};
-	}
+	namespace Query{}
 
 	/*template <class Type>
 	class Query{

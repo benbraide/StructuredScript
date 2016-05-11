@@ -1,4 +1,4 @@
-#include "token.h"
+#include "Token.h"
 
 bool StructuredScript::Scanner::Token::operator ==(const Token &right) const{
 	return (type_ == right.type_ && value_ == right.value_);

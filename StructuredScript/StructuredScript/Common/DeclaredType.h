@@ -4,18 +4,15 @@
 #define STRUCTURED_SCRIPT_DECLARED_TYPE_H
 
 #include "../Storage/MemoryState.h"
-#include "../Storage/MemoryAttributes.h"
-
 #include "../Interfaces/IType.h"
 
 namespace StructuredScript{
 	class DeclaredType{
 	public:
-		typedef StructuredScript::Storage::MemoryState		MemoryState;
-		typedef StructuredScript::Storage::MemoryAttribute	MemoryAttribute;
+		typedef StructuredScript::Storage::MemoryState MemoryState;
 
-		DeclaredType(IType *type, const MemoryState &state, const MemoryAttribute &attribute)
-			: type_(type), state_(state), attribute_(attribute){}
+		DeclaredType(IType *type, const MemoryState &state)
+			: type_(type), state_(state){}
 
 		bool operator ==(const DeclaredType &right) const;
 
@@ -37,12 +34,9 @@ namespace StructuredScript{
 
 		MemoryState &state();
 
-		MemoryAttribute &attribute();
-
 	private:
 		IType *type_;
 		MemoryState state_;
-		MemoryAttribute attribute_;
 	};
 }
 

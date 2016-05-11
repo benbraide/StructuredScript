@@ -30,6 +30,8 @@ namespace StructuredScript{
 
 			virtual void stepToEnd() override;
 
+			virtual bool stepTo(char target) override;
+
 			virtual void collapse() override;
 
 			virtual void commit() override;

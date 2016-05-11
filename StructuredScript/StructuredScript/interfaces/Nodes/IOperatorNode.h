@@ -9,40 +9,30 @@ namespace StructuredScript{
 	namespace Interfaces{
 		class OperatorNode{
 		public:
-			typedef std::shared_ptr<Node> Ptr;
-
 			virtual ~OperatorNode(){}
 
-			virtual std::string getOperator() const = 0;
+			virtual std::string value() const = 0;
 		};
 
-		class LeftUnaryOperatorNode : public OperatorNode{
+		class UnaryOperatorNode : public OperatorNode{
 		public:
-			virtual ~LeftUnaryOperatorNode(){}
+			virtual ~UnaryOperatorNode(){}
 
-			virtual Ptr getOperand() const = 0;
-		};
-
-		class RightUnaryOperatorNode : public OperatorNode{
-		public:
-			virtual ~RightUnaryOperatorNode(){}
-
-			virtual Ptr getOperand() const = 0;
+			virtual std::shared_ptr<Node> operand() = 0;
 		};
 
 		class BinaryOperatorNode : public OperatorNode{
 		public:
 			virtual ~BinaryOperatorNode(){}
 
-			virtual Ptr getLeftOperand() const = 0;
+			virtual std::shared_ptr<Node> leftOperand() = 0;
 
-			virtual Ptr getRightOperand() const = 0;
+			virtual std::shared_ptr<Node> rightOperand() = 0;
 		};
 	}
 
 	typedef Interfaces::OperatorNode			IOperatorNode;
-	typedef Interfaces::LeftUnaryOperatorNode	ILeftUnaryOperatorNode;
-	typedef Interfaces::RightUnaryOperatorNode	IRightUnaryOperatorNode;
+	typedef Interfaces::UnaryOperatorNode		IUnaryOperatorNode;
 	typedef Interfaces::BinaryOperatorNode		IBinaryOperatorNode;
 }
 

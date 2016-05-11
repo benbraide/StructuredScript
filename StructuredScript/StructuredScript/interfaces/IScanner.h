@@ -11,7 +11,7 @@ namespace StructuredScript{
 	namespace Interfaces{
 		class Scanner{
 		public:
-			typedef std::list<IScannerPlugin *>				PluginListType;
+			typedef std::list<ScannerPlugin *>				PluginListType;
 			typedef StructuredScript::Scanner::Token		Token;
 			typedef StructuredScript::Scanner::TokenType	TokenType;
 
@@ -19,19 +19,21 @@ namespace StructuredScript{
 
 			virtual void init() = 0;
 
-			virtual Token next(ICharacterWell &well, const PluginListType &plugins = {}) = 0;
+			virtual Token next(CharacterWell &well, const PluginListType &plugins = {}) = 0;
 
-			virtual Token peek(ICharacterWell &well, const PluginListType &plugins = {}) = 0;
+			virtual Token peek(CharacterWell &well, const PluginListType &plugins = {}) = 0;
 
 			virtual void save(const Token &token) = 0;
 
-			virtual bool open(ICharacterWell &well, char target, char closeWith = '\0') = 0;
+			virtual bool fork(char closeWith) = 0;
 
-			virtual bool close(ICharacterWell &well) = 0;
+			virtual bool open(CharacterWell &well, char target, char closeWith = '\0') = 0;
 
-			virtual bool hasMore(ICharacterWell &well) = 0;
+			virtual bool close(CharacterWell &well, bool force = false) = 0;
 
-			virtual const IScannerPlugin *getPlugin(TokenType target) const = 0;
+			virtual bool hasMore(CharacterWell &well) = 0;
+
+			virtual const ScannerPlugin *getPlugin(TokenType target) const = 0;
 		};
 	}
 

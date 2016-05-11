@@ -11,6 +11,7 @@ namespace StructuredScript{
 		class Type;
 		class Node;
 		class Memory;
+		class MemoryAttribute;
 
 		class Storage{
 		public:
@@ -27,6 +28,10 @@ namespace StructuredScript{
 			virtual std::shared_ptr<Memory> *addMemory(const std::string &name) = 0;
 
 			virtual std::shared_ptr<Memory> findMemory(const std::string &name, bool localOnly) = 0;
+
+			virtual std::shared_ptr<MemoryAttribute> *addMemoryAttribute(const std::string &name) = 0;
+
+			virtual std::shared_ptr<MemoryAttribute> findMemoryAttribute(const std::string &name, bool localOnly) = 0;
 
 			virtual bool remove(const Memory *target) = 0;
 		};

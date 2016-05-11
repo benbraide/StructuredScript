@@ -48,7 +48,7 @@ namespace StructuredScript{
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_BACK_QUOTED_RAW_STRING, "world"));
 
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, "::"));
-		CHECK(scanner.next(well) == Scanner::Token(Scanner::Plugins::BinaryOperatorTokenType::type, "()"));
+		CHECK(scanner.next(well) == Scanner::Token(Scanner::Plugins::OperatorTokenType::type, "()"));
 
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, "==="));
 		CHECK(scanner.next(well, { &signedNumber }) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, "+"));

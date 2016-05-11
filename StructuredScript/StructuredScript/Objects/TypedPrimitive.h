@@ -4,8 +4,6 @@
 #define STRUCTURED_SCRIPT_TYPED_PRIMITIVE_OBJECT_H
 
 #include "Primitive.h"
-
-#include "../Common/Factory.h"
 #include "../Interfaces/Storages/IGlobalStorage.h"
 
 namespace StructuredScript{
@@ -87,9 +85,11 @@ namespace StructuredScript{
 			}
 
 			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto primitive = dynamic_cast<TypedPrimitive *>(right->base());
-				if (primitive == nullptr)
-					return nullptr;//TODO: Throw exception
+				auto primitive = (right == nullptr) ? nullptr : dynamic_cast<TypedPrimitive *>(right->base());
+				if (primitive == nullptr){
+					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+						"'" + value + "': Operands mismatch!", expr)));
+				}
 
 				return reversed ? evaluate_(value, primitive, this, exception, expr) : evaluate_(value, this, primitive, exception, expr);
 			}
@@ -113,7 +113,8 @@ namespace StructuredScript{
 				if (value == ">")
 					return PrimitiveFactory::createBool(left->value_ > right->value_);
 
-				return nullptr;//TODO: Throw exception
+				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+					"'" + value + "': Operands mismatch!", expr)));
 			}
 
 			ValueType value_;

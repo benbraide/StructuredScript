@@ -14,6 +14,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_[Typename::TYPE_NAME_VOID]		= std::make_shared<PrimitiveType>("void", Typename::TYPE_NAME_VOID);
 	primitives_[Typename::TYPE_NAME_BOOLEAN]	= std::make_shared<PrimitiveType>("bool", Typename::TYPE_NAME_BOOLEAN);
 	primitives_[Typename::TYPE_NAME_BYTE]		= std::make_shared<PrimitiveType>("byte", Typename::TYPE_NAME_BYTE);
+	primitives_[Typename::TYPE_NAME_NAN]		= std::make_shared<PrimitiveType>("NaN", Typename::TYPE_NAME_NAN);
 	primitives_[Typename::TYPE_NAME_CHAR]		= std::make_shared<PrimitiveType>("char", Typename::TYPE_NAME_CHAR);
 	primitives_[Typename::TYPE_NAME_UCHAR]		= std::make_shared<PrimitiveType>("unsigned char", Typename::TYPE_NAME_UCHAR);
 	primitives_[Typename::TYPE_NAME_SHORT]		= std::make_shared<PrimitiveType>("short", Typename::TYPE_NAME_SHORT);
@@ -30,7 +31,15 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_[Typename::TYPE_NAME_STRING]		= std::make_shared<PrimitiveType>("string", Typename::TYPE_NAME_STRING);
 	primitives_[Typename::TYPE_NAME_TYPE]		= std::make_shared<PrimitiveType>("type", Typename::TYPE_NAME_TYPE);
 
+	attributes_["Locked"]						= std::make_shared<LockedAttribute>();
+	attributes_["Concurrent"]					= std::make_shared<ConcurentAttribute>();
+	attributes_["Once"]							= std::make_shared<OnceAttribute>();
+	attributes_["Override"]						= std::make_shared<OverrideAttribute>();
+	attributes_["AssumeType"]					= std::make_shared<AssumeTypeAttribute>();
+	attributes_["AssumeConstness"]				= std::make_shared<AssumeConstnessAttribute>();
+
 	types_["integral_type"]						= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
+		primitives_[Typename::TYPE_NAME_NAN],
 		primitives_[Typename::TYPE_NAME_CHAR],
 		primitives_[Typename::TYPE_NAME_UCHAR],
 		primitives_[Typename::TYPE_NAME_SHORT],
@@ -44,12 +53,14 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	}, "integral_type");
 
 	types_["floating_point_type"]				= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
+		primitives_[Typename::TYPE_NAME_NAN],
 		primitives_[Typename::TYPE_NAME_FLOAT],
 		primitives_[Typename::TYPE_NAME_DOUBLE],
 		primitives_[Typename::TYPE_NAME_LDOUBLE]
 	}, "floating_point_type");
 
 	types_["numeric_type"]						= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
+		primitives_[Typename::TYPE_NAME_NAN],
 		primitives_[Typename::TYPE_NAME_CHAR],
 		primitives_[Typename::TYPE_NAME_UCHAR],
 		primitives_[Typename::TYPE_NAME_SHORT],
@@ -70,6 +81,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 		primitives_[Typename::TYPE_NAME_BOOLEAN],
 		primitives_[Typename::TYPE_NAME_BIT],
 		primitives_[Typename::TYPE_NAME_BYTE],
+		primitives_[Typename::TYPE_NAME_NAN],
 		primitives_[Typename::TYPE_NAME_CHAR],
 		primitives_[Typename::TYPE_NAME_UCHAR],
 		primitives_[Typename::TYPE_NAME_SHORT],

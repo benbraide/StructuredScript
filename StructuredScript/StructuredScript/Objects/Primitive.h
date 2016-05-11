@@ -3,7 +3,11 @@
 #ifndef STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_H
 #define STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_H
 
-#include "../Common/Query.h"
+#include "../Common/ExceptionManagerQuery.h"
+#include "../Common/Factory.h"
+
+#include "../Interfaces/Objects/IPrimitiveObject.h"
+#include "../Interfaces/Types/IPrimitiveType.h"
 
 namespace StructuredScript{
 	namespace Objects{
@@ -50,7 +54,7 @@ namespace StructuredScript{
 			static const int DOUBLE_RANK	= 0x000B;
 			static const int LDOUBLE_RANK	= 0x000C;
 			static const int STRING_RANK	= 0x000D;
-			static const int NAN_RANK		= 0x000E;
+			static const int NAN_RANK		= 0xFFFF;
 
 		protected:
 			virtual Ptr promote_(Primitive *target) = 0;

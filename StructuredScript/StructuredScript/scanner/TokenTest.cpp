@@ -1,6 +1,6 @@
 #include "../CppUnitLite/TestHarness.h"
 
-#include "token.h"
+#include "Token.h"
 
 namespace StructuredScript{
 	TEST(Token, Test){

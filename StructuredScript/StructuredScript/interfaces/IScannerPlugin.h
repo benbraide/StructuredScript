@@ -6,7 +6,7 @@
 #include <functional>
 
 #include "ICharacterWell.h"
-#include "../Scanner/token.h"
+#include "../Scanner/Token.h"
 
 namespace StructuredScript{
 	namespace Interfaces{

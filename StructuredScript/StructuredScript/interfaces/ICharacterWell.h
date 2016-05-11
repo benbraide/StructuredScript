@@ -25,6 +25,8 @@ namespace StructuredScript{
 
 			virtual void stepToEnd() = 0;
 
+			virtual bool stepTo(char target) = 0;
+
 			virtual void collapse() = 0;
 
 			virtual void commit() = 0;

@@ -21,6 +21,46 @@ void StructuredScript::OperatorInfo::init(){
 		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
 	};
 
+	entries_["+="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["-="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["*="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["/="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["%="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["&="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["^="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["|="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["<<="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_[">>="] = MatchedListType{
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
 	entries_["?"] = MatchedListType{
 		{ OperatorType(OperatorType::BINARY), Info{ 4, true } }
 	};

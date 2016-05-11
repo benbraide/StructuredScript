@@ -17,6 +17,8 @@ namespace StructuredScript{
 
 		virtual IStorage *storage() override;
 
+		virtual bool isAny() const override;
+
 		virtual bool isEqual(const IType &target) const override;
 
 		virtual bool isParent(const IType &target) const override;

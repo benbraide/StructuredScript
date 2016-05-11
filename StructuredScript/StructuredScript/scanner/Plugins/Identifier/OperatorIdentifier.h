@@ -35,9 +35,7 @@ namespace StructuredScript{
 				Skip skipPlugin_;
 			};
 
-			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 1> LeftUnaryOperatorTokenType;
-			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 2> RightUnaryOperatorTokenType;
-			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 3> BinaryOperatorTokenType;
+			typedef StaticEnumAdapter<TokenType, TokenType::TOKEN_TYPE_ERROR, 1> OperatorTokenType;
 		}
 	}
 }

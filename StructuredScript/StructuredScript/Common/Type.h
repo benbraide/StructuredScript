@@ -10,9 +10,10 @@
 namespace StructuredScript{
 	class Type : public IType, public IStorage{
 	public:
-		typedef std::list<Type *>					ParentListType;
-		typedef std::map<std::string, IType::Ptr>	TypeListType;
-		typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
+		typedef std::list<Type *>								ParentListType;
+		typedef std::map<std::string, IType::Ptr>				TypeListType;
+		typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
+		typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
 
 		Type(IStorage *storage, const std::string &name)
 			: storage_(storage), name_(name){}
@@ -20,6 +21,8 @@ namespace StructuredScript{
 		virtual Ptr ptr() override;
 
 		virtual IStorage *storage() override;
+
+		virtual bool isAny() const override;
 
 		virtual bool isEqual(const IType &target) const override;
 
@@ -43,6 +46,10 @@ namespace StructuredScript{
 
 		virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
 
+		virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
+
+		virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;
+
 		virtual bool remove(const IMemory *target) override;
 
 	private:
@@ -51,6 +58,7 @@ namespace StructuredScript{
 
 		TypeListType types_;
 		MemoryListType objects_;
+		MemoryAttributeListType attributes_;
 		ParentListType parents_;
 	};
 }

@@ -4,7 +4,9 @@
 #define STRUCTURED_SCRIPT_FACTORY_H
 
 #include "Typename.h"
-#include "../Objects/TypedPrimitive.h"
+
+#include "../Interfaces/IAny.h"
+#include "../Interfaces/IMemory.h"
 
 namespace StructuredScript{
 	class PrimitiveFactory{

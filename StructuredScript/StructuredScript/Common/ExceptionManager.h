@@ -16,9 +16,9 @@ namespace StructuredScript{
 
 		virtual void setOnce() override;
 
-		virtual void setExit() override;
+		virtual void setExit(IAny::Ptr value) override;
 
-		virtual void setReturn() override;
+		virtual void setReturn(IAny::Ptr value) override;
 
 		virtual void setBreak() override;
 

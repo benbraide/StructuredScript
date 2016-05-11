@@ -52,6 +52,14 @@ StructuredScript::IStorage *StructuredScript::Objects::Any::findStorage(const st
 		}
 	}
 
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findStorage(name, localOnly);
+}
+
+StructuredScript::IType::Ptr *StructuredScript::Objects::Any::addType(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std::string &name, bool localOnly){
 	return nullptr;
 }
 
@@ -60,6 +68,11 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addMemory(const 
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const std::string &name, bool localOnly){
+	if (name == "self"){
+		auto memory = (self_ == nullptr) ? nullptr : self_->memory();
+		return (memory == nullptr) ? nullptr : memory->ptr();
+	}
+
 	auto object = objects_.find(name);
 	if (object != objects_.end())
 		return object->second;
@@ -72,10 +85,14 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const 
 		}
 	}
 
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findMemory(name, localOnly);
+}
+
+StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Any::addMemoryAttribute(const std::string &name){
 	return nullptr;
 }
 
-StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std::string &name, bool localOnly){
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Any::findMemoryAttribute(const std::string &name, bool localOnly){
 	return nullptr;
 }
 

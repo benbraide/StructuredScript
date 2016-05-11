@@ -19,6 +19,8 @@ namespace StructuredScript{
 
 			virtual Storage *storage() = 0;
 
+			virtual bool isAny() const = 0;
+
 			virtual bool isEqual(const Type &target) const = 0;
 
 			virtual bool isParent(const Type &target) const = 0;

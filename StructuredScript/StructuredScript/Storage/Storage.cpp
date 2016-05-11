@@ -44,6 +44,18 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemory(name, false);
 }
 
+StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Storage::Storage::addMemoryAttribute(const std::string &name){
+	return (findMemoryAttribute(name, true) == nullptr) ? &attributes_[name] : nullptr;
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::Storage::findMemoryAttribute(const std::string &name, bool localOnly){
+	auto attribute = attributes_.find(name);
+	if (attribute != attributes_.end())
+		return attribute->second;
+
+	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemoryAttribute(name, false);
+}
+
 bool StructuredScript::Storage::Storage::remove(const IMemory *target){
 	for (auto object = objects_.begin(); object != objects_.end(); ++object){
 		if (object->second.get() == target){

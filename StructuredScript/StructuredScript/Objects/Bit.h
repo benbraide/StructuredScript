@@ -7,7 +7,7 @@
 
 namespace StructuredScript{
 	namespace Objects{
-		class Bit : public TypedPrimitive<bool, -1>, public IBool {
+		class Bit : public TypedPrimitive<bool, -1>, public IBit {
 		public:
 			explicit Bit(bool value)
 				: TypedPrimitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_BIT), value){}
