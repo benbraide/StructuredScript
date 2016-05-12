@@ -1,32 +1,14 @@
 #include "MemoryAttributes.h"
 
-StructuredScript::Storage::MemoryAttribute &StructuredScript::Storage::MemoryAttribute::operator =(unsigned short attributes){
-	attributes_ = attributes;
-	return *this;
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::MemoryAttributes::getAttribute(const std::string &name){
+	auto attribute = attributes_.find(name);
+	return (attribute == attributes_.end()) ? nullptr : attribute->second;
 }
 
-StructuredScript::Storage::MemoryAttribute &StructuredScript::Storage::MemoryAttribute::operator +=(unsigned short attributes){
-	attributes_ |= attributes;
-	return *this;
+bool StructuredScript::Storage::MemoryAttributes::hasAttribute(const std::string &name) const{
+	return (attributes_.find(name) != attributes_.end());
 }
 
-StructuredScript::Storage::MemoryAttribute &StructuredScript::Storage::MemoryAttribute::operator-=(unsigned short attributes){
-	attributes_ &= ~attributes;
-	return *this;
-}
-
-unsigned short StructuredScript::Storage::MemoryAttribute::getAttributes() const{
-	return attributes_;
-}
-
-bool StructuredScript::Storage::MemoryAttribute::is(unsigned short attributes, bool all /*= true*/) const{
-	return all ? ((attributes_ & attributes) == attributes) : ((attributes_ & attributes) != 0u);
-}
-
-bool StructuredScript::Storage::MemoryAttribute::isLocked() const{
-	return ((attributes_ & ATTRIBUTE_LOCKED) == ATTRIBUTE_LOCKED);
-}
-
-bool StructuredScript::Storage::MemoryAttribute::isConcurrent() const{
-	return ((attributes_ & ATTRIBUTE_CONCURRENT) == ATTRIBUTE_CONCURRENT);
+std::string StructuredScript::Storage::MemoryAttributes::str() const{
+	return "";
 }

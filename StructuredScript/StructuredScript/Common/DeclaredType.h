@@ -11,31 +11,31 @@ namespace StructuredScript{
 	public:
 		typedef StructuredScript::Storage::MemoryState MemoryState;
 
-		DeclaredType(IType *type, const MemoryState &state)
+		DeclaredType(IType::Ptr type, const MemoryState &state)
 			: type_(type), state_(state){}
 
 		bool operator ==(const DeclaredType &right) const;
 
-		bool operator ==(const IType *right) const;
+		bool operator ==(const IType::Ptr right) const;
 
 		bool operator !=(const DeclaredType &right) const;
 
-		bool operator !=(const IType *right) const;
+		bool operator !=(const IType::Ptr right) const;
 
 		bool isCompatibleWith(const DeclaredType &target, bool family = false) const;
 
-		bool isCompatibleWith(const IType *target, const MemoryState &state, bool family = false) const;
+		bool isCompatibleWith(const IType::Ptr target, const MemoryState &state, bool family = false) const;
 
 		bool isEqual(const DeclaredType &target, bool strictly = true) const;
 
-		bool isEqual(const IType *target, bool strictly = true) const;
+		bool isEqual(const IType::Ptr target, bool strictly = true) const;
 
-		IType *type();
+		IType::Ptr type();
 
 		MemoryState &state();
 
 	private:
-		IType *type_;
+		IType::Ptr type_;
 		MemoryState state_;
 	};
 }

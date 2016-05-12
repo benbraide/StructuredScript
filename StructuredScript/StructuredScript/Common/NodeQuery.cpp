@@ -1,42 +1,58 @@
 #include "NodeQuery.h"
 
-bool StructuredScript::Query::Node::isEmpty(const INode *node){
-	return (dynamic_cast<const IEmptyNode *>(node) != nullptr);
+bool StructuredScript::Query::Node::isEmpty(INode::Ptr node){
+	return (dynamic_cast<IEmptyNode *>(node.get()) != nullptr);
 }
 
-bool StructuredScript::Query::Node::isDeclaration(const INode *node){
+bool StructuredScript::Query::Node::isIdentifier(INode::Ptr node){
+	return (dynamic_cast<IIdentifierNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isIdentifierExpression(INode::Ptr node){
+	return (dynamic_cast<IIdentifierExpressionNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isOperatorIdentifier(INode::Ptr node){
+	return (dynamic_cast<IOperatorIdentifierNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isTypeIdentifier(INode::Ptr node){
+	return (dynamic_cast<ITypeIdentifierNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isDeclaration(INode::Ptr node){
+	return (dynamic_cast<IDeclarationNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isInitialization(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isAssignment(const INode *node){
+bool StructuredScript::Query::Node::isParameter(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isParameter(const INode *node){
+bool StructuredScript::Query::Node::isMember(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isMember(const INode *node){
+bool StructuredScript::Query::Node::isControl(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isControl(const INode *node){
+bool StructuredScript::Query::Node::isLoop(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isLoop(const INode *node){
+bool StructuredScript::Query::Node::isSelection(INode::Ptr node){
 	return false;
 }
 
-bool StructuredScript::Query::Node::isSelection(const INode *node){
-	return false;
+bool StructuredScript::Query::Node::isBlock(INode::Ptr node){
+	return (dynamic_cast<IBlockNode *>(node.get()) != nullptr);
 }
 
-bool StructuredScript::Query::Node::isBlock(const INode *node){
-	return (dynamic_cast<const IBlockNode *>(node) != nullptr);
-}
-
-bool StructuredScript::Query::Node::isPlainBlock(const INode *node){
+bool StructuredScript::Query::Node::isPlainBlock(INode::Ptr node){
 	return false;
 }
 

@@ -15,7 +15,7 @@ StructuredScript::Storage::MemoryState &StructuredScript::Storage::MemoryState::
 	return *this;
 }
 
-unsigned short StructuredScript::Storage::MemoryState::getStates() const{
+unsigned short StructuredScript::Storage::MemoryState::states() const{
 	return states_;
 }
 
@@ -57,4 +57,8 @@ bool StructuredScript::Storage::MemoryState::isRValReference() const{
 
 bool StructuredScript::Storage::MemoryState::hasDefault() const{
 	return ((states_ & (STATE_CONSTANT | STATE_FINAL | STATE_REFERENCE)) == 0u);
+}
+
+std::string StructuredScript::Storage::MemoryState::str() const{
+	return "";
 }

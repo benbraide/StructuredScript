@@ -1,18 +1,22 @@
 #pragma once
 
-#ifndef STRUCTURED_SCRIPT_TEMP_MEMORY_H
-#define STRUCTURED_SCRIPT_TEMP_MEMORY_H
+#ifndef STRUCTURED_SCRIPT_FUNCTION_MEMORY_H
+#define STRUCTURED_SCRIPT_FUNCTION_MEMORY_H
 
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/Factory.h"
 
 #include "../Interfaces/INode.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
+
+#include "MemoryAttributes.h"
 
 namespace StructuredScript{
 	namespace Storage{
-		class TempMemory : public IMemory{
+		class FunctionMemory : public IMemory, public IFunctionMemory{
 		public:
-			TempMemory(IStorage *storage, IAny::Ptr value);
+			FunctionMemory(IStorage *storage, IType::Ptr type, const MemoryState &state, const MemoryAttributes &attributes)
+				: storage_(storage), type_(type, state), attributes_(attributes){}
 
 			virtual Ptr ptr() override;
 
@@ -28,9 +32,10 @@ namespace StructuredScript{
 
 		private:
 			IStorage *storage_;
-			IAny::Ptr value_;
+			DeclaredType type_;
+			MemoryAttributes attributes_;
 		};
 	}
 }
 
-#endif /* !STRUCTURED_SCRIPT_TEMP_MEMORY_H */
+#endif /* !STRUCTURED_SCRIPT_FUNCTION_MEMORY_H */

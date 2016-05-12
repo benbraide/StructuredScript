@@ -11,6 +11,10 @@ namespace StructuredScript{
 		class Parser{
 		public:
 			virtual Node::Ptr parse(CharacterWell &well, Scanner &scanner, ExceptionManager *exception, bool single = false) = 0;
+
+			virtual Node::Ptr term(CharacterWell &well, Scanner &scanner, ExceptionManager *exception) = 0;
+
+			virtual Node::Ptr expression(Node::Ptr node, CharacterWell &well, Scanner &scanner, ExceptionManager *exception, short precedence = -1) = 0;
 		};
 	}
 

@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_GLOBAL_STORAGE_H
 
 #include "Storage.h"
+#include "Memory.h"
 
 #include "Attributes/LockedAttribute.h"
 #include "Attributes/ConcurrentAttribute.h"

@@ -5,11 +5,11 @@
 
 #include <list>
 
-#include "../Interfaces/INode.h"
 #include "../Interfaces/Nodes/IOperatorNode.h"
 #include "../Interfaces/Nodes/IEmptyNode.h"
 #include "../Interfaces/Nodes/IBlockNode.h"
 #include "../Interfaces/Nodes/IIdentifierNode.h"
+#include "../Interfaces/Nodes/IDeclarationNode.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 
@@ -19,25 +19,33 @@ namespace StructuredScript{
 		public:
 			typedef std::list<INode::Ptr> ListType;
 
-			static bool isEmpty(const INode *node);
+			static bool isEmpty(INode::Ptr node);
 
-			static bool isDeclaration(const INode *node);
+			static bool isIdentifier(INode::Ptr node);
 
-			static bool isAssignment(const INode *node);
+			static bool isIdentifierExpression(INode::Ptr node);
 
-			static bool isParameter(const INode *node);
+			static bool isOperatorIdentifier(INode::Ptr node);
 
-			static bool isMember(const INode *node);
+			static bool isTypeIdentifier(INode::Ptr node);
 
-			static bool isControl(const INode *node);
+			static bool isDeclaration(INode::Ptr node);
 
-			static bool isLoop(const INode *node);
+			static bool isInitialization(INode::Ptr node);
 
-			static bool isSelection(const INode *node);
+			static bool isParameter(INode::Ptr node);
 
-			static bool isBlock(const INode *node);
+			static bool isMember(INode::Ptr node);
 
-			static bool isPlainBlock(const INode *node);
+			static bool isControl(INode::Ptr node);
+
+			static bool isLoop(INode::Ptr node);
+
+			static bool isSelection(INode::Ptr node);
+
+			static bool isBlock(INode::Ptr node);
+
+			static bool isPlainBlock(INode::Ptr node);
 
 			static void split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary = false);
 

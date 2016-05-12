@@ -7,7 +7,7 @@
 
 namespace StructuredScript{
 	namespace Interfaces{
-		class FunctionMemory : public Memory{
+		class FunctionMemory{
 		public:
 			virtual ~FunctionMemory(){}
 		};

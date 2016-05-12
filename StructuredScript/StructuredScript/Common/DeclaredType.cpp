@@ -4,7 +4,7 @@ bool StructuredScript::DeclaredType::operator ==(const DeclaredType &right) cons
 	return isEqual(right, false);
 }
 
-bool StructuredScript::DeclaredType::operator ==(const IType *right) const{
+bool StructuredScript::DeclaredType::operator ==(const IType::Ptr right) const{
 	return isEqual(right, false);
 }
 
@@ -12,7 +12,7 @@ bool StructuredScript::DeclaredType::operator !=(const DeclaredType &right) cons
 	return !isEqual(right, false);
 }
 
-bool StructuredScript::DeclaredType::operator !=(const IType *right) const{
+bool StructuredScript::DeclaredType::operator !=(const IType::Ptr right) const{
 	return !isEqual(right, false);
 }
 
@@ -20,7 +20,7 @@ bool StructuredScript::DeclaredType::isCompatibleWith(const DeclaredType &target
 	return isCompatibleWith(type_, state_, family);
 }
 
-bool StructuredScript::DeclaredType::isCompatibleWith(const IType *type, const MemoryState &state, bool family /*= false*/) const{
+bool StructuredScript::DeclaredType::isCompatibleWith(const IType::Ptr type, const MemoryState &state, bool family /*= false*/) const{
 	if (type_ == nullptr || type == nullptr)
 		return false;
 
@@ -50,7 +50,7 @@ bool StructuredScript::DeclaredType::isEqual(const DeclaredType &target, bool st
 		state_.isReference() == target.state_.isReference() && state_.isRValReference() == target.state_.isRValReference());
 }
 
-bool StructuredScript::DeclaredType::isEqual(const IType *target, bool strictly /*= true*/) const{
+bool StructuredScript::DeclaredType::isEqual(const IType::Ptr target, bool strictly /*= true*/) const{
 	if (type_ == nullptr || target == nullptr)
 		return false;
 
@@ -60,7 +60,7 @@ bool StructuredScript::DeclaredType::isEqual(const IType *target, bool strictly 
 	return (!state_.isFinal() && !state_.isConstant() && !state_.isReference() && !state_.isRValReference());
 }
 
-StructuredScript::IType *StructuredScript::DeclaredType::type(){
+StructuredScript::IType::Ptr StructuredScript::DeclaredType::type(){
 	return type_;
 }
 

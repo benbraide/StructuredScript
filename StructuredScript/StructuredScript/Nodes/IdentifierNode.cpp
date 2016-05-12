@@ -36,7 +36,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentif
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentifierNode::clone(){
-	return std::make_shared<OperatorIdentifierNode>(value_);
+	return std::make_shared<OperatorIdentifierNode>(value_->clone());
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::OperatorIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -52,6 +52,10 @@ std::string StructuredScript::Nodes::OperatorIdentifierNode::value() const{
 	return (id == nullptr) ? value_->str() : id->value();
 }
 
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentifierNode::nodeValue(){
+	return value_;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierNode::clone(){
 	return std::make_shared<PrimitiveTypeIdentifierNode>(name_, IdentifierNode::str());
 }
@@ -60,8 +64,12 @@ std::string StructuredScript::Nodes::PrimitiveTypeIdentifierNode::str(){
 	return name_;
 }
 
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TypenameIdentifierNode::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TypenameIdentifierNode::clone(){
-	return std::make_shared<TypenameIdentifierNode>(value_);
+	return std::make_shared<TypenameIdentifierNode>(value_->clone());
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::TypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -76,4 +84,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::TypenameIdentifierNode::eva
 
 std::string StructuredScript::Nodes::TypenameIdentifierNode::str(){
 	return ("typename " + value_->str());
+}
+
+std::string StructuredScript::Nodes::TypenameIdentifierNode::value() const{
+	auto id = dynamic_cast<IIdentifierNode *>(value_.get());
+	return (id == nullptr) ? value_->str() : id->value();
 }

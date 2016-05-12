@@ -5,9 +5,6 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	auto bit = std::make_shared<Type>(this, "bit");
 
-	/**bit->addMemory("zero") = PrimitiveFactory::createBit(false);
-	*bit->addMemory("one") = PrimitiveFactory::createBit(true);*/
-
 	primitives_[Typename::TYPE_NAME_BIT]		= bit;
 
 	primitives_[Typename::TYPE_NAME_ANY]		= std::make_shared<AnyType>();
@@ -98,6 +95,9 @@ void StructuredScript::Storage::GlobalStorage::init(){
 		primitives_[Typename::TYPE_NAME_STRING],
 		primitives_[Typename::TYPE_NAME_TYPE]
 	}, "primitive_type");
+
+	*bit->addMemory("zero") = std::make_shared<Memory>(this, PrimitiveFactory::createBit(false), bit, MemoryState(MemoryState::STATE_CONSTANT), MemoryAttributes({}));
+	*bit->addMemory("one") = std::make_shared<Memory>(this, PrimitiveFactory::createBit(true), bit, MemoryState(MemoryState::STATE_CONSTANT), MemoryAttributes({}));
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, bool localOnly){

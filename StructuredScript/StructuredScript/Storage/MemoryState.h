@@ -3,6 +3,8 @@
 #ifndef STRUCTURED_SCRIPT_STORAGE_MEMORY_STATE_H
 #define STRUCTURED_SCRIPT_STORAGE_MEMORY_STATE_H
 
+#include <string>
+
 namespace StructuredScript{
 	namespace Storage{
 		class MemoryState{
@@ -16,7 +18,7 @@ namespace StructuredScript{
 
 			MemoryState &operator -=(unsigned short states);
 
-			unsigned short getStates() const;
+			unsigned short states() const;
 
 			bool is(unsigned short states, bool all = true) const;
 
@@ -38,14 +40,17 @@ namespace StructuredScript{
 
 			bool hasDefault() const;
 
+			std::string str() const;
+
 			static const unsigned short STATE_NONE			= 0x0000;
 			static const unsigned short STATE_CONSTANT		= 0x0001;
 			static const unsigned short STATE_FINAL			= 0x0002;
 			static const unsigned short STATE_STATIC		= 0x0004;
 			static const unsigned short STATE_PRIVATE		= 0x0008;
 			static const unsigned short STATE_PROTECTED		= 0x0010;
-			static const unsigned short STATE_REFERENCE		= 0x0020;
-			static const unsigned short STATE_RVALUE		= 0x0040;
+			static const unsigned short STATE_PUBLIC		= 0x0020;
+			static const unsigned short STATE_REFERENCE		= 0x0040;
+			static const unsigned short STATE_RVALUE		= 0x0080;
 
 		private:
 			unsigned short states_;

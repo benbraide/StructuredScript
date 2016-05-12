@@ -17,9 +17,9 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() = 0;
 
-			virtual bool appliesTo(Memory *memory, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual bool appliesTo(std::shared_ptr<Memory> memory, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual bool appliesTo(Node *node, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual bool appliesTo(std::shared_ptr<Node> node, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}
 

@@ -3,33 +3,27 @@
 #ifndef STRUCTURED_SCRIPT_STORAGE_MEMORY_ATTRIBUTES_H
 #define STRUCTURED_SCRIPT_STORAGE_MEMORY_ATTRIBUTES_H
 
+#include <map>
+
+#include "../Interfaces/Storages/IMemoryAttributes.h"
+
 namespace StructuredScript{
 	namespace Storage{
-		class MemoryAttribute{
+		class MemoryAttributes : public IMemoryAttributes{
 		public:
-			explicit MemoryAttribute(unsigned short attributes = ATTRIBUTE_NONE)
+			typedef std::map<std::string, IMemoryAttribute::Ptr> ListType;
+
+			MemoryAttributes(const ListType &attributes)
 				: attributes_(attributes){}
 
-			MemoryAttribute &operator =(unsigned short attributes);
+			virtual IMemoryAttribute::Ptr getAttribute(const std::string &name) override;
 
-			MemoryAttribute &operator +=(unsigned short attributes);
+			virtual bool hasAttribute(const std::string &name) const override;
 
-			MemoryAttribute &operator -=(unsigned short attributes);
-
-			unsigned short getAttributes() const;
-
-			bool is(unsigned short attributes, bool all = true) const;
-
-			bool isLocked() const;
-
-			bool isConcurrent() const;
-
-			static const unsigned short ATTRIBUTE_NONE			= 0x0000;
-			static const unsigned short ATTRIBUTE_LOCKED		= 0x0001;
-			static const unsigned short ATTRIBUTE_CONCURRENT	= 0x0002;
+			virtual std::string str() const override;
 
 		private:
-			unsigned short attributes_;
+			ListType attributes_;
 		};
 	}
 }
