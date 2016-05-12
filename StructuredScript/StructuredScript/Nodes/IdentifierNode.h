@@ -6,6 +6,7 @@
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
 #include "../Common/Factory.h"
+#include "../Common/CompositeType.h"
 
 namespace StructuredScript{
 	namespace Nodes{
@@ -62,7 +63,7 @@ namespace StructuredScript{
 			std::string name_;
 		};
 
-		class TypenameIdentifierNode : public INode, public ITypeIdentifierNode, public IIdentifierNode, public IIdentifierExpressionNode{
+		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode{
 		public:
 			explicit TypenameIdentifierNode(Ptr value)
 				: value_(value){}
@@ -76,6 +77,23 @@ namespace StructuredScript{
 			virtual std::string str() override;
 
 			virtual std::string value() const override;
+
+		protected:
+			Ptr value_;
+		};
+
+		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode, public ITypeResolver{
+		public:
+			TemplatedTypenameIdentifierNode(Ptr type, Ptr value)
+				: TypenameIdentifierNode(type), value_(value){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
+
+			virtual IType::Ptr resolve(IStorage *storage) override;
 
 		private:
 			Ptr value_;

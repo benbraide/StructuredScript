@@ -41,7 +41,7 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<MemoryAttribute> findMemoryAttribute(const std::string &name, bool localOnly) = 0;
 
-			virtual bool remove(const Memory *target) = 0;
+			virtual bool remove(std::shared_ptr<Memory> target) = 0;
 		};
 	}
 

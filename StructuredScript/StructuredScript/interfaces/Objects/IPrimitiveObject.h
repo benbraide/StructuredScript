@@ -88,6 +88,11 @@ namespace StructuredScript{
 
 			virtual Any::Ptr getIndexValue(unsigned int index) = 0;
 		};
+
+		class Undefined{
+		public:
+			virtual ~Undefined(){}
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -104,6 +109,7 @@ namespace StructuredScript{
 	typedef Interfaces::TypeObject		ITypeObject;
 	typedef Interfaces::IndexObject		IIndexObject;
 	typedef Interfaces::IndexTarget		IIndexTarget;
+	typedef Interfaces::Undefined		IUndefined;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

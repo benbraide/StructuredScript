@@ -121,6 +121,6 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttrib
 	return nullptr;
 }
 
-bool StructuredScript::Type::remove(const IMemory *target){
+bool StructuredScript::Type::remove(IMemory::Ptr target){
 	return false;
 }

@@ -5,5 +5,5 @@ StructuredScript::INode::Ptr StructuredScript::Parser::DeclarationParser::parse(
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	return std::make_shared<Nodes::DeclarationNode>(type_, value, Storage::MemoryState(), Storage::MemoryAttributes({}));
+	return std::make_shared<Nodes::DeclarationNode>(type_, value);
 }

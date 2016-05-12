@@ -82,7 +82,8 @@ void StructuredScript::OperatorInfo::init(){
 	};
 
 	entries_["&"] = MatchedListType{
-		{ OperatorType(OperatorType::BINARY), Info{ 9, true } }
+		{ OperatorType(OperatorType::BINARY), Info{ 9, true } },
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, true } }
 	};
 
 	entries_["=="] = MatchedListType{
@@ -154,10 +155,6 @@ void StructuredScript::OperatorInfo::init(){
 
 	entries_["**"] = MatchedListType{
 		{ OperatorType(OperatorType::BINARY), Info{ 16, true } }
-	};
-
-	entries_["&"] = MatchedListType{
-		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, true } }
 	};
 
 	entries_["~"] = MatchedListType{

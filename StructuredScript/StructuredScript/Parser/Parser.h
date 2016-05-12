@@ -9,6 +9,8 @@
 
 #include "Plugins/TypenameParser.h"
 #include "Plugins/DeclarationParser.h"
+#include "Plugins/InitializationParser.h"
+#include "Plugins/DependentDeclarationParser.h"
 #include "Plugins/MemoryStateParser.h"
 
 #include "../Scanner/Scanner.h"
@@ -25,11 +27,13 @@ namespace StructuredScript{
 		public:
 			typedef std::map< std::string, std::shared_ptr<IParserPlugin> > PluginListType;
 
-			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception, bool single = false) override;
+			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception,
+				Validator validator = nullptr, bool single = false) override;
 
-			virtual INode::Ptr term(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception) override;
+			virtual INode::Ptr term(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception, Validator validator = nullptr) override;
 
-			virtual INode::Ptr expression(INode::Ptr node, ICharacterWell &well, IScanner &scanner, IExceptionManager *exception, short precedence = -1) override;
+			virtual INode::Ptr expression(INode::Ptr node, ICharacterWell &well, IScanner &scanner, IExceptionManager *exception,
+				short precedence = -1, Validator validator = nullptr) override;
 
 			static void init();
 

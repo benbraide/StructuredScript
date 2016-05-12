@@ -90,3 +90,45 @@ std::string StructuredScript::Nodes::TypenameIdentifierNode::value() const{
 	auto id = dynamic_cast<IIdentifierNode *>(value_.get());
 	return (id == nullptr) ? value_->str() : id->value();
 }
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::clone(){
+	return std::make_shared<TemplatedTypenameIdentifierNode>(TypenameIdentifierNode::value_->clone(), value_->clone());
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto type = resolve(storage);
+	if (type == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename!", expr)));
+	}
+
+	return PrimitiveFactory::createTypeObject(type);
+}
+
+std::string StructuredScript::Nodes::TemplatedTypenameIdentifierNode::str(){
+	return (TypenameIdentifierNode::value_->str() + "<" + value_->str() + ">");
+}
+
+StructuredScript::IType::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::resolve(IStorage *storage){
+	auto type = Query::Node::resolveAsType(TypenameIdentifierNode::value_, storage);
+	if (type == nullptr)
+		return nullptr;
+
+	if (type->name() == "any"){//Composite type
+		Query::Node::ListType list;
+		Query::Node::split(",", value_, list);
+
+		CompositeType::ListType types;
+		for (auto node : list){//Resolve type list
+			auto value = Query::Node::resolveAsType(node, storage);
+			if (value == nullptr)//Could not resolve type
+				return nullptr;
+
+			types.push_back(value);
+		}
+
+		return std::make_shared<CompositeType>(types);
+	}
+
+	return nullptr;
+}

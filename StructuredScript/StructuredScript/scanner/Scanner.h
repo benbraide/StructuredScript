@@ -27,8 +27,14 @@ namespace StructuredScript{
 
 		class Scanner : public IScanner{
 		public:
-			typedef std::list<Token>	TokenListType;
-			typedef std::list<char>		OpenListType;
+			struct CloseInfo{
+				std::string value;
+				bool matchAll;
+				bool testBlanks;
+			};
+
+			typedef std::list<Token>		TokenListType;
+			typedef std::list<CloseInfo>	OpenListType;
 
 			virtual void init() override;
 
@@ -38,9 +44,11 @@ namespace StructuredScript{
 
 			virtual void save(const Token &token) override;
 
-			virtual bool fork(char closeWith) override;
+			virtual bool fork(char closeWith, bool testBlanks = false) override;
 
-			virtual bool open(ICharacterWell &well, char target, char closeWith = '\0') override;
+			virtual bool fork(const std::string &closeWith, bool matchAll = false, bool testBlanks = false) override;
+
+			virtual bool open(ICharacterWell &well, char target, char closeWith = '\0', bool testBlanks = false) override;
 
 			virtual bool close(ICharacterWell &well, bool force = false) override;
 
@@ -74,7 +82,7 @@ namespace StructuredScript{
 			Token skip_(ICharacterWell &well) const;
 
 			OpenListType openList_;
-			char closeWith_ = '\0';
+			CloseInfo closeWith_ = CloseInfo{ "", true, false };
 
 			TokenListType savedTokens_;
 			PluginListType plugins_;

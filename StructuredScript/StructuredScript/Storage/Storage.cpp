@@ -72,9 +72,9 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::Storage::find
 	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemoryAttribute(name, false);
 }
 
-bool StructuredScript::Storage::Storage::remove(const IMemory *target){
+bool StructuredScript::Storage::Storage::remove(IMemory::Ptr target){
 	for (auto object = objects_.begin(); object != objects_.end(); ++object){
-		if (object->second.get() == target){
+		if (object->second == target){
 			objects_.erase(object);
 			return true;
 		}

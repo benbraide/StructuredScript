@@ -25,9 +25,11 @@ namespace StructuredScript{
 
 			virtual void save(const Token &token) = 0;
 
-			virtual bool fork(char closeWith) = 0;
+			virtual bool fork(char closeWith, bool testBlanks = false) = 0;
 
-			virtual bool open(CharacterWell &well, char target, char closeWith = '\0') = 0;
+			virtual bool fork(const std::string &closeWith, bool matchAll = false, bool testBlanks = false) = 0;
+
+			virtual bool open(CharacterWell &well, char target, char closeWith = '\0', bool testBlanks = false) = 0;
 
 			virtual bool close(CharacterWell &well, bool force = false) = 0;
 

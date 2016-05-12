@@ -58,7 +58,7 @@ namespace StructuredScript{
 
 		virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;
 
-		virtual bool remove(const IMemory *target) override;
+		virtual bool remove(IMemory::Ptr target) override;
 
 	private:
 		std::string name_;

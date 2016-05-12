@@ -7,7 +7,7 @@
 
 namespace StructuredScript{
 	namespace Objects{
-		class Undefined : public Primitive, public INumber, public IInteger, public IReal, public INaN{
+		class Undefined : public Primitive, public IUndefined{
 		public:
 			Undefined()
 				: Primitive(nullptr){}

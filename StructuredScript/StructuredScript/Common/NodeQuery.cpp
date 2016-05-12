@@ -94,6 +94,10 @@ StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INod
 }
 
 StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode::Ptr node, IStorage *storage){
+	auto typeResolver = dynamic_cast<ITypeResolver *>(node.get());
+	if (typeResolver != nullptr)
+		return typeResolver->resolve(storage);
+
 	bool localOnly;
 	std::string value;
 

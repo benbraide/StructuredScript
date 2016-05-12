@@ -21,7 +21,9 @@ int main(){
 
 	globalStorage.init();
 
+	StructuredScript::Parser::Parser::init();
 	StructuredScript::Parser::Parser::operatorInfo.init();
+
 	StructuredScript::Parser::Parser parser;
 	StructuredScript::Scanner::Scanner scanner;
 

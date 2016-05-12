@@ -112,6 +112,6 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Any::findMemo
 	return nullptr;
 }
 
-bool StructuredScript::Objects::Any::remove(const IMemory *target){
+bool StructuredScript::Objects::Any::remove(IMemory::Ptr target){
 	return false;
 }

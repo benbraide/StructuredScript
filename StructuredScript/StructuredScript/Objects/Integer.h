@@ -10,7 +10,8 @@ namespace StructuredScript{
 		template <class ObjectType, class ValueType, unsigned short Rank>
 		class Integer : public Number<ObjectType, ValueType, Rank>, public IInteger{
 		public:
-			typedef Number<ObjectType, ValueType, Rank> BaseType;
+			typedef Number<ObjectType, ValueType, Rank>	BaseType;
+			typedef TypedPrimitive<ValueType, Rank>		BaseType_;
 
 			explicit Integer(ValueType value)
 				: BaseType(value){}
@@ -37,7 +38,7 @@ namespace StructuredScript{
 			}
 
 		protected:
-			virtual IAny::Ptr evaluate_(const std::string &value, Number *left, Number *right, IExceptionManager *exception, INode *expr){
+			virtual IAny::Ptr evaluate_(const std::string &value, BaseType_ *left, BaseType_ *right, IExceptionManager *exception, INode *expr) override{
 				if (value == "**")
 					return PrimitiveFactory::createDouble(std::pow(left->value(), right->value()));
 

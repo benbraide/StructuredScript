@@ -1,11 +1,11 @@
 #include "Parser.h"
 
 StructuredScript::INode::Ptr StructuredScript::Parser::Parser::parse(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception,
-	bool single /*= false*/){
+	Validator validator/* = nullptr*/, bool single /*= false*/){
 	if (single)//Single line | block expression
 		scanner.fork(';');
 
-	auto node = expression(nullptr, well, scanner, exception);
+	auto node = expression(nullptr, well, scanner, exception, -1, validator);
 	if (single){
 		scanner.close(well, true);
 		return node;
@@ -15,7 +15,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::parse(ICharacterW
 		return node;
 
 	while (true){
-		auto right = expression(nullptr, well, scanner, exception);
+		auto right = expression(nullptr, well, scanner, exception, -1, validator);
 		if (Query::ExceptionManager::has(exception) || Query::Node::isEmpty(right))
 			return node;
 
@@ -25,7 +25,8 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::parse(ICharacterW
 	return node;
 }
 
-StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception){
+StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWell &well, IScanner &scanner, IExceptionManager *exception,
+	Validator validator/* = nullptr*/){
 	auto next = scanner.next(well, { &signedNumber_ });
 	if (next.isError())
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Error in token!"));
@@ -33,6 +34,11 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 	auto type = next.type();
 	if (type == Scanner::TokenType::TOKEN_TYPE_NONE)
 		return std::make_shared<Nodes::EmptyNode>();
+
+	if (validator != nullptr && !validator(next)){//Denied
+		scanner.save(next);
+		return std::make_shared<Nodes::EmptyNode>();
+	}
 
 	if (Scanner::tokenIsLiteralType(type))
 		return std::make_shared<Nodes::LiteralNode>(next);
@@ -45,7 +51,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 		if (plugin != plugins_.end())//Use plugin
 			return plugin->second->parse(well, scanner, *this, exception);
 
-		MemoryStateParser memoryStateParser(next.value());//Try if id is a modifier
+		MemoryStateParser memoryStateParser(next.value());//Check if id is a modifier
 		if (memoryStateParser.state().states() != Storage::MemoryState::STATE_NONE)
 			return memoryStateParser.parse(well, scanner, *this, exception);
 
@@ -58,7 +64,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Unrecognized symbol!"));
 
 	auto info = list[OperatorType(OperatorType::LEFT_UNARY)];
-	auto operand = expression(nullptr, well, scanner, exception, info.precedence);
+	auto operand = expression(nullptr, well, scanner, exception, info.precedence, validator);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
@@ -69,9 +75,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 }
 
 StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode::Ptr node, ICharacterWell &well, IScanner &scanner,
-	IExceptionManager *exception, short precedence /*= -1*/){
+	IExceptionManager *exception, short precedence /*= -1*/, Validator validator/* = nullptr*/){
 	if (node == nullptr){//Get term
-		node = term(well, scanner, exception);
+		node = term(well, scanner, exception, validator);
 		if (Query::ExceptionManager::has(exception) || Query::Node::isEmpty(node))
 			return node;
 
@@ -87,12 +93,64 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	if (type == Scanner::TokenType::TOKEN_TYPE_NONE)
 		return node;
 
+	if (validator != nullptr && !validator(next)){//Denied
+		scanner.save(next);
+		return node;
+	}
+
+	auto value = next.value();
+	if (value == "=" && (Query::Node::isDeclaration(node) || Query::Node::isTypeIdentifier(node))){
+		if (Query::Node::isInitialization(node)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + node->str() + " " + next.str() + "': Bad expression!"));
+		}
+
+		if (Query::Node::isTypeIdentifier(node))//Unnamed declaration
+			node = std::make_shared<Nodes::DeclarationNode>(node, nullptr);
+
+		InitializationParser initializationParser(node);
+		node = initializationParser.parse(well, scanner, *this, exception);
+		if (Query::ExceptionManager::has(exception))
+			return node;
+
+		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
+	if (value == "," && Query::Node::isDeclaration(node)){//Multiple declarations
+		DependentDeclarationParser dependentDeclarationParser(node);
+		node = dependentDeclarationParser.parse(well, scanner, *this, exception);
+		if (Query::ExceptionManager::has(exception))
+			return node;
+
+		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
+	if (value == "<" && Query::Node::isTypeIdentifier(node)){//Templated typename
+		scanner.fork('>');
+		auto content = expression(nullptr, well, scanner, exception, -1, validator);
+
+		if (!scanner.close(well)){
+			if (!Query::ExceptionManager::has(exception)){
+				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+					"'" + node->str() + "<" + content->str() + "...': Bad expression!"));
+			}
+
+			return nullptr;
+		}
+
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		node = std::make_shared<Nodes::TemplatedTypenameIdentifierNode>(node, content);
+		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
 	OperatorInfo::MatchedListType list;
 	if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
-		operatorInfo.find(next.value(), OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
+		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
 	if (list.empty()){//Check declaration
-		if ((type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || next.value() == "operator") &&
+		if ((type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || value == "operator") &&
 			Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
 			scanner.save(next);
 			DeclarationParser declarationParser(node);
@@ -101,7 +159,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 			if (Query::ExceptionManager::has(exception))
 				return node;
 
-			return expression(node, well, scanner, exception, precedence);
+			return expression(node, well, scanner, exception, precedence, validator);
 		}
 
 		if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
@@ -128,16 +186,21 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	}
 
 	if (info->first.isBinary()){
-		auto right = expression(nullptr, well, scanner, exception, info->second.precedence);
+		auto right = expression(nullptr, well, scanner, exception, info->second.precedence, validator);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		node = std::make_shared<Nodes::BinaryOperatorNode>(next.value(), node, right);
+		if (Query::Node::isEmpty(node)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + node->str() + " " + next.str() + "': Missing right operand!"));
+		}
+
+		node = std::make_shared<Nodes::BinaryOperatorNode>(value, node, right);
 	}
 	else//RightUnary
-		node = std::make_shared<Nodes::UnaryOperatorNode>(false, next.value(), node);
+		node = std::make_shared<Nodes::UnaryOperatorNode>(false, value, node);
 
-	return expression(node, well, scanner, exception, precedence);
+	return expression(node, well, scanner, exception, precedence, validator);
 }
 
 void StructuredScript::Parser::Parser::init(){

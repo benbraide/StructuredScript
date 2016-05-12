@@ -16,6 +16,8 @@ namespace StructuredScript{
 
 			virtual Node::Ptr type() = 0;
 
+			virtual Node::Ptr value() = 0;
+
 			virtual void states(unsigned short value) = 0;
 
 			virtual unsigned short states() = 0;
@@ -24,9 +26,15 @@ namespace StructuredScript{
 
 			virtual MemoryAttributes *attributes() = 0;
 		};
+
+		class InitializationNode{
+		public:
+			virtual ~InitializationNode(){}
+		};
 	}
 
-	typedef Interfaces::DeclarationNode IDeclarationNode;
+	typedef Interfaces::DeclarationNode		IDeclarationNode;
+	typedef Interfaces::InitializationNode	IInitializationNode;
 }
 
 #endif /* !STRUCTURED_SCRIPT_DECLARATION_NODE_INTERFACE_H */

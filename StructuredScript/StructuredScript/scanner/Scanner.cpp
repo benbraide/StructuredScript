@@ -44,6 +44,9 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::ne
 }
 
 StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::peek(ICharacterWell &well, const PluginListType &plugins){
+	if (!savedTokens_.empty())
+		return getSaved_(false);
+
 	auto token = next(well, plugins);
 	save(token);
 
@@ -55,33 +58,42 @@ void StructuredScript::Scanner::Scanner::save(const Token &token){
 		savedTokens_.push_back(token);
 }
 
-bool StructuredScript::Scanner::Scanner::fork(char closeWith){
+bool StructuredScript::Scanner::Scanner::fork(char closeWith, bool testBlanks/* = false*/){
 	if (closeWith == '\0')
 		return false;
 
-	openList_.push_back(closeWith_ = closeWith);
+	openList_.push_back(closeWith_ = CloseInfo{ std::string(1, closeWith), true, testBlanks });
 
 	return true;
 }
 
-bool StructuredScript::Scanner::Scanner::open(ICharacterWell &well, char target, char closeWith){
+bool StructuredScript::Scanner::Scanner::fork(const std::string &closeWith, bool matchAll /*= false*/, bool testBlanks/* = false*/){
+	if (closeWith.empty())
+		return false;
+
+	openList_.push_back(closeWith_ = CloseInfo{ closeWith, matchAll, testBlanks });
+
+	return true;
+}
+
+bool StructuredScript::Scanner::Scanner::open(ICharacterWell &well, char target, char closeWith, bool testBlanks/* = false*/){
 	if (!verifyTarget_(well, target, true))
 		return false;
 
 	if (closeWith == '\0')
-		openList_.push_back(closeWith_ = getCloseWith_(target));
+		openList_.push_back(closeWith_ = CloseInfo{ std::string(1, getCloseWith_(target)), true, testBlanks });
 	else
-		openList_.push_back(closeWith_ = closeWith);
+		openList_.push_back(closeWith_ = CloseInfo{ std::string(1, closeWith), true, testBlanks });
 
 	return true;
 }
 
 bool StructuredScript::Scanner::Scanner::close(ICharacterWell &well, bool force/* = false*/){
-	if (!force && (openList_.empty() || !verifyTarget_(well, closeWith_, false)))
+	if (!force && (openList_.empty() || !verifyTarget_(well, closeWith_.value.empty() ? '\0' : closeWith_.value[0], false)))
 		return false;
 
 	openList_.pop_back();
-	closeWith_ = openList_.empty() ? '\0' : *openList_.rbegin();
+	closeWith_ = openList_.empty() ? CloseInfo{ "", true, false } : *openList_.rbegin();
 
 	return true;
 }
@@ -232,8 +244,22 @@ bool StructuredScript::Scanner::Scanner::verifyTarget_(ICharacterWell &well, cha
 }
 
 bool StructuredScript::Scanner::Scanner::hasMore_(ICharacterWell &well, bool check){
-	if (!savedTokens_.empty())
-		return (closeWith_ == '\0' || getSaved_(false).value() != std::string(1, closeWith_));
+	if (!savedTokens_.empty()){
+		if (closeWith_.value.empty())
+			return true;
+
+		if (!closeWith_.matchAll){//Match single character
+			auto saved = getSaved_(false).value();
+			return (saved.length() != 1u || closeWith_.value.find(saved[0]) >= closeWith_.value.length());
+		}
+
+		return (getSaved_(false).value() != closeWith_.value);
+	}
+
+	if (check && closeWith_.testBlanks && !closeWith_.value.empty()){//Test before skipping blanks
+		if ((closeWith_.matchAll && well.peek(1) == closeWith_.value) || (!closeWith_.matchAll && closeWith_.value.find(well.peek()) < closeWith_.value.length()))
+			return false;
+	}
 
 	well.fork();
 	auto token = skip_(well);//Skip blanks and comments
@@ -242,8 +268,12 @@ bool StructuredScript::Scanner::Scanner::hasMore_(ICharacterWell &well, bool che
 	else
 		well.discard();
 
-	auto next = well.peek();
-	return (next != '\0' && (!check || next != closeWith_));
+	if (check && !closeWith_.value.empty()){//Test after skipping blanks
+		if ((closeWith_.matchAll && well.peek(1) == closeWith_.value) || (!closeWith_.matchAll && closeWith_.value.find(well.peek()) < closeWith_.value.length()))
+			return false;
+	}
+
+	return true;
 }
 
 StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::skip_(ICharacterWell &well) const{
