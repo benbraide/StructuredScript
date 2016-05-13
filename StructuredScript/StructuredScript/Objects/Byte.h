@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef STRUCTURED_SCRIPT_BYTE_MEMORY_H
-#define STRUCTURED_SCRIPT_BYTE_MEMORY_H
+#ifndef STRUCTURED_SCRIPT_BYTE_OBJECT_H
+#define STRUCTURED_SCRIPT_BYTE_OBJECT_H
 
 #include "TypedPrimitive.h"
 
@@ -22,7 +22,7 @@ namespace StructuredScript{
 
 			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr getIndexValue(unsigned int index) override;
 
@@ -32,4 +32,4 @@ namespace StructuredScript{
 	}
 }
 
-#endif /* !STRUCTURED_SCRIPT_BYTE_MEMORY_H */
+#endif /* !STRUCTURED_SCRIPT_BYTE_OBJECT_H */

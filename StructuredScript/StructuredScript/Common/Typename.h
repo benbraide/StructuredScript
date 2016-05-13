@@ -26,6 +26,7 @@ namespace StructuredScript{
 		TYPE_NAME_LDOUBLE,
 		TYPE_NAME_STRING,
 		TYPE_NAME_TYPE,
+		TYPE_NAME_FUNCTION,
 		TYPE_NAME_NONE
 	};
 }

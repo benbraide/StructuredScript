@@ -4,13 +4,17 @@
 #define STRUCTURED_SCRIPT_TYPE_H
 
 #include <map>
+#include <list>
 
-#include "Query.h"
+#include "../TypeQuery.h"
+#include "../../Interfaces/IMemory.h"
+#include "../../Storage/MemoryState.h"
+#include "../../Interfaces/Storages/IFunctionMemory.h"
 
 namespace StructuredScript{
 	class Type : public IType, public IStorage{
 	public:
-		typedef std::list<Type *>								ParentListType;
+		typedef std::list<Ptr>									ParentListType;
 		typedef std::map<std::string, IType::Ptr>				TypeListType;
 		typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
 		typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
@@ -20,17 +24,19 @@ namespace StructuredScript{
 
 		virtual Ptr ptr() override;
 
+		virtual Ptr base() override;
+
 		virtual IStorage *storage() override;
 
-		virtual bool isAny() const override;
+		virtual bool isAny() override;
 
-		virtual bool isEqual(const IType &target) const override;
+		virtual bool isEqual(Ptr target) override;
 
-		virtual bool isParent(const IType &target) const override;
+		virtual bool isParent(Ptr target) override;
 
-		virtual bool isCompatibleWith(const IType &target) const override;
+		virtual bool isCompatibleWith(Ptr target, bool family = false) override;
 
-		virtual Ptr getCompatibleType(const IType &target) override;
+		virtual Ptr getCompatibleType(Ptr target, bool family = false) override;
 
 		virtual std::string name() const override;
 

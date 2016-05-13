@@ -20,6 +20,10 @@ bool StructuredScript::Query::Node::isTypeIdentifier(INode::Ptr node){
 	return (dynamic_cast<ITypeIdentifierNode *>(node.get()) != nullptr);
 }
 
+bool StructuredScript::Query::Node::isExpandedTypeIdentifier(INode::Ptr node){
+	return (dynamic_cast<IExpandedTypenameIdentifierNode *>(node.get()) != nullptr);
+}
+
 bool StructuredScript::Query::Node::isDeclaration(INode::Ptr node){
 	return (dynamic_cast<IDeclarationNode *>(node.get()) != nullptr);
 }

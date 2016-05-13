@@ -27,6 +27,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_[Typename::TYPE_NAME_LDOUBLE]	= std::make_shared<PrimitiveType>("long double", Typename::TYPE_NAME_LDOUBLE);
 	primitives_[Typename::TYPE_NAME_STRING]		= std::make_shared<PrimitiveType>("string", Typename::TYPE_NAME_STRING);
 	primitives_[Typename::TYPE_NAME_TYPE]		= std::make_shared<PrimitiveType>("type", Typename::TYPE_NAME_TYPE);
+	primitives_[Typename::TYPE_NAME_FUNCTION]	= std::make_shared<PrimitiveType>("function_type", Typename::TYPE_NAME_TYPE);
 
 	attributes_["Locked"]						= std::make_shared<LockedAttribute>();
 	attributes_["Concurrent"]					= std::make_shared<ConcurentAttribute>();
@@ -96,8 +97,12 @@ void StructuredScript::Storage::GlobalStorage::init(){
 		primitives_[Typename::TYPE_NAME_TYPE]
 	}, "primitive_type");
 
-	*bit->addMemory("zero") = std::make_shared<Memory>(this, PrimitiveFactory::createBit(false), bit, MemoryState(MemoryState::STATE_CONSTANT), MemoryAttributes({}));
-	*bit->addMemory("one") = std::make_shared<Memory>(this, PrimitiveFactory::createBit(true), bit, MemoryState(MemoryState::STATE_CONSTANT), MemoryAttributes({}));
+	//Create a constant bit type & a locked attribute
+	auto type = std::make_shared<DeclaredType>(bit, MemoryState(MemoryState::STATE_CONSTANT));
+	auto attributes = std::make_shared<MemoryAttributes>(MemoryAttributes::ListType{ std::make_pair("Locked", attributes_["Locked"]) });
+
+	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
+	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, bool localOnly){

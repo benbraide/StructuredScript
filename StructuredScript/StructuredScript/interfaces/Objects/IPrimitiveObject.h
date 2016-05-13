@@ -15,7 +15,7 @@ namespace StructuredScript{
 
 			virtual Any::Ptr evaluateRightUnary(const std::string &value, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual Any::Ptr evaluateBinary(const std::string &value, Any::Ptr right, ExceptionManager *exception, Node *expr) = 0;
+			virtual Any::Ptr evaluateBinary(const std::string &value, Any::Ptr right, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual int rank() = 0;
 		};

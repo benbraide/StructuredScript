@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Bit::clone(ISt
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Bit::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
-	if (type->isEqual(*type_))
+	if (type->isEqual(type_))
 		return ptr();
 
 	auto primitive = dynamic_cast<IPrimitiveType *>(type.get());

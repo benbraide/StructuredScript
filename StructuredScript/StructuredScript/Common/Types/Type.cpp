@@ -4,33 +4,57 @@ StructuredScript::Interfaces::Type::Ptr StructuredScript::Type::ptr(){
 	return shared_from_this();
 }
 
+StructuredScript::Interfaces::Type::Ptr StructuredScript::Type::base(){
+	return shared_from_this();
+}
+
 StructuredScript::IStorage *StructuredScript::Type::storage(){
 	return storage_;
 }
 
-bool StructuredScript::Type::isAny() const{
+bool StructuredScript::Type::isAny(){
 	return false;
 }
 
-bool StructuredScript::Type::isEqual(const IType &target) const{
-	return (&target == this || isAny() || target.isAny());
+bool StructuredScript::Type::isEqual(Ptr target){
+	if (isAny() || target->isAny())
+		return true;
+
+	auto declaredType = dynamic_cast<IDeclaredType *>(target.get());
+	if (declaredType != nullptr){//Compare with declared type
+		if (!isEqual(declaredType->value()))
+			return false;
+
+		auto states = StructuredScript::Storage::MemoryState(declaredType->states());
+		return (!states.isConstant() && !states.isFinal());
+	}
+
+	auto compositeType = dynamic_cast<ICompositeType *>(target.get());
+	if (compositeType != nullptr)//Compare with a list of different types
+		return compositeType->isReversedEqual(ptr());
+
+	return (target.get() == this);
 }
 
-bool StructuredScript::Type::isParent(const IType &target) const{
+bool StructuredScript::Type::isParent(Ptr target){
+	auto declaredType = dynamic_cast<IDeclaredType *>(target.get());
+	if (declaredType != nullptr)//Use actual type
+		target = declaredType->value();
+
 	for (auto parent : parents_){
-		if (parent == &target || parent->isParent(target))
+		if (parent->isEqual(target) || parent->isParent(target))
 			return true;
 	}
 
 	return false;
 }
 
-bool StructuredScript::Type::isCompatibleWith(const IType &target) const{
-	return false;
+bool StructuredScript::Type::isCompatibleWith(Ptr target, bool family/* = false*/){
+	return (isEqual(target) || target->isParent(ptr()));
 }
 
-StructuredScript::Interfaces::Type::Ptr StructuredScript::Type::getCompatibleType(const IType &target){
-	return nullptr;
+StructuredScript::Interfaces::Type::Ptr StructuredScript::Type::getCompatibleType(Ptr target, bool family /*= false*/){
+	return isCompatibleWith(target, family) ? ptr() : nullptr;
 }
 
 std::string StructuredScript::Type::name() const{
@@ -56,7 +80,8 @@ StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string 
 
 	if (!localOnly){
 		for (auto parent : parents_){
-			auto type = parent->findType(name, false);
+			auto alike = dynamic_cast<Type *>(parent.get());
+			auto type = (alike == nullptr) ? nullptr : alike->findType(name, false);
 			if (type != nullptr)
 				return type;
 		}
@@ -66,7 +91,11 @@ StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string 
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Type::addMemory(const std::string &name){
-	return (findMemory(name, true) == nullptr) ? &objects_[name] : nullptr;
+	auto object = objects_.find(name);
+	if (object != objects_.end())//Check if it is a function memory
+		return (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr) ? nullptr : &object->second;
+
+	return &objects_[name];
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::string &name, bool localOnly){
@@ -76,7 +105,8 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 
 	if (!localOnly){
 		for (auto parent : parents_){
-			auto object = parent->findMemory(name, false);
+			auto alike = dynamic_cast<Type *>(parent.get());
+			auto object = (alike == nullptr) ? nullptr : alike->findMemory(name, false);
 			if (object != nullptr)
 				return object;
 		}
@@ -112,7 +142,8 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttrib
 
 	if (!localOnly){
 		for (auto parent : parents_){
-			auto attribute = parent->findMemoryAttribute(name, false);
+			auto alike = dynamic_cast<Type *>(parent.get());
+			auto attribute = (alike == nullptr) ? nullptr : alike->findMemoryAttribute(name, false);
 			if (attribute != nullptr)
 				return attribute;
 		}

@@ -9,6 +9,7 @@
 #include "../Interfaces/Nodes/IEmptyNode.h"
 #include "../Interfaces/Nodes/IIdentifierNode.h"
 #include "../Interfaces/Nodes/IDeclarationNode.h"
+#include "../Interfaces/Nodes/IFunctionNode.h"
 #include "../Interfaces/Nodes/IGroupNode.h"
 #include "../Interfaces/Nodes/IIndexNode.h"
 #include "../Interfaces/Nodes/IBlockNode.h"
@@ -31,6 +32,8 @@ namespace StructuredScript{
 			static bool isOperatorIdentifier(INode::Ptr node);
 
 			static bool isTypeIdentifier(INode::Ptr node);
+
+			static bool isExpandedTypeIdentifier(INode::Ptr node);
 
 			static bool isDeclaration(INode::Ptr node);
 

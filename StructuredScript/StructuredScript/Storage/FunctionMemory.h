@@ -6,34 +6,41 @@
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/Factory.h"
 
-#include "../Interfaces/INode.h"
-#include "../Interfaces/Storages/IFunctionMemory.h"
+#include "Memory.h"
 
-#include "MemoryAttributes.h"
+#include "../Interfaces/Storages/IGlobalStorage.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
 
 namespace StructuredScript{
 	namespace Storage{
 		class FunctionMemory : public IMemory, public IFunctionMemory{
 		public:
-			FunctionMemory(IStorage *storage, IType::Ptr type, const MemoryState &state, const MemoryAttributes &attributes)
-				: storage_(storage), type_(type, state), attributes_(attributes){}
+			typedef std::list<Ptr> ListType;
+
+			FunctionMemory(IStorage *storage)
+				: storage_(storage){}
 
 			virtual Ptr ptr() override;
 
-			virtual void assign(IAny::Ptr object, IExceptionManager *exception, INode *expr) override;
+			virtual void assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual IAny::Ptr object() override;
 
-			virtual DeclaredType *type() override;
+			virtual IType::Ptr type() override;
 
-			virtual IMemoryAttributes *attributes() override;
+			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual IStorage *storage() override;
 
+			virtual Ptr add(IAny::Ptr function, IMemoryAttributes::Ptr attributes) override;
+
+			virtual Ptr find(const IFunction::ArgListType &args) override;
+
+			virtual Ptr find(const IFunction::TypeListType &args) override;
+
 		private:
 			IStorage *storage_;
-			DeclaredType type_;
-			MemoryAttributes attributes_;
+			ListType list_;
 		};
 	}
 }

@@ -8,60 +8,32 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::allocate(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto type = Query::Node::resolveAsType(this->type(), storage);
 	if (type == nullptr){
-		if (storage == nullptr){
-			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));
-		}
-		else{
-			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + this->type()->str() + "'!", expr)));
-		}
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + this->type()->str() + "'!", expr)));
 
 		return nullptr;
 	}
 
 	auto value = this->value();
 	if (value == nullptr)//Unnamed declaration
-		return std::make_shared<Storage::TempMemory>(storage, PrimitiveFactory::createUndefined());
+		return std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes());
 
-	if (!Query::Node::isIdentifier(value) || Query::Node::isTypeIdentifier(value)){
+	if (!Query::Node::isIdentifier(value) || Query::Node::isTypeIdentifier(value) || Query::Node::isOperatorIdentifier(value)){
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Expected identifier after typename!", expr)));
+
+		return nullptr;
 	}
 
-	IMemory::Ptr *memory;
-	auto operatorId = dynamic_cast<IOperatorIdentifierNode *>(value.get());
-	if (operatorId != nullptr){//Add operator memory
-		auto nodeValue = operatorId->nodeValue();
-		if (dynamic_cast<ITypeIdentifierNode *>(nodeValue.get()) == nullptr)//General operator
-			memory = storage->addOperatorMemory(dynamic_cast<IIdentifierNode *>(value.get())->value());
-		else//Typename operator
-			memory = storage->addTypenameOperatorMemory(dynamic_cast<IIdentifierNode *>(value.get())->value());
-	}
-	else//Add general memory
-		memory = storage->addMemory(dynamic_cast<IIdentifierNode *>(value.get())->value());
-
-	if (memory == nullptr){//Failed to add memory
+	auto memory = storage->addMemory(dynamic_cast<IIdentifierNode *>(value.get())->value());
+	if (memory == nullptr || dynamic_cast<IFunctionMemory *>(memory->get()) != nullptr){//Failed to add memory
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));
 
 		return nullptr;
 	}
 
-	auto state = Storage::MemoryState(states());
-	auto attributes = dynamic_cast<Storage::MemoryAttributes *>(this->attributes());
-	if (attributes == nullptr){//Unknown error
-		storage->remove(*memory);//Rollback
-		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Bad declaration!", expr)));
-
-		return nullptr;
-	}
-
-	if (operatorId != nullptr)//Operator memory
-		return (*memory = std::make_shared<Storage::FunctionMemory>(storage, type, state, *attributes));
-
-	return (*memory = std::make_shared<Storage::Memory>(storage, PrimitiveFactory::createUndefined(), type, state, *attributes));
+	return (*memory = std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes()));
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode::ptr(){
@@ -70,9 +42,9 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode::clone(){
 	if (value_ == nullptr)//Unnamed declaration
-		return std::make_shared<DeclarationNode>(type_->clone(), nullptr, state_, attributes_);
+		return std::make_shared<DeclarationNode>(type_->clone(), nullptr, attributes_);
 
-	return std::make_shared<DeclarationNode>(type_->clone(), value_->clone(), state_, attributes_);
+	return std::make_shared<DeclarationNode>(type_->clone(), value_->clone(), attributes_);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::DeclarationNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -80,20 +52,15 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::DeclarationNode::evaluate(I
 }
 
 std::string StructuredScript::Nodes::DeclarationNode::str(){
-	auto value = attributes_.str();
+	auto value = (attributes_ == nullptr) ? "" : attributes_->str();
 	if (value.empty())
-		value = state_.str();
+		value = type_->str();
 	else
-		value += ("\n" + state_.str());
-
-	if (value.empty() || *value.rbegin() == '\n')
-		value += type_->str();
-	else
-		value += (" " + type_->str());
+		value += ("\n" + type_->str());
 
 	if (value_ != nullptr){
 		if (value.empty())
-			value += value_->str();
+			value = value_->str();
 		else
 			value += (" " + value_->str());
 	}
@@ -113,19 +80,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode
 	return value_;
 }
 
-unsigned short StructuredScript::Nodes::DeclarationNode::states(){
-	return state_.states();
+StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::DeclarationNode::attributes(){
+	return attributes_;
 }
 
-void StructuredScript::Nodes::DeclarationNode::states(unsigned short value){
-	state_ = value;
-}
-
-StructuredScript::IMemoryAttributes *StructuredScript::Nodes::DeclarationNode::attributes(){
-	return &attributes_;
-}
-
-void StructuredScript::Nodes::DeclarationNode::attributes(const Storage::MemoryAttributes &value){
+void StructuredScript::Nodes::DeclarationNode::attributes(IMemoryAttributes::Ptr value){
 	attributes_ = value;
 }
 
@@ -146,24 +105,13 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::CommonDeclarati
 	return (declaration == nullptr) ? nullptr : declaration->value();
 }
 
-void StructuredScript::Nodes::CommonDeclaration::states(unsigned short value){
-	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
-	if (declaration != nullptr)
-		declaration->states(value);
-}
-
-unsigned short StructuredScript::Nodes::CommonDeclaration::states(){
-	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
-	return (declaration == nullptr) ? 0 : declaration->states();
-}
-
-void StructuredScript::Nodes::CommonDeclaration::attributes(const Storage::MemoryAttributes &value){
+void StructuredScript::Nodes::CommonDeclaration::attributes(IMemoryAttributes::Ptr value){
 	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
 	if (declaration != nullptr)
 		declaration->attributes(value);
 }
 
-StructuredScript::IMemoryAttributes *StructuredScript::Nodes::CommonDeclaration::attributes(){
+StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::CommonDeclaration::attributes(){
 	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
 	return (declaration == nullptr) ? nullptr : declaration->attributes();
 }
@@ -204,7 +152,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::InitializationNode::evaluat
 	}
 
 	auto undefined = memory->object();
-	memory->assign(value, exception, expr);
+	memory->assign(value, storage, exception, expr);
 	if (Query::ExceptionManager::has(exception)){
 		memory->storage()->remove(memory);//Rollback
 		return nullptr;
@@ -271,10 +219,6 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DependentDeclar
 	return value_;
 }
 
-unsigned short StructuredScript::Nodes::DependentDeclarationNode::states(){
-	return CommonDeclaration::states();
-}
-
-StructuredScript::IMemoryAttributes *StructuredScript::Nodes::DependentDeclarationNode::attributes(){
+StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::DependentDeclarationNode::attributes(){
 	return CommonDeclaration::attributes();
 }

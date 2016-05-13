@@ -11,7 +11,8 @@
 #include "Plugins/DeclarationParser.h"
 #include "Plugins/InitializationParser.h"
 #include "Plugins/DependentDeclarationParser.h"
-#include "Plugins/MemoryStateParser.h"
+#include "Plugins/DeclaredTypeParser.h"
+#include "Plugins/FunctionParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"

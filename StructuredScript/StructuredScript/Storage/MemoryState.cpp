@@ -60,5 +60,28 @@ bool StructuredScript::Storage::MemoryState::hasDefault() const{
 }
 
 std::string StructuredScript::Storage::MemoryState::str() const{
-	return "";
+	std::string value;
+	if (isPrivate())
+		value = "private";
+	else if (isProtected())
+		value = "protected";
+	else if ((states_ & STATE_PUBLIC) == STATE_PUBLIC)
+		value = "public";
+
+	if (isStatic())
+		value = value.empty() ? "static" : (value + " static");
+
+	if (isReference())
+		value = value.empty() ? "ref" : (value + " ref");
+
+	if (isRValReference())
+		value = value.empty() ? "val" : (value + " val");
+
+	if (isConstant())
+		value = value.empty() ? "const" : (value + " const");
+
+	if (isFinal())
+		value = value.empty() ? "final" : (value + " final");
+
+	return value;
 }

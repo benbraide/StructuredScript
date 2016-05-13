@@ -22,7 +22,7 @@ namespace StructuredScript{
 			}
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				if (type->isEqual(*BaseType::type_))
+				if (type->isEqual(BaseType::type_))
 					return ptr();
 
 				auto primitive = dynamic_cast<IPrimitiveType *>(type.get());

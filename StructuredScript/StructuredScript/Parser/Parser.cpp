@@ -19,6 +19,11 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::parse(ICharacterW
 		if (Query::ExceptionManager::has(exception) || Query::Node::isEmpty(right))
 			return node;
 
+		if (scanner.hasMore(well) && !Query::Node::isBlock(node)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + node->str() + " " + scanner.next(well).value() + "...': Bad expression!"));
+		}
+
 		node = std::make_shared<Nodes::BlockPairNode>(node, right);
 	}
 
@@ -51,9 +56,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 		if (plugin != plugins_.end())//Use plugin
 			return plugin->second->parse(well, scanner, *this, exception);
 
-		MemoryStateParser memoryStateParser(next.value());//Check if id is a modifier
-		if (memoryStateParser.state().states() != Storage::MemoryState::STATE_NONE)
-			return memoryStateParser.parse(well, scanner, *this, exception);
+		DeclaredTypeParser declaredTypeParser(next.value());//Check if id is a modifier
+		if (declaredTypeParser.state().states() != Storage::MemoryState::STATE_NONE)
+			return declaredTypeParser.parse(well, scanner, *this, exception);
 
 		return std::make_shared<Nodes::IdentifierNode>(next.value());
 	}
@@ -145,6 +150,28 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		return expression(node, well, scanner, exception, precedence, validator);
 	}
 
+	if (value == "..." && Query::Node::isTypeIdentifier(node)){//Expanded type
+		node = std::make_shared<Nodes::ExpandedTypenameIdentifierNode>(node);
+		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
+	if ((value == "(" || value == "()") && Query::Node::isDeclaration(node)){//Function declaration | definition
+		if (Query::Node::isInitialization(node)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + node->str() + " " + next.str() + "': Bad expression!"));
+		}
+
+		if (value.size() == 2u)//Return '()' to scanner
+			scanner.save(next);
+
+		FunctionParser functionParser(node);
+		node = functionParser.parse(well, scanner, *this, exception);
+		if (Query::ExceptionManager::has(exception))
+			return node;
+
+		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
 	OperatorInfo::MatchedListType list;
 	if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
 		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
@@ -165,7 +192,8 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
 			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Unrecognized symbol!"));
 
-		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + node->str() + " " + next.str() + "': Bad expression!"));
+		scanner.save(next);
+		return node;
 	}
 
 	OperatorInfo::MatchedListType::iterator info;

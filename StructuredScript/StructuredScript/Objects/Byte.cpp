@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::clone(IS
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
-	if (type->isEqual(*type_))
+	if (type->isEqual(type_))
 		return ptr();
 
 	auto primitive = dynamic_cast<IPrimitiveType *>(type.get());
@@ -59,9 +59,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluate
 	return TypedPrimitive::evaluateLeftUnary(value, exception, expr);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
 	if (value != "[]")
-		return Primitive::evaluateBinary(value, right, exception, expr);
+		return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
 	if (dynamic_cast<IInteger *>(right->base()) == nullptr)
 		return nullptr;//TODO: Throw exception

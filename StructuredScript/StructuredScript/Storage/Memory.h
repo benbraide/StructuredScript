@@ -3,23 +3,37 @@
 #ifndef STRUCTURED_SCRIPT_MEMORY_H
 #define STRUCTURED_SCRIPT_MEMORY_H
 
-#include "TempMemory.h"
-#include "MemoryAttributes.h"
+#include "../Common/ExceptionManagerQuery.h"
+#include "../Common/TypeQuery.h"
+#include "../Common/ObjectQuery.h"
+#include "../Common/Factory.h"
+
+#include "../Interfaces/INode.h"
+#include "MemoryState.h"
 
 namespace StructuredScript{
 	namespace Storage{
-		class Memory : public TempMemory{
+		class Memory : public IMemory{
 		public:
-			Memory(IStorage *storage, IAny::Ptr value, IType::Ptr type, const MemoryState &state, const MemoryAttributes &attributes)
-				: TempMemory(storage, value), type_(type, state), attributes_(attributes){}
+			Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes);
 
-			virtual DeclaredType *type() override;
+			virtual Ptr ptr() override;
 
-			virtual IMemoryAttributes *attributes() override;
+			virtual void assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual IAny::Ptr object() override;
+
+			virtual IType::Ptr type() override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
+			virtual IStorage *storage() override;
 
 		private:
-			DeclaredType type_;
-			MemoryAttributes attributes_;
+			IStorage *storage_;
+			IType::Ptr type_;
+			IAny::Ptr value_;
+			IMemoryAttributes::Ptr attributes_;
 		};
 	}
 }

@@ -11,15 +11,11 @@ namespace StructuredScript{
 		CompositePrimitiveType(const ListType &types, const std::string &name)
 			: CompositeType(types), name_(name){}
 
-		virtual bool isParent(const IType &target) const override;
+		virtual bool isParent(Ptr target) override;
 
 		virtual std::string name() const override;
 
 		virtual Typename value() const override;
-
-		virtual bool has(Typename value) const override;
-
-		virtual bool has(Typename from, Typename to) const override;
 
 	private:
 		std::string name_;

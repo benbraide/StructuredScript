@@ -5,7 +5,10 @@
 
 #include <map>
 
-#include "TempMemory.h"
+#include "Memory.h"
+
+#include "../Interfaces/Storages/IGlobalStorage.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
 
 namespace StructuredScript{
 	namespace Storage{

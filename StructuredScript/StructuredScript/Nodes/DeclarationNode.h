@@ -5,9 +5,9 @@
 
 #include "../Common/NodeQuery.h"
 #include "../Common/ObjectQuery.h"
+#include "../Common/Types/DeclaredType.h"
 
 #include "../Storage/MemoryState.h"
-#include "../Storage/MemoryAttributes.h"
 #include "../Storage/Memory.h"
 #include "../Storage/FunctionMemory.h"
 
@@ -25,18 +25,16 @@ namespace StructuredScript{
 
 			virtual INode::Ptr value() = 0;
 
-			virtual unsigned short states() = 0;
-
-			virtual IMemoryAttributes *attributes() = 0;
+			virtual IMemoryAttributes::Ptr attributes() = 0;
 		};
 
 		class DeclarationNode : public SharedDeclaration, public INode, public IDeclarationNode{
 		public:
 			DeclarationNode(Ptr type, Ptr value)
-				: type_(type), value_(value), state_(Storage::MemoryState::STATE_NONE), attributes_({}){}
+				: type_(type), value_(value), attributes_({}){}
 
-			DeclarationNode(Ptr type, Ptr value, const Storage::MemoryState &state, const Storage::MemoryAttributes &attributes)
-				: type_(type), value_(value), state_(state), attributes_(attributes){}
+			DeclarationNode(Ptr type, Ptr value, IMemoryAttributes::Ptr attributes)
+				: type_(type), value_(value), attributes_(attributes){}
 
 			virtual Ptr ptr() override;
 
@@ -52,19 +50,14 @@ namespace StructuredScript{
 
 			virtual Ptr value() override;
 
-			virtual void states(unsigned short value) override;
+			virtual void attributes(IMemoryAttributes::Ptr value) override;
 
-			virtual unsigned short states() override;
-
-			virtual void attributes(const Storage::MemoryAttributes &value) override;
-
-			virtual IMemoryAttributes *attributes() override;
+			virtual IMemoryAttributes::Ptr attributes() override;
 
 		private:
 			Ptr type_;
 			Ptr value_;
-			Storage::MemoryState state_;
-			Storage::MemoryAttributes attributes_;
+			IMemoryAttributes::Ptr attributes_;
 		};
 
 		class CommonDeclaration : public INode, public IDeclarationNode{
@@ -77,13 +70,9 @@ namespace StructuredScript{
 
 			virtual Ptr value() override;
 
-			virtual void states(unsigned short value) override;
+			virtual void attributes(IMemoryAttributes::Ptr value) override;
 
-			virtual unsigned short states() override;
-
-			virtual void attributes(const Storage::MemoryAttributes &value) override;
-
-			virtual IMemoryAttributes *attributes() override;
+			virtual IMemoryAttributes::Ptr attributes() override;
 
 		protected:
 			Ptr declaration_;
@@ -121,9 +110,7 @@ namespace StructuredScript{
 
 			virtual Ptr value() override;
 
-			virtual unsigned short states() override;
-
-			virtual IMemoryAttributes *attributes() override;
+			virtual IMemoryAttributes::Ptr attributes() override;
 		};
 	}
 }

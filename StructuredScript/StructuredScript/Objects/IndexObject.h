@@ -22,7 +22,7 @@ namespace StructuredScript{
 
 			virtual Ptr evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual int rank() override;
 

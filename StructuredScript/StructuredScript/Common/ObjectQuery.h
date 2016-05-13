@@ -5,6 +5,7 @@
 
 #include "../Interfaces/IAny.h"
 #include "../Interfaces/Objects/IPrimitiveObject.h"
+#include "../Interfaces/Objects/IFunction.h"
 
 namespace StructuredScript{
 	namespace Query{

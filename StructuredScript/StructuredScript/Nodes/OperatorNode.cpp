@@ -86,7 +86,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	std::string value;
 	if (value_ == "===" || value_ == "!=="){//Compare types first
 		auto leftType = leftValue->type(), rightType = rightValue->type();
-		if (leftType == nullptr || rightType == nullptr || !leftType->isEqual(*rightType))
+		if (leftType == nullptr || rightType == nullptr || !leftType->isEqual(rightType))
 			return PrimitiveFactory::createBool(value_[0] == '!');
 
 		value = value_.substr(0, 2);
@@ -96,7 +96,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 
 	auto primitive = dynamic_cast<IPrimitiveObject *>(leftValue->base());
 	if (primitive != nullptr)
-		return primitive->evaluateBinary(value, rightValue, exception, expr);
+		return primitive->evaluateBinary(value, rightValue, storage, exception, expr);
 
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value_ + "': Operand mismatch!", expr)));

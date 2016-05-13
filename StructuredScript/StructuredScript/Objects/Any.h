@@ -7,6 +7,7 @@
 #include <map>
 
 #include "../Common/ExceptionManagerQuery.h"
+#include "../Common/ObjectQuery.h"
 
 namespace StructuredScript{
 	namespace Objects{

@@ -16,6 +16,8 @@ namespace StructuredScript{
 			MemoryAttributes(const ListType &attributes)
 				: attributes_(attributes){}
 
+			virtual Ptr ptr() override;
+
 			virtual IMemoryAttribute::Ptr getAttribute(const std::string &name) override;
 
 			virtual bool hasAttribute(const std::string &name) const override;

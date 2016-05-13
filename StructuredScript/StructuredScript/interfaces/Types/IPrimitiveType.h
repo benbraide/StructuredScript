@@ -12,10 +12,6 @@ namespace StructuredScript{
 			virtual ~PrimitiveType(){}
 
 			virtual Typename value() const = 0;
-
-			virtual bool has(Typename value) const = 0;
-
-			virtual bool has(Typename from, Typename to) const = 0;
 		};
 
 		class AnyType{

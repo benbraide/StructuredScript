@@ -5,6 +5,7 @@
 
 #include "Storage.h"
 #include "Memory.h"
+#include "MemoryAttributes.h"
 
 #include "Attributes/LockedAttribute.h"
 #include "Attributes/ConcurrentAttribute.h"
@@ -16,9 +17,10 @@
 #include "../Interfaces/Storages/IGlobalStorage.h"
 #include "../Objects/Primitive.h"
 
-#include "../Common/Type.h"
-#include "../Common/PrimitiveType.h"
-#include "../Common/CompositePrimitiveType.h"
+#include "../Common/Types/Type.h"
+#include "../Common/Types/PrimitiveType.h"
+#include "../Common/Types/CompositePrimitiveType.h"
+#include "../Common/Types/DeclaredType.h"
 #include "../Common/Factory.h"
 
 namespace StructuredScript{

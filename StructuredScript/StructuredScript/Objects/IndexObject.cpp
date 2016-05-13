@@ -42,13 +42,14 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateRightUnary(value, exception, expr);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
 	if (target == nullptr)
 		return nullptr;//TODO: Throw exception
 
 	auto indexValue = target->getIndexValue(value_);
-	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateBinary(value, right, exception, expr);
+	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateBinary(value, right, storage, exception, expr);
 }
 
 int StructuredScript::Objects::IndexObject::rank(){

@@ -29,7 +29,11 @@ StructuredScript::IType::Ptr StructuredScript::Storage::Storage::findType(const 
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addMemory(const std::string &name){
-	return (findMemory(name, true) == nullptr) ? &objects_[name] : nullptr;
+	auto object = objects_.find(name);
+	if (object != objects_.end())//Check if it is a function memory
+		return (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr) ? nullptr : &object->second;
+
+	return &objects_[name];
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(const std::string &name, bool localOnly){
@@ -38,8 +42,10 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 		return object->second;
 
 	auto type = findType(name, true);
-	if (type != nullptr)
-		return std::make_shared<TempMemory>(this, PrimitiveFactory::createTypeObject(type));
+	if (type != nullptr){//Create type object in a temporary memory
+		return std::make_shared<Memory>(this, IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_TYPE),
+			PrimitiveFactory::createTypeObject(type), nullptr);
+	}
 
 	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemory(name, false);
 }

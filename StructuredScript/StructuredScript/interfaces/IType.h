@@ -17,17 +17,19 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() = 0;
 
+			virtual Ptr base() = 0;
+
 			virtual Storage *storage() = 0;
 
-			virtual bool isAny() const = 0;
+			virtual bool isAny() = 0;
 
-			virtual bool isEqual(const Type &target) const = 0;
+			virtual bool isEqual(Ptr target) = 0;
 
-			virtual bool isParent(const Type &target) const = 0;
+			virtual bool isParent(Ptr target) = 0;
 
-			virtual bool isCompatibleWith(const Type &target) const = 0;
+			virtual bool isCompatibleWith(Ptr target, bool family = false) = 0;
 
-			virtual Ptr getCompatibleType(const Type &target) = 0;
+			virtual Ptr getCompatibleType(Ptr target, bool family = false) = 0;
 
 			virtual std::string name() const = 0;
 		};

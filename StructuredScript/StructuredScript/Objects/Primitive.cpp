@@ -5,11 +5,12 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::ptr
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot copy object!", expr)));
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return type->isEqual(*type_) ? ptr() : nullptr;
+	return type->isEqual(type_) ? ptr() : nullptr;
 }
 
 StructuredScript::IAny *StructuredScript::Objects::Primitive::base(){
@@ -33,6 +34,9 @@ bool StructuredScript::Objects::Primitive::truth(IStorage *storage, IExceptionMa
 }
 
 std::string StructuredScript::Objects::Primitive::str(IStorage *storage, IExceptionManager *exception, INode *expr){
+	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot get string value of object!", expr)));
+
 	return "";
 }
 
@@ -46,7 +50,8 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 		"'" + value + "': Operands mismatch!", expr)));
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
 	if (value == "=" || value == "+=" || value == "-=" || value == "*=" || value == "/=" || value == "%=" || value == "&=" ||
 		value == "^=" || value == "|=" || value == "<<=" || value == ">>="){//Assignment
 		if (memory_ == nullptr){
@@ -61,7 +66,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 		}
 
 		auto memory = memory_;
-		memory->assign(right, exception, expr);
+		memory->assign(right, storage, exception, expr);
 
 		return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
 	}
@@ -79,4 +84,18 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 		return primitive->evaluate_(value, true, primitive->promote_(this), exception, expr);
 
 	return evaluate_(value, false, right, exception, expr);
+}
+
+int StructuredScript::Objects::Primitive::rank(){
+	return -1;
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::promote_(Primitive *target){
+	return nullptr;
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluate_(const std::string &value, bool reversed, Ptr right,
+	IExceptionManager *exception, INode *expr){
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+		"'" + value + "': Operands mismatch!", expr)));
 }

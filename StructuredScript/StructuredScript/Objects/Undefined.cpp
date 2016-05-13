@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Undefined::clo
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::Undefined::type(){
-	return (memory_ == nullptr) ? nullptr : memory_->type()->type()->ptr();
+	return (memory_ == nullptr) ? nullptr : memory_->type();
 }
 
 bool StructuredScript::Objects::Undefined::truth(IStorage *storage, IExceptionManager *exception, INode *expr){

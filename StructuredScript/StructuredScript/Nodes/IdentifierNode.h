@@ -6,7 +6,11 @@
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
 #include "../Common/Factory.h"
-#include "../Common/CompositeType.h"
+#include "../Common/Types/CompositeType.h"
+#include "../Common/Types/DeclaredType.h"
+#include "../Common/Types/StackedType.h"
+
+#include "../Storage/MemoryState.h"
 
 namespace StructuredScript{
 	namespace Nodes{
@@ -82,6 +86,20 @@ namespace StructuredScript{
 			Ptr value_;
 		};
 
+		class ExpandedTypenameIdentifierNode : public TypenameIdentifierNode, public IExpandedTypenameIdentifierNode, public ITypeResolver{
+		public:
+			explicit ExpandedTypenameIdentifierNode(Ptr value)
+				: TypenameIdentifierNode(value){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
+
+			virtual IType::Ptr resolve(IStorage *storage) override;
+		};
+
 		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode, public ITypeResolver{
 		public:
 			TemplatedTypenameIdentifierNode(Ptr type, Ptr value)
@@ -97,6 +115,27 @@ namespace StructuredScript{
 
 		private:
 			Ptr value_;
+		};
+
+		class ModifiedTypenameIdentifierNode : public TypenameIdentifierNode, public IModifiedTypeIdentifierNode, public ITypeResolver{
+		public:
+			ModifiedTypenameIdentifierNode(Ptr type, const Storage::MemoryState &value)
+				: TypenameIdentifierNode(type), value_(value){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
+
+			virtual void states(unsigned short value) override;
+
+			virtual unsigned short states() const override;
+
+			virtual IType::Ptr resolve(IStorage *storage) override;
+
+		private:
+			Storage::MemoryState value_;
 		};
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "Storage/GlobalStorage.h"
 #include "Common/OperatorInfo.h"
+#include "Common/ExceptionManager.h"
 
 #include "Scanner/Scanner.h"
 #include "Scanner/Wells/StringCharacterWell.h"
@@ -31,19 +32,30 @@ int main(){
 	scanner.operatorSymbols.init();
 
 	std::string input;
+	StructuredScript::ExceptionManager xManager;
+
 	while (true){
 		std::cout << "> ";
 		std::getline(std::cin, input);
 		StructuredScript::Scanner::StringCharacterWell well(input);
 
-		auto node = parser.parse(well, scanner, nullptr);
-		auto value = node->evaluate(&globalStorage, nullptr, nullptr);
+		auto node = parser.parse(well, scanner, &xManager);
+		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
+			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+			continue;
+		}
+
+		auto value = node->evaluate(&globalStorage, &xManager, nullptr);
+		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
+			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+			continue;
+		}
 
 		std::cout << node->str() << "\n";
 		if (value == nullptr)
 			std::cout << "Error!\n";
 		else
-			std::cout << value->str(nullptr, nullptr, nullptr) << "\n";
+			std::cout << value->str(nullptr, &xManager, nullptr) << "\n";
 	}
 
 	return 0;

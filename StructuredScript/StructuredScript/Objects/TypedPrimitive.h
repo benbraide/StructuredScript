@@ -21,9 +21,9 @@ namespace StructuredScript{
 				return (value_ != static_cast<ValueType>(0));
 			}
 
-			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override{
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override{
 				if (value != "[]")
-					return Primitive::evaluateBinary(value, right, exception, expr);
+					return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
 				if (dynamic_cast<IInteger *>(right->base()) == nullptr)
 					return nullptr;//TODO: Throw exception

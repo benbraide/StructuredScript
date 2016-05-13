@@ -1,5 +1,9 @@
 #include "MemoryAttributes.h"
 
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Storage::MemoryAttributes::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::MemoryAttributes::getAttribute(const std::string &name){
 	auto attribute = attributes_.find(name);
 	return (attribute == attributes_.end()) ? nullptr : attribute->second;

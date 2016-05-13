@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_H
 
 #include "../Common/ExceptionManagerQuery.h"
+#include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
 
 #include "../Interfaces/Objects/IPrimitiveObject.h"
@@ -38,7 +39,9 @@ namespace StructuredScript{
 
 			virtual Ptr evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual int rank() override;
 
 			static const int CHAR_RANK		= 0x0000;
 			static const int UCHAR_RANK		= 0x0001;
@@ -57,9 +60,9 @@ namespace StructuredScript{
 			static const int NAN_RANK		= 0xFFFF;
 
 		protected:
-			virtual Ptr promote_(Primitive *target) = 0;
+			virtual Ptr promote_(Primitive *target);
 
-			virtual Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) = 0;
+			virtual Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr);
 
 			IType::Ptr type_;
 			IMemory *memory_ = nullptr;

@@ -10,8 +10,12 @@
 
 namespace StructuredScript{
 	namespace Interfaces{
-		class MemoryAttributes{
+		class MemoryAttributes : protected std::enable_shared_from_this<MemoryAttributes>{
 		public:
+			typedef std::shared_ptr<MemoryAttributes> Ptr;
+
+			virtual Ptr ptr() = 0;
+
 			virtual MemoryAttribute::Ptr getAttribute(const std::string &name) = 0;
 
 			virtual bool hasAttribute(const std::string &name) const = 0;
