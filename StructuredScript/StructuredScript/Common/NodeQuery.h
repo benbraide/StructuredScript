@@ -70,7 +70,7 @@ namespace StructuredScript{
 			static IMemory::Ptr resolveAsObject(INode::Ptr node, IStorage *storage);
 
 		private:
-			static bool resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, bool &localOnly);
+			static bool resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, unsigned short &scope);
 		};
 	}
 }

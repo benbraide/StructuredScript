@@ -9,7 +9,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::IdentifierNode:
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::IdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto memory = (storage == nullptr) ? nullptr : storage->findMemory(value_, false);
+	auto memory = (storage == nullptr) ? nullptr : storage->findMemory(value_, IStorage::SEARCH_DEFAULT);
 	if (memory == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve identifier!", expr)));
@@ -73,7 +73,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TypenameIdentif
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::TypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto type = (storage == nullptr) ? nullptr : storage->findType(value(), false);
+	auto type = (storage == nullptr) ? nullptr : storage->findType(value(), IStorage::SEARCH_DEFAULT);
 	if (type == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename!", expr)));

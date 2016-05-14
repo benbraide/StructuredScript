@@ -103,21 +103,39 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
+
+	createString_();
 }
 
-StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, bool localOnly){
+StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	if (name.empty())
 		return nullptr;
 
 	if (::isdigit(name[0]))
 		return getPrimitiveType(static_cast<Typename>(std::stoi(name)));
 
-	return Storage::findType(name, localOnly);
+	return Storage::findType(name, searchScope);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(Typename type){
 	auto value = primitives_.find(type);
 	return (value == primitives_.end()) ? nullptr : value->second;
+}
+
+bool StructuredScript::Storage::GlobalStorage::createString_(){
+	auto string = std::make_shared<Type>(this, "string");
+
+	Parser::Parser::init();
+	Parser::Parser::operatorInfo.init();
+
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+
+	scanner.init();
+	scanner.operatorSymbols.init();
+
+	primitives_[Typename::TYPE_NAME_STRING] = string;
+	return true;
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){

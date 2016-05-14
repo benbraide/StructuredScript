@@ -40,26 +40,26 @@ std::shared_ptr<StructuredScript::IStorage> *StructuredScript::Objects::Any::add
 	return nullptr;
 }
 
-StructuredScript::IStorage *StructuredScript::Objects::Any::findStorage(const std::string &name, bool localOnly){
+StructuredScript::IStorage *StructuredScript::Objects::Any::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	if (name == type_->name())
 		return this;
 
-	if (!localOnly){
+	if (searchScope != SEARCH_LOCAL){
 		for (auto parent : parents_){
-			auto storage = parent->findStorage(name, false);
+			auto storage = parent->findStorage(name, SEARCH_FAMILY);
 			if (storage != nullptr)
 				return storage;
 		}
 	}
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findStorage(name, localOnly);
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findStorage(name, searchScope);
 }
 
 StructuredScript::IType::Ptr *StructuredScript::Objects::Any::addType(const std::string &name){
 	return nullptr;
 }
 
-StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std::string &name, bool localOnly){
+StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 
@@ -67,7 +67,7 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addMemory(const 
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const std::string &name, bool localOnly){
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	if (name == "self"){
 		auto memory = (self_ == nullptr) ? nullptr : self_->memory();
 		return (memory == nullptr) ? nullptr : memory->ptr();
@@ -77,22 +77,34 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const 
 	if (object != objects_.end())
 		return object->second;
 
-	if (!localOnly){
-		for (auto parent : parents_){
-			auto object = parent->findMemory(name, false);
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	if (storage != nullptr){//Search immediate type content
+		auto memory = storage->findMemory(name, SEARCH_LOCAL);
+		if (memory != nullptr)
+			return memory;
+	}
+
+	if (searchScope != SEARCH_LOCAL){
+		for (auto parent : parents_){//Search parent objects and their immediate type contents
+			auto object = parent->findMemory(name, SEARCH_FAMILY);
 			if (object != nullptr)
 				return object;
 		}
 	}
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findMemory(name, localOnly);
+	if (self_ == nullptr || self_ == this){//Search storage using search scope
+		storage = type_->storage();
+		return (storage == nullptr) ? nullptr : storage->findMemory(name, searchScope);
+	}
+
+	return self_->findMemory(name, searchScope);//Forward search to object
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addOperatorMemory(const std::string &name){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findOperatorMemory(const std::string &name, bool localOnly){
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 
@@ -100,7 +112,7 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addTypenameOpera
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findTypenameOperatorMemory(const std::string &name, bool localOnly){
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 
@@ -108,7 +120,7 @@ StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Any::addMemo
 	return nullptr;
 }
 
-StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Any::findMemoryAttribute(const std::string &name, bool localOnly){
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Any::findMemoryAttribute(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 

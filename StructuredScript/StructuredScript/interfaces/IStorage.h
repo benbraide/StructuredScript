@@ -27,33 +27,37 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Storage> *addStorage(const std::string &name) = 0;
 
-			virtual Storage *findStorage(const std::string &name, bool localOnly) = 0;
+			virtual Storage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<Type> *addType(const std::string &name) = 0;
 
-			virtual std::shared_ptr<Type> findType(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<Type> findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<Memory> *addMemory(const std::string &name) = 0;
 
-			virtual std::shared_ptr<Memory> findMemory(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<Memory> findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> findFunctionMemory(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<Memory> findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<Memory> *addOperatorMemory(const std::string &name) = 0;
 
-			virtual std::shared_ptr<Memory> findOperatorMemory(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<Memory> findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<Memory> *addTypenameOperatorMemory(const std::string &name) = 0;
 
-			virtual std::shared_ptr<Memory> findTypenameOperatorMemory(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<Memory> findTypenameOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<MemoryAttribute> *addMemoryAttribute(const std::string &name) = 0;
 
-			virtual std::shared_ptr<MemoryAttribute> findMemoryAttribute(const std::string &name, bool localOnly) = 0;
+			virtual std::shared_ptr<MemoryAttribute> findMemoryAttribute(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual ExternalCallType findExternalCall(const std::string &name) = 0;
 
 			virtual bool remove(std::shared_ptr<Memory> target) = 0;
+
+			static const unsigned short SEARCH_DEFAULT		= 0x0000;
+			static const unsigned short SEARCH_FAMILY		= 0x0001;
+			static const unsigned short SEARCH_LOCAL		= 0x0002;
 		};
 	}
 

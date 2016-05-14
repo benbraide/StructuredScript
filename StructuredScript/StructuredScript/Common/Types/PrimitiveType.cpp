@@ -58,9 +58,9 @@ bool StructuredScript::PrimitiveType::isCompatibleWith(Ptr target, bool family/*
 		return compositeType->isReversedCompatibleWith(ptr(), family);
 
 	auto storage = dynamic_cast<IStorage *>(IGlobalStorage::globalStorage);
-	auto numericType = storage->findType("numeric_type", true);
+	auto numericType = storage->findType("numeric_type", IStorage::SEARCH_LOCAL);
 	if (target->isEqual(numericType))//Type is numeric -- Compatible: numeric & string types
-		return (isEqual(numericType) || isEqual(storage->findType("string", true)));
+		return (isEqual(numericType) || isEqual(storage->findType("string", IStorage::SEARCH_LOCAL)));
 
 	return (target.get() == this);
 }

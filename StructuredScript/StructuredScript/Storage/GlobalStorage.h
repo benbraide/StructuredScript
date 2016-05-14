@@ -23,6 +23,11 @@
 #include "../Common/Types/DeclaredType.h"
 #include "../Common/Factory.h"
 
+#include "../Scanner/Scanner.h"
+#include "../Scanner/Wells/StringCharacterWell.h"
+
+#include "../Parser/Parser.h"
+
 namespace StructuredScript{
 	namespace Storage{
 		class GlobalStorage : public Storage, public IGlobalStorage{
@@ -34,13 +39,15 @@ namespace StructuredScript{
 
 			void init();
 
-			virtual IType::Ptr findType(const std::string &name, bool localOnly) override;
+			virtual IType::Ptr findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 			virtual IType::Ptr getPrimitiveType(Typename type) override;
 
 			virtual IType::Ptr getPrimitiveType(int rank) override;
 
 		private:
+			bool createString_();
+
 			ListType primitives_;
 		};
 	}

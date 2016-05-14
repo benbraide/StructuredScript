@@ -111,13 +111,13 @@ StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INod
 	if (resolver != nullptr)
 		return resolver->resolveStorage(storage);
 
-	bool localOnly;
 	std::string value;
+	unsigned short scope;
 	
-	if (!resolvePartial_(node, storage, value, localOnly))
+	if (!resolvePartial_(node, storage, value, scope))
 		return nullptr;
 
-	return storage->findStorage(value, localOnly);
+	return storage->findStorage(value, scope);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode::Ptr node, IStorage *storage){
@@ -125,13 +125,13 @@ StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode:
 	if (resolver != nullptr)
 		return resolver->resolveType(storage);
 
-	bool localOnly;
 	std::string value;
+	unsigned short scope;
 
-	if (!resolvePartial_(node, storage, value, localOnly))
+	if (!resolvePartial_(node, storage, value, scope))
 		return nullptr;
 
-	return storage->findType(value, localOnly);
+	return storage->findType(value, scope);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsObject(INode::Ptr node, IStorage *storage){
@@ -139,16 +139,16 @@ StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsObject(IN
 	if (resolver != nullptr)
 		return resolver->resolveMemory(storage);
 
-	bool localOnly;
 	std::string value;
+	unsigned short scope;
 
-	if (!resolvePartial_(node, storage, value, localOnly))
+	if (!resolvePartial_(node, storage, value, scope))
 		return nullptr;
 
-	return storage->findMemory(value, localOnly);
+	return storage->findMemory(value, scope);
 }
 
-bool StructuredScript::Query::Node::resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, bool &localOnly){
+bool StructuredScript::Query::Node::resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, unsigned short &scope){
 	if (storage == nullptr)
 		return false;
 
@@ -184,7 +184,7 @@ bool StructuredScript::Query::Node::resolvePartial_(INode::Ptr node, IStorage *&
 			value = id->value();
 		}
 
-		localOnly = true;
+		scope = IStorage::SEARCH_LOCAL;
 	}
 	else{
 		auto id = dynamic_cast<IIdentifierNode *>(node.get());
@@ -192,7 +192,7 @@ bool StructuredScript::Query::Node::resolvePartial_(INode::Ptr node, IStorage *&
 			return false;
 
 		value = id->value();
-		localOnly = false;
+		scope = IStorage::SEARCH_DEFAULT;
 	}
 
 	return true;
