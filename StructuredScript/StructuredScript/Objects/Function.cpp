@@ -118,6 +118,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 	auto param = list_.begin();
 	auto arg = args.begin();
 
+	IMemory::Ptr expansionMemory;
 	IExpansion *expansion = nullptr;
 	Storage::Storage parameterStorage(storage);
 
@@ -133,8 +134,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 		auto object = memory->object();
 		expansion = (object == nullptr) ? nullptr : dynamic_cast<IExpansion *>(object->base());
-		if (expansion != nullptr)//Add entry
+		if (expansion != nullptr){//Add entry
+			expansionMemory = memory;//Store memory reference for when memory is temporary
 			memory = expansion->add();
+		}
 
 		memory->assign(*arg, storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))//Failed to create object
@@ -143,7 +146,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	if (param != list_.end()){//Parameters must be initialization declarations
 		for (; param != list_.end(); ++param){
-			if (!Query::Node::isInitialization(*param)){
+			if (!Query::Node::isInitialization(*param) && !Query::Node::isExpandedTypeIdentifier(dynamic_cast<IDeclarationNode *>(param->get())->type())){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
 			}
@@ -175,6 +178,14 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 		if (value == nullptr)
 			value = PrimitiveFactory::createVoid();
 		exception->clear();
+	}
+	else if (Query::ExceptionManager::hasBreak(exception)){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'break' found outside loop!", expr)));
+	}
+	else if (Query::ExceptionManager::hasContinue(exception)){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'continue' found outside loop!", expr)));
 	}
 	else if (!Query::ExceptionManager::has(exception))
 		value = PrimitiveFactory::createVoid();

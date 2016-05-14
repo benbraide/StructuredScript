@@ -46,6 +46,8 @@ namespace StructuredScript{
 
 			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, bool localOnly) override;
 
+			virtual ExternalCallType findExternalCall(const std::string &name) override;
+
 			virtual bool remove(IMemory::Ptr target) override;
 
 		protected:

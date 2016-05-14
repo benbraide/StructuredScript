@@ -47,6 +47,12 @@ namespace StructuredScript{
 
 			static bool isControl(INode::Ptr node);
 
+			static bool isFunction(INode::Ptr node);
+
+			static bool isFunctionDeclaration(INode::Ptr node);
+
+			static bool isFunctionDefinition(INode::Ptr node);
+
 			static bool isLoop(INode::Ptr node);
 
 			static bool isSelection(INode::Ptr node);

@@ -9,5 +9,17 @@ bool StructuredScript::Storage::AssumeTypeAttribute::appliesTo(IMemory::Ptr memo
 }
 
 bool StructuredScript::Storage::AssumeTypeAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return (Query::Node::isInitialization(node) || Query::Node::isParameter(node) || Query::Node::isMember(node));
+	return Query::Node::isDeclaration(node);
+}
+
+void StructuredScript::Storage::AssumeTypeAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+void StructuredScript::Storage::AssumeTypeAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeTypeAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return shared_from_this();
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeTypeAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return nullptr;
 }

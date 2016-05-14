@@ -9,5 +9,17 @@ bool StructuredScript::Storage::AssumeConstnessAttribute::appliesTo(IMemory::Ptr
 }
 
 bool StructuredScript::Storage::AssumeConstnessAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return (Query::Node::isInitialization(node) || Query::Node::isParameter(node) || Query::Node::isMember(node));
+	return Query::Node::isDeclaration(node);
+}
+
+void StructuredScript::Storage::AssumeConstnessAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+void StructuredScript::Storage::AssumeConstnessAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeConstnessAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return shared_from_this();
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeConstnessAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return nullptr;
 }

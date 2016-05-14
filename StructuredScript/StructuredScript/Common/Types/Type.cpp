@@ -189,6 +189,10 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttrib
 	return nullptr;
 }
 
+StructuredScript::IStorage::ExternalCallType StructuredScript::Type::findExternalCall(const std::string &name){
+	return nullptr;
+}
+
 bool StructuredScript::Type::remove(IMemory::Ptr target){
 	return false;
 }

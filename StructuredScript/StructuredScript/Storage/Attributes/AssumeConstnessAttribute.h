@@ -14,6 +14,14 @@ namespace StructuredScript{
 			virtual bool appliesTo(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual bool appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual void apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual void apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 		};
 	}
 }

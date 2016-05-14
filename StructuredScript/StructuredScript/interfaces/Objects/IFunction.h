@@ -5,13 +5,13 @@
 
 #include <list>
 
-#include "../IAny.h"
+#include "../IExceptionManager.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
 		class Function{
 		public:
-			typedef std::list<IAny::Ptr>	ArgListType;
+			typedef Storage::ArgListType	ArgListType;
 			typedef std::list<IType::Ptr>	TypeListType;
 
 			virtual ~Function(){}

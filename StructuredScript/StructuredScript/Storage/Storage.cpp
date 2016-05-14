@@ -105,6 +105,10 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::Storage::find
 	return (localOnly || parent_ == nullptr) ? nullptr : parent_->findMemoryAttribute(name, false);
 }
 
+StructuredScript::IStorage::ExternalCallType StructuredScript::Storage::Storage::findExternalCall(const std::string &name){
+	return nullptr;
+}
+
 bool StructuredScript::Storage::Storage::remove(IMemory::Ptr target){
 	for (auto object = objects_.begin(); object != objects_.end(); ++object){
 		if (object->second == target){

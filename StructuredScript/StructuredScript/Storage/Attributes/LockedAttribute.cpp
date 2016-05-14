@@ -9,5 +9,17 @@ bool StructuredScript::Storage::LockedAttribute::appliesTo(IMemory::Ptr memory, 
 }
 
 bool StructuredScript::Storage::LockedAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return Query::Node::isDeclaration(node);
+	return (Query::Node::isDeclaration(node) || Query::Node::isFunction(node));
+}
+
+void StructuredScript::Storage::LockedAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+void StructuredScript::Storage::LockedAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::LockedAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return shared_from_this();
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::LockedAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return nullptr;
 }

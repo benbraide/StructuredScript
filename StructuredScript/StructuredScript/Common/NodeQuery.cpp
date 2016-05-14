@@ -51,6 +51,18 @@ bool StructuredScript::Query::Node::isControl(INode::Ptr node){
 	return false;
 }
 
+bool StructuredScript::Query::Node::isFunction(INode::Ptr node){
+	return (dynamic_cast<IFunctionDeclarationNode *>(node.get()) != nullptr || dynamic_cast<IFunctionDefinitionNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isFunctionDeclaration(INode::Ptr node){
+	return dynamic_cast<IFunctionDeclarationNode *>(node.get()) != nullptr;
+}
+
+bool StructuredScript::Query::Node::isFunctionDefinition(INode::Ptr node){
+	return dynamic_cast<IFunctionDefinitionNode *>(node.get()) != nullptr;
+}
+
 bool StructuredScript::Query::Node::isLoop(INode::Ptr node){
 	return false;
 }

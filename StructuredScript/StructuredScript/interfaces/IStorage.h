@@ -3,18 +3,26 @@
 #ifndef STRUCTURED_SCRIPT_STORAGE_INTERFACE_H
 #define STRUCTURED_SCRIPT_STORAGE_INTERFACE_H
 
+#include <list>
 #include <string>
 #include <memory>
+#include <functional>
 
 namespace StructuredScript{
 	namespace Interfaces{
+		class Any;
 		class Type;
 		class Node;
 		class Memory;
 		class MemoryAttribute;
+		class ExceptionManager;
 
 		class Storage{
 		public:
+			typedef std::shared_ptr<Any> AnyPtr;
+			typedef std::list<AnyPtr> ArgListType;
+			typedef std::function<AnyPtr(const ArgListType &args, Storage *storage, ExceptionManager *exception, Node *expr)> ExternalCallType;
+
 			virtual ~Storage(){}
 
 			virtual std::shared_ptr<Storage> *addStorage(const std::string &name) = 0;
@@ -42,6 +50,8 @@ namespace StructuredScript{
 			virtual std::shared_ptr<MemoryAttribute> *addMemoryAttribute(const std::string &name) = 0;
 
 			virtual std::shared_ptr<MemoryAttribute> findMemoryAttribute(const std::string &name, bool localOnly) = 0;
+
+			virtual ExternalCallType findExternalCall(const std::string &name) = 0;
 
 			virtual bool remove(std::shared_ptr<Memory> target) = 0;
 		};

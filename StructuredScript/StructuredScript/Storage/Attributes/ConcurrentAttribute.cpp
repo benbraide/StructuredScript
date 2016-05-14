@@ -5,9 +5,21 @@ StructuredScript::Interfaces::MemoryAttribute::Ptr StructuredScript::Storage::Co
 }
 
 bool StructuredScript::Storage::ConcurentAttribute::appliesTo(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return false;
+	return (memory != nullptr);
 }
 
 bool StructuredScript::Storage::ConcurentAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return (Query::Node::isControl(node) || Query::Node::isPlainBlock(node));
+	return (Query::Node::isFunction(node) || Query::Node::isControl(node) || Query::Node::isPlainBlock(node));
+}
+
+void StructuredScript::Storage::ConcurentAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+void StructuredScript::Storage::ConcurentAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::ConcurentAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return shared_from_this();
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::ConcurentAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return nullptr;
 }
