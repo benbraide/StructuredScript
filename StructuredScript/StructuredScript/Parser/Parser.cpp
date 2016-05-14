@@ -167,15 +167,21 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		FunctionParser functionParser(node);
 		node = functionParser.parse(well, scanner, *this, exception);
 		if (Query::ExceptionManager::has(exception))
-			return node;
+			return nullptr;
 
 		return expression(node, well, scanner, exception, precedence, validator);
+	}
+
+	if (value == "("){//Convert to symbol
+		value = "()";
+		type = Scanner::TokenType::TOKEN_TYPE_SYMBOL;
 	}
 
 	OperatorInfo::MatchedListType list;
 	if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
 		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
+	value = next.value();
 	if (list.empty()){//Check declaration
 		if ((type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || value == "operator") &&
 			Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
@@ -197,24 +203,43 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	}
 
 	OperatorInfo::MatchedListType::iterator info;
-	if (scanner.hasMore(well)){//Binary | RightUnary
+	if (value == "("){//Content inside parenthesis -- binary
 		info = list.find(OperatorType(OperatorType::BINARY));
-		if (info == list.end())
+	}
+	else if (scanner.hasMore(well)){//Binary | Right unary
+		if (value != "()"){
+			info = list.find(OperatorType(OperatorType::BINARY));
+			if (info == list.end())
+				info = list.find(OperatorType(OperatorType::RIGHT_UNARY));
+		}
+		else//No content inside parenthesis -- right unary
 			info = list.find(OperatorType(OperatorType::RIGHT_UNARY));
 	}
-	else//RightUnary
+	else//Right unary
 		info = list.find(OperatorType(OperatorType::RIGHT_UNARY));
 
 	if (info == list.end())
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Bad operator!"));
 
 	if (info->second.precedence < precedence || (info->second.precedence == precedence && info->second.isLeftAssociative)){//Don't stack
-		scanner.save(next);
+		if (value != "(")//Return token if it's a symbol
+			scanner.save(next);
 		return node;
 	}
 
 	if (info->first.isBinary()){
-		auto right = expression(nullptr, well, scanner, exception, info->second.precedence, validator);
+		INode::Ptr right;
+		if (value == "("){//Right operand is parenthesis' content
+			scanner.open(well, '(', ')');
+			right = expression(nullptr, well, scanner, exception, info->second.precedence);
+			if (!scanner.close(well) && !Query::ExceptionManager::has(exception)){
+				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+					"'" + node->str() + "(" + right->str() + "...': Bad expression!"));
+			}
+		}
+		else
+			right = expression(nullptr, well, scanner, exception, info->second.precedence, validator);
+
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
@@ -223,7 +248,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 				"'" + node->str() + " " + next.str() + "': Missing right operand!"));
 		}
 
-		node = std::make_shared<Nodes::BinaryOperatorNode>(value, node, right);
+		node = std::make_shared<Nodes::BinaryOperatorNode>("()", node, right);
 	}
 	else//RightUnary
 		node = std::make_shared<Nodes::UnaryOperatorNode>(false, value, node);

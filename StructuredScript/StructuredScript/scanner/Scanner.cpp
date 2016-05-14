@@ -30,8 +30,6 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::ne
 		return token;
 
 	switch (well.peek()){
-	case '(':
-		return Token(TokenType::TOKEN_TYPE_GROUP, "(");
 	case '[':
 		return Token(TokenType::TOKEN_TYPE_INDEX, "[");
 	case '{':
@@ -135,6 +133,29 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::ge
 		}
 
 		return token.isGroup(TokenGroup::TOKEN_GROUP_NUMBER) ? extendNumber_(well, token) : token;
+	}
+
+	auto next = well.peek();
+	if (next == '(' || next == '['){//Check for '()' | '[]' symbol separated by blanks
+		if (hasMore_(well, true)){
+			well.step(1);
+			well.fork();
+
+			auto token = skip_(well);//Skip blanks and comments
+			well.discard();
+			well.step(-1);
+
+			if (token.type() == TokenType::TOKEN_TYPE_ERROR)
+				return Token(TokenType::TOKEN_TYPE_ERROR, "(" + token.str());
+
+			auto nextPair = well.peek(2);
+			if (nextPair.size() == 2u && (nextPair[1] == ')' || nextPair[1] == ']')){// '()' | '[]' symbol
+				well.step(2);//Skip pair
+				return Token(TokenType::TOKEN_TYPE_SYMBOL, nextPair);
+			}
+		}
+
+		return Token(TokenType::TOKEN_TYPE_GROUP, std::string(1, next));
 	}
 
 	return Token(TokenType::TOKEN_TYPE_NONE, "");

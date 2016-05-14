@@ -27,7 +27,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_[Typename::TYPE_NAME_LDOUBLE]	= std::make_shared<PrimitiveType>("long double", Typename::TYPE_NAME_LDOUBLE);
 	primitives_[Typename::TYPE_NAME_STRING]		= std::make_shared<PrimitiveType>("string", Typename::TYPE_NAME_STRING);
 	primitives_[Typename::TYPE_NAME_TYPE]		= std::make_shared<PrimitiveType>("type", Typename::TYPE_NAME_TYPE);
-	primitives_[Typename::TYPE_NAME_FUNCTION]	= std::make_shared<PrimitiveType>("function_type", Typename::TYPE_NAME_TYPE);
+	primitives_[Typename::TYPE_NAME_FUNCTION]	= std::make_shared<PrimitiveType>("function_type", Typename::TYPE_NAME_FUNCTION);
 
 	attributes_["Locked"]						= std::make_shared<LockedAttribute>();
 	attributes_["Concurrent"]					= std::make_shared<ConcurentAttribute>();

@@ -97,7 +97,7 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
-			virtual IType::Ptr resolve(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage) override;
 		};
 
 		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode, public ITypeResolver{
@@ -111,7 +111,7 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
-			virtual IType::Ptr resolve(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage) override;
 
 		private:
 			Ptr value_;
@@ -132,7 +132,7 @@ namespace StructuredScript{
 
 			virtual unsigned short states() const override;
 
-			virtual IType::Ptr resolve(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage) override;
 
 		private:
 			Storage::MemoryState value_;

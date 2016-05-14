@@ -13,7 +13,9 @@
 #include "../Interfaces/Nodes/IGroupNode.h"
 #include "../Interfaces/Nodes/IIndexNode.h"
 #include "../Interfaces/Nodes/IBlockNode.h"
+#include "../Interfaces/Nodes/IStorageResolver.h"
 #include "../Interfaces/Nodes/ITypeResolver.h"
+#include "../Interfaces/Nodes/IMemoryResolver.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 

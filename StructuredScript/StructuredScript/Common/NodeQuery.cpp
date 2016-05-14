@@ -9,7 +9,14 @@ bool StructuredScript::Query::Node::isIdentifier(INode::Ptr node){
 }
 
 bool StructuredScript::Query::Node::isIdentifierExpression(INode::Ptr node){
-	return (dynamic_cast<IIdentifierExpressionNode *>(node.get()) != nullptr);
+	if (dynamic_cast<IIdentifierExpressionNode *>(node.get()) != nullptr)
+		return true;
+
+	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
+	if (operatorNode != nullptr && (operatorNode->value() == "." || operatorNode->value() == "::"))
+		return true;
+
+	return false;
 }
 
 bool StructuredScript::Query::Node::isOperatorIdentifier(INode::Ptr node){
@@ -88,6 +95,10 @@ void StructuredScript::Query::Node::split(const std::string &value, INode::Ptr n
 }
 
 StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INode::Ptr node, IStorage *storage){
+	auto resolver = dynamic_cast<IStorageResolver *>(node.get());
+	if (resolver != nullptr)
+		return resolver->resolveStorage(storage);
+
 	bool localOnly;
 	std::string value;
 	
@@ -98,9 +109,9 @@ StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INod
 }
 
 StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode::Ptr node, IStorage *storage){
-	auto typeResolver = dynamic_cast<ITypeResolver *>(node.get());
-	if (typeResolver != nullptr)
-		return typeResolver->resolve(storage);
+	auto resolver = dynamic_cast<ITypeResolver *>(node.get());
+	if (resolver != nullptr)
+		return resolver->resolveType(storage);
 
 	bool localOnly;
 	std::string value;
@@ -112,6 +123,10 @@ StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode:
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsObject(INode::Ptr node, IStorage *storage){
+	auto resolver = dynamic_cast<IMemoryResolver *>(node.get());
+	if (resolver != nullptr)
+		return resolver->resolveMemory(storage);
+
 	bool localOnly;
 	std::string value;
 

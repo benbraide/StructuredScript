@@ -1,0 +1,21 @@
+#pragma once
+
+#ifndef STRUCTURED_SCRIPT_MEMORY_RESOLVER_INTERFACE_H
+#define STRUCTURED_SCRIPT_MEMORY_RESOLVER_INTERFACE_H
+
+#include "../IMemory.h"
+
+namespace StructuredScript{
+	namespace Interfaces{
+		class MemoryResolver{
+		public:
+			virtual ~MemoryResolver(){}
+
+			virtual Memory::Ptr resolveMemory(Storage *storage) = 0;
+		};
+	}
+
+	typedef Interfaces::MemoryResolver IMemoryResolver;
+}
+
+#endif /* !STRUCTURED_SCRIPT_MEMORY_RESOLVER_INTERFACE_H */

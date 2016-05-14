@@ -41,7 +41,7 @@ bool StructuredScript::CompositeType::isParent(Ptr target){
 
 bool StructuredScript::CompositeType::isCompatibleWith(Ptr target, bool family/* = false*/){
 	for (auto type : types_){
-		if (type->isCompatibleWith(target, true))
+		if (type->isEqual(target) || target->isParent(type))
 			return true;
 	}
 
@@ -49,12 +49,18 @@ bool StructuredScript::CompositeType::isCompatibleWith(Ptr target, bool family/*
 }
 
 StructuredScript::Interfaces::Type::Ptr StructuredScript::CompositeType::getCompatibleType(Ptr target, bool family/* = false*/){
+	IType::Ptr match;
 	for (auto type : types_){
-		if (type->isCompatibleWith(target, true))
+		if (type->isEqual(target))
 			return type;
+
+		if (target->isParent(type)){//Get nearest parent
+			if (match == nullptr || type->isParent(match))
+				match = type;
+		}
 	}
 
-	return nullptr;
+	return match;
 }
 
 std::string StructuredScript::CompositeType::name() const{

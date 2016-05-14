@@ -96,7 +96,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TemplatedTypena
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto type = resolve(storage);
+	auto type = resolveType(storage);
 	if (type == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename!", expr)));
@@ -109,7 +109,7 @@ std::string StructuredScript::Nodes::TemplatedTypenameIdentifierNode::str(){
 	return (TypenameIdentifierNode::value_->str() + "<" + value_->str() + ">");
 }
 
-StructuredScript::IType::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::resolve(IStorage *storage){
+StructuredScript::IType::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::resolveType(IStorage *storage){
 	auto type = Query::Node::resolveAsType(TypenameIdentifierNode::value_, storage);
 	if (type == nullptr)
 		return nullptr;
@@ -138,7 +138,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ModifiedTypenam
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::ModifiedTypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto type = resolve(storage);
+	auto type = resolveType(storage);
 	if (type == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename!", expr)));
@@ -159,7 +159,7 @@ unsigned short StructuredScript::Nodes::ModifiedTypenameIdentifierNode::states()
 	return value_.states();
 }
 
-StructuredScript::IType::Ptr StructuredScript::Nodes::ModifiedTypenameIdentifierNode::resolve(IStorage *storage){
+StructuredScript::IType::Ptr StructuredScript::Nodes::ModifiedTypenameIdentifierNode::resolveType(IStorage *storage){
 	auto type = Query::Node::resolveAsType(TypenameIdentifierNode::value_, storage);
 	return (type == nullptr) ? nullptr : std::make_shared<DeclaredType>(type, value_);
 }
@@ -169,7 +169,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ExpandedTypenam
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::ExpandedTypenameIdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto type = resolve(storage);
+	auto type = resolveType(storage);
 	if (type == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename!", expr)));
@@ -182,7 +182,7 @@ std::string StructuredScript::Nodes::ExpandedTypenameIdentifierNode::str(){
 	return (value_->str() + "...");
 }
 
-StructuredScript::IType::Ptr StructuredScript::Nodes::ExpandedTypenameIdentifierNode::resolve(IStorage *storage){
+StructuredScript::IType::Ptr StructuredScript::Nodes::ExpandedTypenameIdentifierNode::resolveType(IStorage *storage){
 	auto type = Query::Node::resolveAsType(TypenameIdentifierNode::value_, storage);
 	return (type == nullptr) ? nullptr : std::make_shared<ExpandedType>(type);
 }

@@ -5,10 +5,7 @@
 
 #include <map>
 
-#include "Memory.h"
-
-#include "../Interfaces/Storages/IGlobalStorage.h"
-#include "../Interfaces/Storages/IFunctionMemory.h"
+#include "FunctionMemory.h"
 
 namespace StructuredScript{
 	namespace Storage{
@@ -34,6 +31,8 @@ namespace StructuredScript{
 			virtual IMemory::Ptr *addMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
+
+			virtual IMemory::Ptr findFunctionMemory(const std::string &name, bool localOnly) override;
 
 			virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
 

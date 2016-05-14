@@ -29,6 +29,8 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Memory> findMemory(const std::string &name, bool localOnly) = 0;
 
+			virtual std::shared_ptr<Memory> findFunctionMemory(const std::string &name, bool localOnly) = 0;
+
 			virtual std::shared_ptr<Memory> *addOperatorMemory(const std::string &name) = 0;
 
 			virtual std::shared_ptr<Memory> findOperatorMemory(const std::string &name, bool localOnly) = 0;

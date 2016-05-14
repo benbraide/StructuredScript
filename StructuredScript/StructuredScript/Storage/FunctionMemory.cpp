@@ -1,5 +1,16 @@
 #include "FunctionMemory.h"
 
+StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &components)
+	: storage_(nullptr){//Combine multiple function memories into one
+	for (auto component : components){
+		auto functionMemory = dynamic_cast<FunctionMemory *>(component.get());
+		if (functionMemory != nullptr){
+			for (auto memory : functionMemory->list_)
+				list_.push_back(memory);
+		}
+	}
+}
+
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::ptr(){
 	return shared_from_this();
 }
@@ -23,6 +34,10 @@ StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Storage::F
 
 StructuredScript::IStorage *StructuredScript::Storage::FunctionMemory::storage(){
 	return storage_;
+}
+
+void StructuredScript::Storage::FunctionMemory::setStorage(IStorage *storage){
+	storage_ = storage;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IAny::Ptr function, IMemoryAttributes::Ptr attributes){
@@ -63,4 +78,24 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	}
 
 	return selected;
+}
+
+void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr){
+	Query::Node::ListType list;
+	Query::Node::split(",", args, list);
+
+	for (auto arg : list){
+		auto value = arg->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			break;
+
+		if (Query::Object::isUndefined(value)){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + arg->str() + "': Bad argument to function call!", expr)));
+
+			break;
+		}
+
+		resolved.push_back(value);
+	}
 }

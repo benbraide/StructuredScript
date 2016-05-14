@@ -15,8 +15,14 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parse(ICh
 			return (next.value() != ",");
 		});
 
-		if (!Query::Node::isEmpty(node) && Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node))//Unnamed parameter
-			node = std::make_shared<Nodes::DeclarationNode>(node, nullptr);
+		if (!Query::Node::isDeclaration(node)){//Check unnamed parameter
+			if (Query::Node::isEmpty(node) || !Query::Node::isIdentifier(node) || Query::Node::isOperatorIdentifier(node)){
+				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+					"'" + node->str() + "': Expected function parameter to be a declaration!"));
+			}
+
+			node = std::make_shared<Nodes::DeclarationNode>(node, nullptr);//Unnamed
+		}
 
 		if (parameters != nullptr){
 			if (Query::Node::isEmpty(node)){//Trailing ','

@@ -7,9 +7,7 @@
 #include <list>
 
 #include "../TypeQuery.h"
-#include "../../Interfaces/IMemory.h"
-#include "../../Storage/MemoryState.h"
-#include "../../Interfaces/Storages/IFunctionMemory.h"
+#include "../../Storage/FunctionMemory.h"
 
 namespace StructuredScript{
 	class Type : public IType, public IStorage{
@@ -51,6 +49,8 @@ namespace StructuredScript{
 		virtual IMemory::Ptr *addMemory(const std::string &name) override;
 
 		virtual IMemory::Ptr findMemory(const std::string &name, bool localOnly) override;
+
+		virtual IMemory::Ptr findFunctionMemory(const std::string &name, bool localOnly) override;
 
 		virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
 
