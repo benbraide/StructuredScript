@@ -2,32 +2,44 @@
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Bad index object while copying!", expr)));
+	}
 
 	return target->getIndexValue(value_);
 }
 
 bool StructuredScript::Objects::IndexObject::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Bad index object while converting to bool!", expr)));
+
+		return false;
+	}
 
 	return target->getIndexValue(value_)->truth(storage, exception, expr);
 }
 
 std::string StructuredScript::Objects::IndexObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Bad index object while converting to string!", expr)));
+
+		return "";
+	}
 
 	return target->getIndexValue(value_)->str(storage, exception, expr);
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Bad index object!", expr)));
+	}
 
 	auto indexValue = target->getIndexValue(value_);
 	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateLeftUnary(value, exception, expr);
@@ -35,8 +47,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Bad index object!", expr)));
+	}
 
 	auto indexValue = target->getIndexValue(value_);
 	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateRightUnary(value, exception, expr);
@@ -45,8 +59,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
 	IExceptionManager *exception, INode *expr){
 	auto target = dynamic_cast<IIndexTarget *>(memory_->object()->base());
-	if (target == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Bad index object!", expr)));
+	}
 
 	auto indexValue = target->getIndexValue(value_);
 	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->evaluateBinary(value, right, storage, exception, expr);
@@ -59,16 +75,4 @@ int StructuredScript::Objects::IndexObject::rank(){
 
 	auto indexValue = target->getIndexValue(value_);
 	return dynamic_cast<IPrimitiveObject *>(indexValue->base())->rank();
-}
-
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::promote_(Primitive *target){
-	return nullptr;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Objects::IndexObject::evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr){
-	return nullptr;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Objects::IndexObject::evaluate_(const std::string &value, INumber *right, IExceptionManager *exception, INode *expr){
-	return nullptr;
 }

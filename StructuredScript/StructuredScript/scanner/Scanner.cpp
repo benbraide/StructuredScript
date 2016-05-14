@@ -52,7 +52,7 @@ StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::pe
 }
 
 void StructuredScript::Scanner::Scanner::save(const Token &token){
-	if (token.type() != TokenType::TOKEN_TYPE_NONE)
+	if (token.type() != TokenType::TOKEN_TYPE_NONE && token.type() != TokenType::TOKEN_TYPE_GROUP)
 		savedTokens_.push_back(token);
 }
 

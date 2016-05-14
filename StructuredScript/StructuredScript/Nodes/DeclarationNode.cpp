@@ -16,7 +16,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 
 	auto value = this->value();
 	if (value == nullptr)//Unnamed declaration
-		return std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes());
+		return createMemory_(storage, type);
 
 	if (!Query::Node::isIdentifier(value) || Query::Node::isTypeIdentifier(value) || Query::Node::isOperatorIdentifier(value)){
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
@@ -33,7 +33,16 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 		return nullptr;
 	}
 
-	return (*memory = std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes()));
+	return (*memory = createMemory_(storage, type));
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::createMemory_(IStorage *storage, IType::Ptr type){
+	auto expandedType = dynamic_cast<IExpandedType *>(type.get());
+	if (expandedType == nullptr)
+		return std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes());
+
+	auto expansion = std::make_shared<Objects::Expansion>(dynamic_cast<IStackedType *>(expandedType)->value());
+	return std::make_shared<Storage::Memory>(storage, type, expansion, attributes());
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode::ptr(){

@@ -30,6 +30,9 @@ StructuredScript::IMemory *StructuredScript::Objects::Primitive::memory(){
 }
 
 bool StructuredScript::Objects::Primitive::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
+	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot get truth value of object!", expr)));
+
 	return false;
 }
 

@@ -64,8 +64,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluate
 	if (value != "[]")
 		return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
-	if (dynamic_cast<IInteger *>(right->base()) == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (dynamic_cast<IInteger *>(right->base()) == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'[]': Expected index to be an integral value!", expr)));
+	}
 
 	auto index = static_cast<unsigned char>(getIndex(right));
 	if (memory_ == nullptr)

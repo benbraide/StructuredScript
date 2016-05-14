@@ -8,8 +8,9 @@
 #include "../Common/Types/DeclaredType.h"
 
 #include "../Storage/MemoryState.h"
-#include "../Storage/Memory.h"
 #include "../Storage/FunctionMemory.h"
+
+#include "../Objects/Expansion.h"
 
 namespace StructuredScript{
 	namespace Nodes{
@@ -26,6 +27,9 @@ namespace StructuredScript{
 			virtual INode::Ptr value() = 0;
 
 			virtual IMemoryAttributes::Ptr attributes() = 0;
+
+		private:
+			IMemory::Ptr createMemory_(IStorage *storage, IType::Ptr type);
 		};
 
 		class DeclarationNode : public SharedDeclaration, public INode, public IDeclarationNode{

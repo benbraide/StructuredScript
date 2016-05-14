@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H
 
 #include "../IExceptionManager.h"
+#include "IFunction.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
@@ -93,6 +94,15 @@ namespace StructuredScript{
 		public:
 			virtual ~Undefined(){}
 		};
+
+		class Expansion{
+		public:
+			virtual ~Expansion(){}
+
+			virtual void expand(Function::ArgListType &args) = 0;
+
+			virtual std::shared_ptr<Memory> add() = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -110,6 +120,7 @@ namespace StructuredScript{
 	typedef Interfaces::IndexObject		IIndexObject;
 	typedef Interfaces::IndexTarget		IIndexTarget;
 	typedef Interfaces::Undefined		IUndefined;
+	typedef Interfaces::Expansion		IExpansion;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

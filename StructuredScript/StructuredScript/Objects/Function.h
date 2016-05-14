@@ -3,9 +3,11 @@
 #ifndef STRUCTURED_SCRIPT_FUNCTION_H
 #define STRUCTURED_SCRIPT_FUNCTION_H
 
-#include "Primitive.h"
 #include "../Common/NodeQuery.h"
 #include "../Common/TypeQuery.h"
+#include "../Storage/SpecializedStorage.h"
+
+#include "Primitive.h"
 
 namespace StructuredScript{
 	namespace Objects{

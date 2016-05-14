@@ -12,7 +12,9 @@
 #include "Plugins/InitializationParser.h"
 #include "Plugins/DependentDeclarationParser.h"
 #include "Plugins/DeclaredTypeParser.h"
-#include "Plugins/FunctionParser.h"
+#include "Plugins/GroupParser.h"
+#include "Plugins/SourceParser.h"
+#include "Plugins/ExpressionParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"
@@ -21,6 +23,7 @@
 #include "../Nodes/BlockPairNode.h"
 #include "../Nodes/EmptyNode.h"
 #include "../Nodes/IdentifierNode.h"
+#include "../Nodes/InterruptNode.h"
 
 namespace StructuredScript{
 	namespace Parser{

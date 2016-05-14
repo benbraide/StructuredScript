@@ -13,6 +13,8 @@ namespace StructuredScript{
 	public:
 		static IAny::Ptr createUndefined();
 
+		static IAny::Ptr createVoid();
+
 		static IAny::Ptr createNaN();
 
 		static IAny::Ptr createBool(bool value);

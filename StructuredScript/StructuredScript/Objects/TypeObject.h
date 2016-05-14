@@ -15,17 +15,11 @@ namespace StructuredScript{
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual IAny *base() override;
-
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
-
-			virtual int rank() override;
 
 			virtual IType::Ptr value() override;
 
 		protected:
-			virtual Ptr promote_(Primitive *target) override;
-
 			virtual Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override;
 
 			IType::Ptr value_;

@@ -66,7 +66,7 @@ bool StructuredScript::Query::ExceptionManager::hasExit(IExceptionManager *xMana
 }
 
 bool StructuredScript::Query::ExceptionManager::hasReturn(IExceptionManager *xManager){
-	return (xManager == nullptr) ? false : xManager->hasExit();
+	return (xManager == nullptr) ? false : xManager->hasReturn();
 }
 
 bool StructuredScript::Query::ExceptionManager::hasBreak(IExceptionManager *xManager){

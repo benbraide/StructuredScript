@@ -90,7 +90,7 @@ void StructuredScript::Query::Node::split(const std::string &value, INode::Ptr n
 		else//Operator mismatch -- don't split
 			list.push_back(node);
 	}
-	else if (/*dynamic_cast<IEmptyNode *>(node.get()) != nullptr*/true)//Not operator -- add non-empty node
+	else if (dynamic_cast<IEmptyNode *>(node.get()) == nullptr)//Not operator -- add non-empty node
 		list.push_back(node);
 }
 

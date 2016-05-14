@@ -27,12 +27,6 @@ namespace StructuredScript{
 			virtual int rank() override;
 
 		protected:
-			virtual Ptr promote_(Primitive *target) override;
-
-			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override;
-
-			virtual IAny::Ptr evaluate_(const std::string &value, INumber *right, IExceptionManager *exception, INode *expr);
-
 			unsigned int value_;
 			IMemory *target_;
 		};

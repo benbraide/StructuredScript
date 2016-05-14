@@ -1,6 +1,7 @@
 #include "Factory.h"
 
 #include "../Objects/Undefined.h"
+#include "../Objects/Void.h"
 #include "../Objects/NaN.h"
 #include "../Objects/Bool.h"
 #include "../Objects/Bit.h"
@@ -12,6 +13,10 @@
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUndefined(){
 	return std::make_shared<Objects::Undefined>();
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createVoid(){
+	return std::make_shared<Objects::Void>();
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNaN(){

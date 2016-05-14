@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_FUNCTION_PARSER_PLUGIN_H
 
 #include "../../Interfaces/IParserPlugin.h"
+#include "../../Nodes/EmptyNode.h"
 #include "../../Nodes/FunctionNode.h"
 #include "../../Nodes/OperatorNode.h"
 #include "../../Nodes/DeclarationNode.h"

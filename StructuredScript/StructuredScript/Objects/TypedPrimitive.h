@@ -25,12 +25,16 @@ namespace StructuredScript{
 				if (value != "[]")
 					return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
-				if (dynamic_cast<IInteger *>(right->base()) == nullptr)
-					return nullptr;//TODO: Throw exception
+				if (dynamic_cast<IInteger *>(right->base()) == nullptr){
+					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+						"'[]': Expected index to be an integral value!", expr)));
+				}
 
 				auto index = getIndex(right);
-				if (index >= sizeof value_)
-					return nullptr;//TODO: Throw exception
+				if (index >= sizeof value_){
+					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+						"'[]': Index is out of bounds!", expr)));
+				}
 
 				if (memory_ == nullptr)
 					return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[index]);

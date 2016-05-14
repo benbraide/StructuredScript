@@ -72,6 +72,9 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
+	if (args.empty())
+		return 1;
+
 	auto total = 0;
 	unsigned int index = 0;
 
@@ -94,6 +97,9 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
+	if (args.empty())
+		return 1;
+
 	auto total = 0;
 	unsigned int index = 0;
 
@@ -109,15 +115,94 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	auto param = list_.begin();
+	auto arg = args.begin();
+
+	IExpansion *expansion = nullptr;
+	Storage::Storage parameterStorage(storage);
+
+	for (; arg != args.end() && param != list_.end(); ++arg, ++param){//Create parameter objects
+		if (expansion != nullptr){//Bad expression
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Invalid function parameter list!", expr)));
+		}
+
+		auto memory = dynamic_cast<IDeclarationNode *>(param->get())->allocate(&parameterStorage, exception, expr);
+		if (Query::ExceptionManager::has(exception))//Failed to allocate memory
+			return nullptr;
+
+		auto object = memory->object();
+		expansion = (object == nullptr) ? nullptr : dynamic_cast<IExpansion *>(object->base());
+		if (expansion != nullptr)//Add entry
+			memory = expansion->add();
+
+		memory->assign(*arg, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))//Failed to create object
+			return nullptr;
+	}
+
+	if (param != list_.end()){//Parameters must be initialization declarations
+		for (; param != list_.end(); ++param){
+			if (!Query::Node::isInitialization(*param)){
+				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
+			}
+
+			(*param)->evaluate(&parameterStorage, exception, expr);
+			if (Query::ExceptionManager::has(exception))//Failed to create object
+				return nullptr;
+		}
+	}
+	else if (arg != args.end()){//Expanded memory must have been be created
+		if (expansion == nullptr){//Too many arguments
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Too many arguments in function call!", expr)));
+		}
+
+		for (; arg != args.end(); ++arg){
+			expansion->add()->assign(*arg, storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))//Failed to create object
+				return nullptr;
+		}
+	}
+
+	if (!Query::Node::isEmpty(definition_))
+		definition_->evaluate(&parameterStorage, exception, expr);
+
+	Ptr value;//Return value
+	if (Query::ExceptionManager::hasReturn(exception)){
+		value = exception->get();
+		if (value == nullptr)
+			value = PrimitiveFactory::createVoid();
+		exception->clear();
+	}
+	else if (!Query::ExceptionManager::has(exception))
+		value = PrimitiveFactory::createVoid();
+	else
+		return nullptr;
+
+	Storage::Memory converter(nullptr, type_, value, nullptr);//For converting return value
+	converter.assign(value, storage, exception, expr);
+
+	return Query::ExceptionManager::has(exception) ? nullptr : converter.object();
 }
 
 int StructuredScript::Objects::Function::score_(IType::Ptr type, unsigned int index){
 	IType::Ptr target;
-	if (index < list_.size())
+	if (index < list_.size()){
 		target = *std::next(types_.begin(), index);
-	else//Assume last parameter has expanded type
-		target = dynamic_cast<IStackedType *>(types_.rbegin()->get())->value();
+
+		auto stackedType = dynamic_cast<IStackedType *>(target.get());
+		if (stackedType != nullptr)
+			target = stackedType->value();
+	}
+	else{//Assume last parameter has expanded type
+		auto stackedType = dynamic_cast<IStackedType *>(types_.rbegin()->get());
+		if (stackedType == nullptr)
+			return 0;
+
+		target = stackedType->value();
+	}
 
 	if (target->isEqual(type))
 		return 3;

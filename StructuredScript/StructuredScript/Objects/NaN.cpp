@@ -59,8 +59,10 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::NaN::evaluate_(const std:
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::NaN::evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr){
 	auto number = dynamic_cast<INumber *>(right.get());
-	if (number == nullptr)
-		return nullptr;//TODO: Throw exception
+	if (number == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}
 
 	return evaluate_(value, number, exception, expr);
 }
