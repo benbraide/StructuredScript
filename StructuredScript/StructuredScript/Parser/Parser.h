@@ -25,6 +25,8 @@
 #include "../Nodes/IdentifierNode.h"
 #include "../Nodes/InterruptNode.h"
 
+#include "../Storage/MemoryAttributes.h"
+
 namespace StructuredScript{
 	namespace Parser{
 		class Parser : public IParser{
@@ -44,6 +46,8 @@ namespace StructuredScript{
 			static OperatorInfo operatorInfo;
 
 		private:
+			INode::Ptr extendAttributes_(INode::Ptr node, ICharacterWell &well, IScanner &scanner, IExceptionManager *exception, Validator validator);
+
 			Scanner::Plugins::SignedNumber signedNumber_;
 
 			static PluginListType plugins_;

@@ -35,6 +35,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	attributes_["Override"]						= std::make_shared<OverrideAttribute>();
 	attributes_["AssumeType"]					= std::make_shared<AssumeTypeAttribute>();
 	attributes_["AssumeConstness"]				= std::make_shared<AssumeConstnessAttribute>();
+	attributes_["Call"]							= std::make_shared< AttributeSpawner<CallAttribute> >();
 
 	types_["integral_type"]						= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
 		primitives_[Typename::TYPE_NAME_NAN],
@@ -133,8 +134,25 @@ bool StructuredScript::Storage::GlobalStorage::createString_(){
 
 	scanner.init();
 	scanner.operatorSymbols.init();
-
 	primitives_[Typename::TYPE_NAME_STRING] = string;
+
+	std::list<std::string> lines({
+		"[Call(at)]char at(integral_type index)",
+		"[Call(append)]void append(const ref val string value)",
+		"[Call(insert)]void append(integral_type index, const ref val string value)",
+		"[Call(erase)]void erase(integral_type index, integral_type count = npos)",
+		"[Call(clear)]void clear()",
+		"[Call(substr)]string substr(integral_type index, integral_type count = npos)",
+		"[Call(find)]int find(const ref val string value, integral_type offset = 0)",
+		"[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
+		"static const unsigned int npos = -1u"
+	});
+
+	for (auto &line : lines){
+		Scanner::StringCharacterWell well(line);
+		parser.parse(well, scanner, nullptr)->evaluate(string.get(), nullptr, nullptr);
+	}
+
 	return true;
 }
 

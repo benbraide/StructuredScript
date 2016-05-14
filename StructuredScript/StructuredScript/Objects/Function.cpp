@@ -61,6 +61,23 @@ bool StructuredScript::Objects::Function::init(IStorage *storage, IExceptionMana
 	return true;
 }
 
+bool StructuredScript::Objects::Function::isDefined(){
+	return (definition_ != nullptr);
+}
+
+bool StructuredScript::Objects::Function::equals(Any::Ptr target){
+	auto function = dynamic_cast<Function *>(target->base());
+	if (function == nullptr || !type_->isEqual(function->type_) || types_.size() != function->types_.size())
+		return false;
+
+	for (auto type = types_.begin(), targetType = function->types_.begin(); type != types_.end() && targetType != function->types_.end(); ++type, ++targetType){
+		if (!(*type)->isEqual(*targetType))
+			return false;
+	}
+
+	return true;
+}
+
 bool StructuredScript::Objects::Function::accepts(int count){
 	if (count < limits_.first)//Count is less than min requirement
 		return false;
@@ -115,6 +132,11 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (definition_ == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
+	}
+
 	auto param = list_.begin();
 	auto arg = args.begin();
 

@@ -41,6 +41,22 @@ void StructuredScript::Storage::FunctionMemory::setStorage(IStorage *storage){
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IAny::Ptr function, IMemoryAttributes::Ptr attributes){
+	auto functionObject = dynamic_cast<IFunction *>(function->base());
+	if (functionObject == nullptr)//Function is required
+		return nullptr;
+
+	auto existing = find_(function);
+	if (existing != list_.end()){//Replace existing only if existing is declaration and new is not
+		if (dynamic_cast<IFunction *>((*existing)->object()->base())->isDefined() || !functionObject->isDefined())
+			return nullptr;
+
+		auto attributes = (*existing)->attributes();
+		if (attributes != nullptr && (attributes->hasAttribute("Locked") || attributes->hasAttribute("Call")))//Restricted | Defined
+			return nullptr;
+
+		list_.erase(existing);
+	}
+
 	list_.push_back(std::make_shared<StructuredScript::Storage::Memory>(storage_, IGlobalStorage::globalStorage->getPrimitiveType(
 		Typename::TYPE_NAME_FUNCTION), nullptr, attributes));
 
@@ -98,4 +114,14 @@ void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFu
 
 		resolved.push_back(value);
 	}
+}
+
+StructuredScript::Storage::FunctionMemory::ListType::iterator StructuredScript::Storage::FunctionMemory::find_(IAny::Ptr function){
+	for (auto item = list_.begin(); item != list_.end(); ++item){
+		auto functionObject = dynamic_cast<IFunction *>((*item)->object()->base());
+		if (functionObject != nullptr && functionObject->equals(function))
+			return item;
+	}
+
+	return list_.end();
 }

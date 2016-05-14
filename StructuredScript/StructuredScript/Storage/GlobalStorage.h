@@ -13,6 +13,10 @@
 #include "Attributes/OverrideAttribute.h"
 #include "Attributes/AssumeTypeAttribute.h"
 #include "Attributes/AssumeConstnessAttribute.h"
+#include "Attributes/CallAttribute.h"
+
+#include "Attributes/ParameterizedAttribute.h"
+#include "Attributes/AttributeSpawner.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 #include "../Objects/Primitive.h"

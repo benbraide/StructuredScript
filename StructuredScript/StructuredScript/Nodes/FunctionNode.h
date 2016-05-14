@@ -28,6 +28,8 @@ namespace StructuredScript{
 			virtual Node::Ptr parameters() override;
 
 		protected:
+			IAny::Ptr evaluate_(Ptr definition, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			Ptr declaration_;
 			Ptr parameters_;
 		};

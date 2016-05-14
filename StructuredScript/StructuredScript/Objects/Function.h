@@ -20,6 +20,10 @@ namespace StructuredScript{
 
 			virtual bool init(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
+			virtual bool isDefined() override;
+
+			virtual bool equals(Any::Ptr target) override;
+
 			virtual bool accepts(int count) override;
 
 			virtual int score(const ArgListType &args) override;

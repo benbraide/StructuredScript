@@ -38,10 +38,18 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Node> arg() = 0;
 		};
+
+		class AttributeWithArgument{
+		public:
+			virtual ~AttributeWithArgument(){}
+
+			virtual std::shared_ptr<Node> arg() = 0;
+		};
 	}
 
 	typedef Interfaces::MemoryAttribute			IMemoryAttribute;
 	typedef Interfaces::ParameterizedAttribute	IParameterizedAttribute;
+	typedef Interfaces::AttributeWithArgument	IAttributeWithArgument;
 }
 
 #endif /* !STRUCTURED_SCRIPT_MEMORY_ATTRIBUTE_INTERFACE_H */

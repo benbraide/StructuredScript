@@ -17,7 +17,7 @@ void StructuredScript::Storage::OverrideAttribute::apply(IMemory::Ptr memory, IS
 void StructuredScript::Storage::OverrideAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::OverrideAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return shared_from_this();
+	return (args == nullptr || Query::Node::isEmpty(args)) ? shared_from_this() : nullptr;
 }
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::OverrideAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){

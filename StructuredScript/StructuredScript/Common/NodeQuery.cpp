@@ -71,6 +71,14 @@ bool StructuredScript::Query::Node::isSelection(INode::Ptr node){
 	return false;
 }
 
+bool StructuredScript::Query::Node::isGroup(INode::Ptr node){
+	return (dynamic_cast<IGroupNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isIndex(INode::Ptr node){
+	return (dynamic_cast<IIndexNode *>(node.get()) != nullptr);
+}
+
 bool StructuredScript::Query::Node::isBlock(INode::Ptr node){
 	return (dynamic_cast<IBlockNode *>(node.get()) != nullptr);
 }
@@ -80,6 +88,9 @@ bool StructuredScript::Query::Node::isPlainBlock(INode::Ptr node){
 }
 
 void StructuredScript::Query::Node::split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary /*= false*/){
+	if (node == nullptr)
+		return;
+
 	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
 	if (operatorNode != nullptr){//Operator
 		if (operatorNode->value() == value){//Values match -- split

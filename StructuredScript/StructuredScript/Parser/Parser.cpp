@@ -169,11 +169,14 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 
 	if (value[0] == '(' || value[0] == '[' || value[0] == '{'){//Group
 		scanner.save(next);//Save symbol
-		node = GroupParser(node, operatorInfo, precedence).parse(well, scanner, *this, exception);
+		auto value = GroupParser(node, operatorInfo, precedence).parse(well, scanner, *this, exception);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		return expression(node, well, scanner, exception, precedence, validator);
+		if (value == node)//Operator stacking was rejected
+			return node;
+
+		return expression(value, well, scanner, exception, precedence, validator);
 	}
 
 	OperatorInfo::MatchedListType list;
@@ -181,10 +184,28 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
 	if (list.empty()){//Check declaration
-		if ((type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || value == "operator") &&
-			Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
+		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || value == "operator"){
+			if (Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
+				scanner.save(next);
+				node = DeclarationParser(node).parse(well, scanner, *this, exception);
+				if (Query::ExceptionManager::has(exception))
+					return node;
+
+				return expression(node, well, scanner, exception, precedence, validator);
+			}
+
+			if (Query::Node::isIndex(node)){//Attributes...
+				scanner.save(next);
+				node = extendAttributes_(node, well, scanner, exception, validator);
+				if (Query::ExceptionManager::has(exception))
+					return node;
+
+				return expression(node, well, scanner, exception, precedence, validator);
+			}
+		}
+		else if (type == Scanner::Plugins::TypenameTokenType::type && Query::Node::isIndex(node)){//Attributes...
 			scanner.save(next);
-			node = DeclarationParser(node).parse(well, scanner, *this, exception);
+			node = extendAttributes_(node, well, scanner, exception, validator);
 			if (Query::ExceptionManager::has(exception))
 				return node;
 
@@ -239,5 +260,20 @@ void StructuredScript::Parser::Parser::init(){
 }
 
 StructuredScript::OperatorInfo StructuredScript::Parser::Parser::operatorInfo;
+
+StructuredScript::INode::Ptr StructuredScript::Parser::Parser::extendAttributes_(INode::Ptr node, ICharacterWell &well, IScanner &scanner,
+	IExceptionManager *exception, Validator validator){
+	scanner.fork(';');//Single line
+	auto value = expression(nullptr, well, scanner, exception, -1, validator);
+
+	scanner.close(well, true);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	Storage::MemoryAttributes::ListType attributes;
+	Storage::MemoryAttributes::parse(dynamic_cast<IIndexNode *>(node.get())->value(), value, attributes);
+
+	return value;
+}
 
 StructuredScript::Parser::Parser::PluginListType StructuredScript::Parser::Parser::plugins_;

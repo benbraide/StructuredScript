@@ -18,13 +18,17 @@ namespace StructuredScript{
 
 			virtual bool init(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
+			virtual bool isDefined() = 0;
+
+			virtual bool equals(Any::Ptr target) = 0;
+
 			virtual bool accepts(int count) = 0;
 
 			virtual int score(const ArgListType &args) = 0;
 
 			virtual int score(const TypeListType &args) = 0;
 
-			virtual IAny::Ptr call(const ArgListType &args, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual Any::Ptr call(const ArgListType &args, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}
 

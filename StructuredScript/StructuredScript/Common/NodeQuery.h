@@ -57,6 +57,10 @@ namespace StructuredScript{
 
 			static bool isSelection(INode::Ptr node);
 
+			static bool isGroup(INode::Ptr node);
+
+			static bool isIndex(INode::Ptr node);
+
 			static bool isBlock(INode::Ptr node);
 
 			static bool isPlainBlock(INode::Ptr node);

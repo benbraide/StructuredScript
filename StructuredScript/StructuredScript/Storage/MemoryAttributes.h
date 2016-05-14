@@ -5,7 +5,10 @@
 
 #include <map>
 
+#include "../Common/NodeQuery.h"
+
 #include "../Interfaces/Storages/IMemoryAttributes.h"
+#include "../Interfaces/Storages/IGlobalStorage.h"
 
 namespace StructuredScript{
 	namespace Storage{
@@ -23,6 +26,10 @@ namespace StructuredScript{
 			virtual bool hasAttribute(const std::string &name) const override;
 
 			virtual std::string str() const override;
+
+			static bool parse(INode::Ptr attributes, INode::Ptr target, ListType &parsed);
+
+			static IMemoryAttribute::Ptr resolve(INode::Ptr target, std::string &name);
 
 		private:
 			ListType attributes_;

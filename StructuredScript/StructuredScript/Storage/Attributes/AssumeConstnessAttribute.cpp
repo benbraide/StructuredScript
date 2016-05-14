@@ -17,7 +17,7 @@ void StructuredScript::Storage::AssumeConstnessAttribute::apply(IMemory::Ptr mem
 void StructuredScript::Storage::AssumeConstnessAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeConstnessAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return shared_from_this();
+	return (args == nullptr || Query::Node::isEmpty(args)) ? shared_from_this() : nullptr;
 }
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::AssumeConstnessAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){

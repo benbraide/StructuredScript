@@ -17,7 +17,7 @@ void StructuredScript::Storage::ConcurentAttribute::apply(IMemory::Ptr memory, I
 void StructuredScript::Storage::ConcurentAttribute::apply(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){}
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::ConcurentAttribute::spawn(INode::Ptr args, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return shared_from_this();
+	return (args == nullptr || Query::Node::isEmpty(args)) ? shared_from_this() : nullptr;
 }
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::ConcurentAttribute::find(const std::string &name, IStorage *storage, IExceptionManager *exception, INode *expr){
