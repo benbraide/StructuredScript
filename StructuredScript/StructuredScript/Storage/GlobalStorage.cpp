@@ -137,14 +137,14 @@ bool StructuredScript::Storage::GlobalStorage::createString_(){
 	primitives_[Typename::TYPE_NAME_STRING] = string;
 
 	std::list<std::string> lines({
-		"[Call(at)]char at(integral_type index)",
-		"[Call(append)]void append(const ref val string value)",
-		"[Call(insert)]void append(integral_type index, const ref val string value)",
-		"[Call(erase)]void erase(integral_type index, integral_type count = npos)",
-		"[Call(clear)]void clear()",
-		"[Call(substr)]string substr(integral_type index, integral_type count = npos)",
-		"[Call(find)]int find(const ref val string value, integral_type offset = 0)",
-		"[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
+		"@[Call(at)]char at(integral_type index)",
+		"@[Call(append)]void append(const ref val string value)",
+		"@[Call(insert)]void append(integral_type index, const ref val string value)",
+		"@[Call(erase)]void erase(integral_type index, integral_type count = npos)",
+		"@[Call(clear)]void clear()",
+		"@[Call(substr)]string substr(integral_type index, integral_type count = npos)",
+		"@[Call(find)]int find(const ref val string value, integral_type offset = 0)",
+		"@[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
 		"static const unsigned int npos = -1u"
 	});
 

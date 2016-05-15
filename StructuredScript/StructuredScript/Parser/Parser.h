@@ -15,6 +15,7 @@
 #include "Plugins/GroupParser.h"
 #include "Plugins/SourceParser.h"
 #include "Plugins/ExpressionParser.h"
+#include "Plugins/AtSymbolParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"
@@ -46,8 +47,6 @@ namespace StructuredScript{
 			static OperatorInfo operatorInfo;
 
 		private:
-			INode::Ptr extendAttributes_(INode::Ptr node, ICharacterWell &well, IScanner &scanner, IExceptionManager *exception, Validator validator);
-
 			Scanner::Plugins::SignedNumber signedNumber_;
 
 			static PluginListType plugins_;

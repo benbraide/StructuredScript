@@ -70,6 +70,12 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 		return std::make_shared<Nodes::IdentifierNode>(value);
 	}
 
+	if (value == "@"){
+		auto node = AtSymbolParser(validator).parse(well, scanner, *this, exception);
+		if (node != nullptr || Query::ExceptionManager::has(exception))
+			return node;
+	}
+
 	if (value[0] == '(' || value[0] == '[' || value[0] == '{'){//Group
 		scanner.save(next);//Save symbol
 		return GroupParser(nullptr, operatorInfo, -1).parse(well, scanner, *this, exception);
@@ -193,23 +199,6 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 
 				return expression(node, well, scanner, exception, precedence, validator);
 			}
-
-			if (Query::Node::isIndex(node)){//Attributes...
-				scanner.save(next);
-				node = extendAttributes_(node, well, scanner, exception, validator);
-				if (Query::ExceptionManager::has(exception))
-					return node;
-
-				return expression(node, well, scanner, exception, precedence, validator);
-			}
-		}
-		else if (type == Scanner::Plugins::TypenameTokenType::type && Query::Node::isIndex(node)){//Attributes...
-			scanner.save(next);
-			node = extendAttributes_(node, well, scanner, exception, validator);
-			if (Query::ExceptionManager::has(exception))
-				return node;
-
-			return expression(node, well, scanner, exception, precedence, validator);
 		}
 
 		if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
@@ -260,20 +249,5 @@ void StructuredScript::Parser::Parser::init(){
 }
 
 StructuredScript::OperatorInfo StructuredScript::Parser::Parser::operatorInfo;
-
-StructuredScript::INode::Ptr StructuredScript::Parser::Parser::extendAttributes_(INode::Ptr node, ICharacterWell &well, IScanner &scanner,
-	IExceptionManager *exception, Validator validator){
-	scanner.fork(';');//Single line
-	auto value = expression(nullptr, well, scanner, exception, -1, validator);
-
-	scanner.close(well, true);
-	if (Query::ExceptionManager::has(exception))
-		return nullptr;
-
-	Storage::MemoryAttributes::ListType attributes;
-	Storage::MemoryAttributes::parse(dynamic_cast<IIndexNode *>(node.get())->value(), value, attributes);
-
-	return value;
-}
 
 StructuredScript::Parser::Parser::PluginListType StructuredScript::Parser::Parser::plugins_;
