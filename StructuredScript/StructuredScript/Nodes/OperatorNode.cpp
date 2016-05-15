@@ -246,7 +246,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::reso
 		auto memory = Query::Node::resolveAsObject(leftOperand_, storage);
 		auto object = (memory == nullptr) ? nullptr : memory->object();
 		
-		auto storageObject = dynamic_cast<IStorage *>(object.get());
+		auto storageObject = dynamic_cast<IStorage *>(object->base());
 		if (storageObject == nullptr)
 			return nullptr;
 

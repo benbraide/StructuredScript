@@ -37,11 +37,11 @@ namespace StructuredScript{
 				return BaseType::evaluate_(value, left, right, exception, expr);
 			}
 
-			std::string str_(int precision){
+			static std::string str_(int precision, ValueType val){
 				std::ostringstream ss;
 
 				ss << std::fixed << std::setprecision(precision);
-				ss << value_;
+				ss << val;
 
 				auto value = ss.str();
 				if (value.find('e') < value.size())
@@ -66,7 +66,11 @@ namespace StructuredScript{
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				return str_(6);
+				return str_(6, value_);
+			}
+
+			static std::string toString(float value){
+				return str_(6, value);
 			}
 		};
 
@@ -76,7 +80,11 @@ namespace StructuredScript{
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				return str_(12);
+				return str_(12, value_);
+			}
+
+			static std::string toString(double value){
+				return str_(12, value);
 			}
 		};
 
@@ -86,7 +94,11 @@ namespace StructuredScript{
 				: Real(value){}
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				return str_(24);
+				return str_(24, value_);
+			}
+
+			static std::string toString(long double value){
+				return str_(24, value);
 			}
 		};
 	}

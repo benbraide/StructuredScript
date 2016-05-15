@@ -69,8 +69,6 @@ namespace StructuredScript{
 		class String{
 		public:
 			virtual ~String(){}
-
-			virtual std::string &value() = 0;
 		};
 
 		class TypeObject{

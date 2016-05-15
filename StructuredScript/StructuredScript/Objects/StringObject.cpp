@@ -12,8 +12,96 @@ std::string StructuredScript::Objects::String::str(IStorage *storage, IException
 	return value_;
 }
 
-std::string &StructuredScript::Objects::String::value(){
-	return value_;
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
+	if (value != "[]")
+		return Primitive::evaluateBinary(value, right, storage, exception, expr);
+
+	if (dynamic_cast<IInteger *>(right->base()) == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'[]': Expected index to be an integral value!", expr)));
+	}
+
+	unsigned char index = '\0';
+
+	return PrimitiveFactory::createIndexObject(type_, index, memory_);
+}
+
+StructuredScript::IStorage *StructuredScript::Objects::String::parent(){
+	if (type_ == nullptr)
+		return (memory_ == nullptr) ? nullptr : memory_->storage();
+
+	return type_->storage();
+}
+
+std::shared_ptr<StructuredScript::IStorage> *StructuredScript::Objects::String::addStorage(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IStorage *StructuredScript::Objects::String::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	if (name == type_->name())
+		return this;
+
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findStorage(name, searchScope);
+}
+
+StructuredScript::IType::Ptr *StructuredScript::Objects::String::addType(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Objects::String::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findType(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::String::addMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::String::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::String::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberFunctionMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::String::addOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::String::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberOperatorMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::String::addTypenameOperatorMemory(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::String::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberTypenameOperatorMemory(name, searchScope);
+}
+
+StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::String::addMemoryAttribute(const std::string &name){
+	return nullptr;
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::String::findMemoryAttribute(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return nullptr;
+}
+
+StructuredScript::Objects::String::ExternalCallType StructuredScript::Objects::String::findExternalCall(const std::string &name){
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findExternalCall(name);
+}
+
+bool StructuredScript::Objects::String::remove(IMemory::Ptr target){
+	return false;
 }
 
 void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanner &scanner, IParser &parser){
