@@ -45,6 +45,10 @@ namespace StructuredScript{
 
 			virtual void resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
+			unsigned int count() const;
+
+			void getStaticMemories(ListType &list);
+
 		private:
 			ListType::iterator find_(IAny::Ptr function);
 

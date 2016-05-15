@@ -27,6 +27,8 @@ namespace StructuredScript{
 
 		virtual Ptr value() override;
 
+		virtual unsigned short states() const override;
+
 	protected:
 		Ptr value_;
 	};

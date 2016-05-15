@@ -8,6 +8,8 @@ StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &compon
 			for (auto memory : functionMemory->list_)
 				list_.push_back(memory);
 		}
+		else
+			list_.push_back(component);
 	}
 }
 
@@ -113,6 +115,21 @@ void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFu
 		}
 
 		resolved.push_back(value);
+	}
+}
+
+unsigned int StructuredScript::Storage::FunctionMemory::count() const{
+	return list_.size();
+}
+
+void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list){
+	for (auto memory : list_){
+		auto type = memory->type();
+		auto declaredType = dynamic_cast<IDeclaredType *>(type.get());
+
+		auto states = (declaredType == nullptr) ? StructuredScript::Storage::MemoryState::STATE_NONE : declaredType->states();
+		if (StructuredScript::Storage::MemoryState(states).isStatic())
+			list.push_back(memory);
 	}
 }
 

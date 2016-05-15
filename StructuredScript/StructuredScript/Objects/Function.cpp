@@ -132,6 +132,7 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	IStorage::ExternalCallType call = nullptr;
 	if (definition_ == nullptr){
 		auto attributes = (memory_ == nullptr) ? nullptr : memory_->attributes();
 		if (attributes == nullptr){
@@ -145,12 +146,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 				Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
 		}
 
-		auto call = storage->findExternalCall(dynamic_cast<IAttributeWithArgument *>(callAttribute.get())->arg()->str());
-		if (call != nullptr)//Forward call
-			return call(args, storage, exception, expr);
-
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
+		call = storage->findExternalCall(dynamic_cast<IAttributeWithArgument *>(callAttribute.get())->arg()->str());
+		if (call == nullptr){//Undefined
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
+		}
 	}
 
 	auto param = list_.begin();
@@ -206,6 +206,9 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 				return nullptr;
 		}
 	}
+
+	if (call != nullptr)//Forward call
+		return call(&parameterStorage, exception, expr);
 
 	if (!Query::Node::isEmpty(definition_))
 		definition_->evaluate(&parameterStorage, exception, expr);

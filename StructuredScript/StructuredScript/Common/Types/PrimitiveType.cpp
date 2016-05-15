@@ -77,6 +77,10 @@ StructuredScript::Typename StructuredScript::PrimitiveType::value() const{
 	return value_;
 }
 
+unsigned short StructuredScript::PrimitiveType::states() const {
+	return 0;
+}
+
 bool StructuredScript::AnyType::isAny(){
 	return true;
 }

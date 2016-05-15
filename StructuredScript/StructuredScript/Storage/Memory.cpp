@@ -20,15 +20,12 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 		}
 	}
 
-	auto declaredType = dynamic_cast<IDeclaredType *>(type_.get());
-	if (declaredType != nullptr && value_ != nullptr && !Query::Object::isUndefined(value_)){//Validate access
-		auto states = MemoryState(declaredType->states());
-		if (states.isConstant() || states.isFinal()){//Cannot assign to a const | final memory
-			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-				"Cannot modify memory!", expr)));
+	auto states = MemoryState(type_->states());
+	if ((states.isConstant() || states.isFinal()) && value_ != nullptr && !Query::Object::isUndefined(value_)){//Cannot assign to a const | final memory
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Cannot modify memory!", expr)));
 
-			return;
-		}
+		return;
 	}
 
 	auto type = object->type();
@@ -42,7 +39,7 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 	if (type_ != nullptr){//Validate assignment
 		auto compatibleType = type_->getCompatibleType(type);
 		if (compatibleType == nullptr){//Incompatible types -- use type as is
-			if (declaredType != nullptr){//Compatible type required
+			if (states.isReference()){//Compatible type required
 				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 					"Incompatible types!", expr)));
 
@@ -52,8 +49,26 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 			compatibleType = type_;
 		}
 
-		if (declaredType != nullptr){//Get reference
+		if (states.isReference()){//Get reference
+			auto memory = object->base()->memory();
+			if (states.isRValReference()){//Value | Reference
+				if (memory != nullptr){
+					auto objectType = memory->type();
+					auto objectStates = MemoryState((objectType == nullptr) ? MemoryState::STATE_NONE : objectType->states());
+					if (!objectStates.isRValReference()){//Only get reference if object is not an rvalue reference
+						object = PrimitiveFactory::createReference(memory->ptr());
+						dynamic_cast<IDeclaredType *>(type_.get())->states((states -= MemoryState::STATE_RVALUE).states());
+					}
+				}
+			}
+			else if (memory == nullptr){//Reference requires an lvalue
+				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+					"Cannot get reference of an rvalue!", expr)));
 
+				return;
+			}
+			else//Reference
+				object = PrimitiveFactory::createReference(memory->ptr());
 		}
 		else{//Cast object to compatible type
 			object = object->cast(compatibleType->base(), storage, exception, expr);

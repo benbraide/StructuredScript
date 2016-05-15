@@ -36,7 +36,7 @@ bool StructuredScript::Query::Node::isDeclaration(INode::Ptr node){
 }
 
 bool StructuredScript::Query::Node::isInitialization(INode::Ptr node){
-	return false;
+	return (dynamic_cast<IInitializationNode *>(node.get()) != nullptr);
 }
 
 bool StructuredScript::Query::Node::isParameter(INode::Ptr node){

@@ -13,7 +13,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	if (type == Typename::TYPE_NAME_NONE)
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
-	return Token(TypenameTokenType::type, std::to_string(type), value, "", true);
+	return Token(TypenameTokenType::type, value);
 }
 
 bool StructuredScript::Scanner::Plugins::TypenameIdentifier::matches(const ICharacterWell &well) const{
@@ -49,15 +49,15 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 
 	well.merge();
 	if (type == Typename::TYPE_NAME_LONG)//long long
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LLONG), "long long", "", true);
+		return Token(TypenameTokenType::type, "long long");
 
 	if (type == Typename::TYPE_NAME_DOUBLE)//long double
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LDOUBLE), "long double", "", true);
+		return Token(TypenameTokenType::type, "long double");
 
 	if (type != Typename::TYPE_NAME_NONE)//long *typename" -- ERROR
 		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.value());
 
-	return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LONG), "long", "", true);
+	return Token(TypenameTokenType::type, "long");
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getUnsigned_(ICharacterWell &well, FilterType filter) const{
@@ -71,27 +71,27 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 
 	well.merge();
 	if (type == Typename::TYPE_NAME_CHAR)//unsigned char
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_UCHAR), "unsigned char", "", true);
+		return Token(TypenameTokenType::type, "unsigned char");
 
 	if (type == Typename::TYPE_NAME_SHORT)//unsigned short
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_USHORT), "unsigned short", "", true);
+		return Token(TypenameTokenType::type, "unsigned short");
 
 	if (type == Typename::TYPE_NAME_INT)//unsigned int
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_UINT), "unsigned int", "", true);
+		return Token(TypenameTokenType::type, "unsigned int");
 
 	if (type == Typename::TYPE_NAME_LONG){//unsigned (long | long long)
 		token = getLong_(well, filter);
 		if (token.type() == TokenType::TOKEN_TYPE_ERROR)
 			return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned long " + token.value());
 
-		auto type = static_cast<Typename>(std::stoi(token.value()));
-		if (type == Typename::TYPE_NAME_LDOUBLE)//unsigned long double -- ERROR
+		auto value = token.value();
+		if (value == "long double")//unsigned long double -- ERROR
 			return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned long double");
 
-		if (type == Typename::TYPE_NAME_LLONG)//unsigned long long
-			return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ULLONG), "unsigned long long", "", true);
+		if (value == "long long")//unsigned long long
+			return Token(TypenameTokenType::type, "unsigned long long");
 
-		return Token(TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ULONG), "unsigned long", "", true);
+		return Token(TypenameTokenType::type, "unsigned long");
 	}
 
 	if (type != Typename::TYPE_NAME_NONE)//unsigned *typename" -- ERROR

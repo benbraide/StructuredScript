@@ -1,5 +1,6 @@
 #include "Factory.h"
 
+#include "../Objects/Reference.h"
 #include "../Objects/Undefined.h"
 #include "../Objects/Void.h"
 #include "../Objects/NaN.h"
@@ -8,6 +9,7 @@
 #include "../Objects/Byte.h"
 #include "../Objects/Integer.h"
 #include "../Objects/Real.h"
+#include "../Objects/StringObject.h"
 #include "../Objects/TypeObject.h"
 #include "../Objects/IndexObject.h"
 
@@ -21,6 +23,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createVoid(){
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNaN(){
 	return std::make_shared<Objects::NaN>();
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createReference(IMemory::Ptr value){
+	return std::make_shared<Objects::Reference>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createBool(bool value){
@@ -88,7 +94,7 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createLDouble(lo
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createString(const std::string &value){
-	return nullptr;
+	return std::make_shared<Objects::String>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createTypeObject(IType::Ptr value){

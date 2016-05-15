@@ -7,6 +7,7 @@
 #include "../Interfaces/Types/ICompositeType.h"
 #include "../Interfaces/Types/IPrimitiveType.h"
 #include "../Interfaces/Types/IStackedType.h"
+#include "../Interfaces/Types/ICompoundType.h"
 
 namespace StructuredScript{
 	namespace Query{

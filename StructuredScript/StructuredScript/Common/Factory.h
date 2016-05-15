@@ -17,6 +17,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createNaN();
 
+		static IAny::Ptr createReference(IMemory::Ptr value);
+
 		static IAny::Ptr createBool(bool value);
 
 		static IAny::Ptr createBit(bool value);

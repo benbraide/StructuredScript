@@ -32,6 +32,10 @@ StructuredScript::Interfaces::Type::Ptr StructuredScript::StackedType::value(){
 	return value_;
 }
 
+unsigned short StructuredScript::StackedType::states() const {
+	return 0;
+}
+
 bool StructuredScript::ExpandedType::isEqual(Ptr target){
 	return Query::Type::isExpanded(target);
 }

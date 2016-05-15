@@ -11,8 +11,8 @@ namespace StructuredScript{
 	namespace Interfaces{
 		class Function{
 		public:
-			typedef Storage::ArgListType	ArgListType;
-			typedef std::list<IType::Ptr>	TypeListType;
+			typedef std::list<Any::Ptr>		ArgListType;
+			typedef std::list<Type::Ptr>	TypeListType;
 
 			virtual ~Function(){}
 

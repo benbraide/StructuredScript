@@ -151,7 +151,19 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 		return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createBool(false);
 
 	if (value_ == "."){//Member access -- don't evaluate right operand
-		return nullptr;
+		auto objectStorage = dynamic_cast<IStorage *>(leftValue->base());
+		if (objectStorage == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+		}
+
+		auto memory = Query::Node::resolveAsObject(rightOperand_, objectStorage);
+		if (memory == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+		}
+
+		return memory->object();
 	}
 
 	auto rightValue = rightOperand_->evaluate(storage, exception, expr);

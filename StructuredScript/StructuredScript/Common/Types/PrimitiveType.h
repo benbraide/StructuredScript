@@ -33,6 +33,8 @@ namespace StructuredScript{
 
 		virtual Typename value() const override;
 
+		virtual unsigned short states() const override;
+
 	private:
 		std::string name_;
 		Typename value_;

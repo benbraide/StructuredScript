@@ -1,10 +1,14 @@
 #include "SpecializedStorage.h"
 
+StructuredScript::IStorage *StructuredScript::Storage::SharedStorage::parent(){
+	return then_;
+}
+
 StructuredScript::Storage::SharedStorage::Ptr *StructuredScript::Storage::SharedStorage::addStorage(const std::string &name){
 	return first_->addStorage(name);
 }
 
-StructuredScript::IStorage * StructuredScript::Storage::SharedStorage::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IStorage *StructuredScript::Storage::SharedStorage::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto value = first_->findStorage(name, SEARCH_LOCAL);
 	return (value == nullptr) ? then_->findStorage(name, searchScope) : value;
 }

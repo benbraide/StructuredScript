@@ -50,7 +50,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 
 	auto value = next.value();
 	if (type == Scanner::Plugins::TypenameTokenType::type)
-		return std::make_shared<Nodes::PrimitiveTypeIdentifierNode>(next.prefix(), value);
+		return std::make_shared<Nodes::PrimitiveTypeIdentifierNode>(value);
 
 	if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER){
 		auto plugin = plugins_.find(value);

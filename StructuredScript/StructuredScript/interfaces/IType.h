@@ -32,6 +32,8 @@ namespace StructuredScript{
 			virtual Ptr getCompatibleType(Ptr target, bool family = false) = 0;
 
 			virtual std::string name() const = 0;
+
+			virtual unsigned short states() const = 0;
 		};
 	}
 

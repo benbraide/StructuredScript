@@ -27,6 +27,8 @@
 #include "../Common/Types/DeclaredType.h"
 #include "../Common/Factory.h"
 
+#include "../Objects/StringObject.h"
+
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Wells/StringCharacterWell.h"
 
@@ -50,8 +52,6 @@ namespace StructuredScript{
 			virtual IType::Ptr getPrimitiveType(int rank) override;
 
 		private:
-			bool createString_();
-
 			ListType primitives_;
 		};
 	}

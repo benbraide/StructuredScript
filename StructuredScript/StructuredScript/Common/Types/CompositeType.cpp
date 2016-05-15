@@ -75,6 +75,10 @@ std::string StructuredScript::CompositeType::name() const{
 	return ("any<" + value + ">");
 }
 
+unsigned short StructuredScript::CompositeType::states() const {
+	return 0;
+}
+
 bool StructuredScript::CompositeType::isReversedEqual(IType::Ptr target){
 	for (auto type : types_){
 		if (target->isEqual(type))

@@ -59,31 +59,31 @@ namespace StructuredScript{
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, ";"));
 		CHECK(scanner.next(well) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_NONE, ""));
 
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ANY)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_VOID)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_BOOLEAN)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_BIT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_BYTE)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_CHAR)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_UCHAR)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_SHORT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_USHORT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_INT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_UINT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LONG)));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "any"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "void"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "bool"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "bit"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "byte"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "char"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "unsigned char"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "short"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "unsigned short"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "int"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "unsigned int"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "long"));
 
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, ";"));
 
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ULONG)));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "unsigned long"));
 
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, ";"));
 
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LLONG)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_ULLONG)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_FLOAT)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_DOUBLE)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_LDOUBLE)));
-		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, std::to_string(Typename::TYPE_NAME_STRING)));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "long long"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "unsigned long long"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "float"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "double"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "long double"));
+		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::Plugins::TypenameTokenType::type, "string"));
 
 		CHECK(scanner.next(typeWell) == Scanner::Token(Scanner::TokenType::TOKEN_TYPE_IDENTIFIER, "str"));
 

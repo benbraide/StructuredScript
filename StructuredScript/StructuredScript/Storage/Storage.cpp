@@ -1,5 +1,9 @@
 #include "Storage.h"
 
+StructuredScript::IStorage *StructuredScript::Storage::Storage::parent(){
+	return parent_;
+}
+
 StructuredScript::Storage::Storage::Ptr *StructuredScript::Storage::Storage::addStorage(const std::string &name){
 	return &storages_[name];
 }

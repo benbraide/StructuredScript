@@ -20,10 +20,11 @@ namespace StructuredScript{
 		class Storage{
 		public:
 			typedef std::shared_ptr<Any> AnyPtr;
-			typedef std::list<AnyPtr> ArgListType;
-			typedef std::function<AnyPtr(const ArgListType &args, Storage *storage, ExceptionManager *exception, Node *expr)> ExternalCallType;
+			typedef std::function<AnyPtr(Storage *storage, ExceptionManager *exception, Node *expr)> ExternalCallType;
 
 			virtual ~Storage(){}
+
+			virtual Storage *parent() = 0;
 
 			virtual std::shared_ptr<Storage> *addStorage(const std::string &name) = 0;
 

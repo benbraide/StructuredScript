@@ -33,6 +33,8 @@ namespace StructuredScript{
 
 		virtual std::string name() const override;
 
+		virtual unsigned short states() const override;
+
 		virtual bool isReversedEqual(IType::Ptr target) override;
 
 		virtual bool isReversedParent(IType::Ptr target) override;

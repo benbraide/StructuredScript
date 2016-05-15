@@ -64,15 +64,10 @@ namespace StructuredScript{
 
 		class PrimitiveTypeIdentifierNode : public IdentifierNode, public ITypeIdentifierNode{
 		public:
-			PrimitiveTypeIdentifierNode(const std::string &name, const std::string &value)
-				: IdentifierNode(value), name_(name){}
+			PrimitiveTypeIdentifierNode(const std::string &value)
+				: IdentifierNode(value){}
 
 			virtual Ptr clone() override;
-
-			virtual std::string str() override;
-
-		private:
-			std::string name_;
 		};
 
 		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode{

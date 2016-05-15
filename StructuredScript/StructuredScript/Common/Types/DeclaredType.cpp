@@ -35,7 +35,7 @@ bool StructuredScript::DeclaredType::isParent(Ptr target){
 
 bool StructuredScript::DeclaredType::isCompatibleWith(Ptr target, bool family/* = false*/){
 	if (family || state_.isReference())//Types must be identical
-		return (isEqual(target) || value_->isParent(target));
+		return (isEqual(target) || value_->isEqual(target) || value_->isParent(target));
 
 	auto declaredType = dynamic_cast<IDeclaredType *>(target.get());
 	if (declaredType != nullptr){//Compare with declared type
@@ -88,6 +88,10 @@ StructuredScript::IType::Ptr StructuredScript::DeclaredType::value(){
 
 unsigned short StructuredScript::DeclaredType::states() const{
 	return state_.states();
+}
+
+void StructuredScript::DeclaredType::states(unsigned short value){
+	state_ = value;
 }
 
 bool StructuredScript::DeclaredType::isEqual_(Ptr target){

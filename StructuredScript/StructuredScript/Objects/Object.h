@@ -1,42 +1,32 @@
 #pragma once
 
-#ifndef STRUCTURED_SCRIPT_ANY_OBJECT_H
-#define STRUCTURED_SCRIPT_ANY_OBJECT_H
+#ifndef STRUCTURED_SCRIPT_OBJECT_H
+#define STRUCTURED_SCRIPT_OBJECT_H
 
-#include "../Common/ExceptionManagerQuery.h"
-#include "../Common/ObjectQuery.h"
-#include "../Common/Factory.h"
+#include <list>
+#include <map>
 
-#include "../Interfaces/Types/ICompoundType.h"
+#include "Any.h"
 
 namespace StructuredScript{
 	namespace Objects{
-		class Any : public IAny, public IStorage{
+		class Object : public Any{
 		public:
-			explicit Any(IType::Ptr type)
-				: type_(type){}
+			typedef std::list<Any *>					ParentListType;
+			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
 
-			virtual ~Any(){}
+			explicit Object(IType::Ptr type)
+				: Any(type), self_(this){}
 
-			virtual Ptr ptr() override;
+			virtual ~Object(){}
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual IAny *base() override;
-
-			virtual IType::Ptr type() override;
-
-			virtual void setMemory(IMemory *memory) override;
-
-			virtual IMemory *memory() override;
-
 			virtual bool truth(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
-
-			virtual IStorage *parent() override;
 
 			virtual std::shared_ptr<IStorage> *addStorage(const std::string &name) override;
 
@@ -50,8 +40,6 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
-
 			virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
@@ -64,15 +52,16 @@ namespace StructuredScript{
 
 			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual ExternalCallType findExternalCall(const std::string &name) override;
-
 			virtual bool remove(IMemory::Ptr target) override;
 
+			void self(Any *self);
+
 		protected:
-			IType::Ptr type_;
-			IMemory *memory_ = nullptr;
+			Any *self_;
+			MemoryListType objects_;
+			ParentListType parents_;
 		};
 	}
 }
 
-#endif /* !STRUCTURED_SCRIPT_ANY_OBJECT_H */
+#endif /* !STRUCTURED_SCRIPT_OBJECT_H */

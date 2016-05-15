@@ -14,6 +14,8 @@ namespace StructuredScript{
 			SharedStorage(IStorage &first, IStorage &then)
 				: first_(&first), then_(&then){}
 
+			virtual IStorage *parent() override;
+
 			virtual Ptr *addStorage(const std::string &name) override;
 
 			virtual IStorage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;

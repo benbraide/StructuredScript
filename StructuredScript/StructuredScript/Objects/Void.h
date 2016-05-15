@@ -12,6 +12,8 @@ namespace StructuredScript{
 		public:
 			Void()
 				: Primitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_VOID)){}
+
+			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 		};
 	}
 }

@@ -7,10 +7,11 @@
 #include <list>
 
 #include "../TypeQuery.h"
+#include "../../Storage/MemoryState.h"
 #include "../../Storage/FunctionMemory.h"
 
 namespace StructuredScript{
-	class Type : public IType, public IStorage{
+	class Type : public IType, public IStorage, public ICompoundType{
 	public:
 		typedef std::list<Ptr>									ParentListType;
 		typedef std::map<std::string, IType::Ptr>				TypeListType;
@@ -38,6 +39,10 @@ namespace StructuredScript{
 		virtual Ptr getCompatibleType(Ptr target, bool family = false) override;
 
 		virtual std::string name() const override;
+
+		virtual unsigned short states() const override;
+
+		virtual IStorage *parent() override;
 
 		virtual std::shared_ptr<IStorage> *addStorage(const std::string &name) override;
 
@@ -68,6 +73,14 @@ namespace StructuredScript{
 		virtual ExternalCallType findExternalCall(const std::string &name) override;
 
 		virtual bool remove(IMemory::Ptr target) override;
+
+		virtual IMemory::Ptr findMemberMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+		virtual IMemory::Ptr findMemberFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+		virtual IMemory::Ptr findMemberOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+		virtual IMemory::Ptr findMemberTypenameOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 		void addExternalCall(const std::string &name, ExternalCallType value);
 

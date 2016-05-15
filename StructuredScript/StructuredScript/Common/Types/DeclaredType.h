@@ -34,6 +34,8 @@ namespace StructuredScript{
 
 		virtual IType::Ptr value() override;
 
+		virtual void states(unsigned short value) override;
+
 		virtual unsigned short states() const override;
 
 	private:

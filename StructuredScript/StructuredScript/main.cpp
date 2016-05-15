@@ -22,14 +22,10 @@ int main(){
 
 	globalStorage.init();
 
-	StructuredScript::Parser::Parser::init();
-	StructuredScript::Parser::Parser::operatorInfo.init();
-
 	StructuredScript::Parser::Parser parser;
 	StructuredScript::Scanner::Scanner scanner;
 
 	scanner.init();
-	scanner.operatorSymbols.init();
 
 	std::string input;
 	StructuredScript::ExceptionManager xManager;
@@ -42,20 +38,29 @@ int main(){
 		auto node = parser.parse(well, scanner, &xManager);
 		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
 			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+			xManager.clear();
 			continue;
 		}
 
 		auto value = node->evaluate(&globalStorage, &xManager, nullptr);
 		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
 			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+			xManager.clear();
 			continue;
 		}
 
 		std::cout << node->str() << "\n";
-		if (value == nullptr)
-			std::cout << "Error!\n";
+		if (value != nullptr){
+			auto str = value->str(nullptr, &xManager, nullptr);
+			if (StructuredScript::Query::ExceptionManager::has(&xManager)){
+				std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+				xManager.clear();
+			}
+			else
+				std::cout << str << "\n";
+		}
 		else
-			std::cout << value->str(nullptr, &xManager, nullptr) << "\n";
+			std::cout << "Error!\n";
 	}
 
 	return 0;

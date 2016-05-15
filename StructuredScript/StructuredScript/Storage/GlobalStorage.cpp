@@ -1,6 +1,10 @@
 #include "GlobalStorage.h"
 
 void StructuredScript::Storage::GlobalStorage::init(){
+	Parser::Parser::init();
+	Parser::Parser::operatorInfo.init();
+	Scanner::Scanner::operatorSymbols.init();
+
 	primitives_.clear();
 
 	auto bit = std::make_shared<Type>(this, "bit");
@@ -105,7 +109,13 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
 
-	createString_();
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+	scanner.init();
+
+	auto string = std::make_shared<Type>(this, "string");
+	primitives_[Typename::TYPE_NAME_STRING] = string;
+	Objects::String::init(string, scanner, parser);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -115,77 +125,17 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(
 	if (::isdigit(name[0]))
 		return getPrimitiveType(static_cast<Typename>(std::stoi(name)));
 
+	for (auto &primitive : primitives_){
+		if (primitive.second->name() == name)
+			return primitive.second;
+	}
+
 	return Storage::findType(name, searchScope);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(Typename type){
 	auto value = primitives_.find(type);
 	return (value == primitives_.end()) ? nullptr : value->second;
-}
-
-bool StructuredScript::Storage::GlobalStorage::createString_(){
-	auto string = std::make_shared<Type>(this, "string");
-
-	Parser::Parser::init();
-	Parser::Parser::operatorInfo.init();
-
-	Parser::Parser parser;
-	Scanner::Scanner scanner;
-
-	scanner.init();
-	scanner.operatorSymbols.init();
-	primitives_[Typename::TYPE_NAME_STRING] = string;
-
-	std::list<std::string> lines({
-		"@[Call(at)]char at(integral_type index)",
-		"@[Call(append)]void append(const ref val string value)",
-		"@[Call(insert)]void append(integral_type index, const ref val string value)",
-		"@[Call(erase)]void erase(integral_type index, integral_type count = npos)",
-		"@[Call(clear)]void clear()",
-		"@[Call(substr)]string substr(integral_type index, integral_type count = npos)",
-		"@[Call(find)]int find(const ref val string value, integral_type offset = 0)",
-		"@[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
-		"static const unsigned int npos = -1u"
-	});
-
-	for (auto &line : lines){
-		Scanner::StringCharacterWell well(line);
-		parser.parse(well, scanner, nullptr)->evaluate(string.get(), nullptr, nullptr);
-	}
-
-	string->addExternalCall("at", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("append", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("insert", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("erase", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("clear", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("substr", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("find", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	string->addExternalCall("find_last", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		return nullptr;
-	});
-
-	return true;
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){

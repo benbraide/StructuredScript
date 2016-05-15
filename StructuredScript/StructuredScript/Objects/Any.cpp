@@ -5,11 +5,12 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::ptr(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot copy object!", expr)));
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	return type->isEqual(type_) ? ptr() : nullptr;
 }
 
 StructuredScript::IAny *StructuredScript::Objects::Any::base(){
@@ -29,11 +30,24 @@ StructuredScript::IMemory *StructuredScript::Objects::Any::memory(){
 }
 
 bool StructuredScript::Objects::Any::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
+	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot get truth value of object!", expr)));
+
 	return false;
 }
 
 std::string StructuredScript::Objects::Any::str(IStorage *storage, IExceptionManager *exception, INode *expr){
+	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot get string value of object!", expr)));
+
 	return "";
+}
+
+StructuredScript::IStorage *StructuredScript::Objects::Any::parent(){
+	if (type_ == nullptr)
+		return (memory_ == nullptr) ? nullptr : memory_->storage();
+
+	return type_->storage();
 }
 
 std::shared_ptr<StructuredScript::IStorage> *StructuredScript::Objects::Any::addStorage(const std::string &name){
@@ -44,15 +58,8 @@ StructuredScript::IStorage *StructuredScript::Objects::Any::findStorage(const st
 	if (name == type_->name())
 		return this;
 
-	if (searchScope != SEARCH_LOCAL){
-		for (auto parent : parents_){
-			auto storage = parent->findStorage(name, SEARCH_FAMILY);
-			if (storage != nullptr)
-				return storage;
-		}
-	}
-
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findStorage(name, searchScope);
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findStorage(name, searchScope);
 }
 
 StructuredScript::IType::Ptr *StructuredScript::Objects::Any::addType(const std::string &name){
@@ -60,7 +67,8 @@ StructuredScript::IType::Ptr *StructuredScript::Objects::Any::addType(const std:
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return nullptr;
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findType(name, searchScope);
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addMemory(const std::string &name){
@@ -68,36 +76,13 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addMemory(const 
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	if (name == "self"){
-		auto memory = (self_ == nullptr) ? nullptr : self_->memory();
-		return (memory == nullptr) ? nullptr : memory->ptr();
-	}
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberMemory(name, searchScope);
+}
 
-	auto object = objects_.find(name);
-	if (object != objects_.end())
-		return object->second;
-
-	auto storage = dynamic_cast<IStorage *>(type_.get());
-	if (storage != nullptr){//Search immediate type content
-		auto memory = storage->findMemory(name, SEARCH_LOCAL);
-		if (memory != nullptr)
-			return memory;
-	}
-
-	if (searchScope != SEARCH_LOCAL){
-		for (auto parent : parents_){//Search parent objects and their immediate type contents
-			auto object = parent->findMemory(name, SEARCH_FAMILY);
-			if (object != nullptr)
-				return object;
-		}
-	}
-
-	if (self_ == nullptr || self_ == this){//Search storage using search scope
-		storage = type_->storage();
-		return (storage == nullptr) ? nullptr : storage->findMemory(name, searchScope);
-	}
-
-	return self_->findMemory(name, searchScope);//Forward search to object
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberFunctionMemory(name, searchScope);
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addOperatorMemory(const std::string &name){
@@ -105,7 +90,8 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addOperatorMemor
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return nullptr;
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberOperatorMemory(name, searchScope);
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addTypenameOperatorMemory(const std::string &name){
@@ -113,7 +99,8 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addTypenameOpera
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return nullptr;
+	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
+	return (compoundType == nullptr) ? nullptr : compoundType->findMemberTypenameOperatorMemory(name, searchScope);
 }
 
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Any::addMemoryAttribute(const std::string &name){
@@ -122,6 +109,11 @@ StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Any::addMemo
 
 StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Any::findMemoryAttribute(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
+}
+
+StructuredScript::Objects::Any::ExternalCallType StructuredScript::Objects::Any::findExternalCall(const std::string &name){
+	auto storage = dynamic_cast<IStorage *>(type_.get());
+	return (storage == nullptr) ? nullptr : storage->findExternalCall(name);
 }
 
 bool StructuredScript::Objects::Any::remove(IMemory::Ptr target){

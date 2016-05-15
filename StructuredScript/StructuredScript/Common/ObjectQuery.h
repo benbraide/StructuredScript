@@ -14,7 +14,25 @@ namespace StructuredScript{
 			static bool isPrimitive(IAny::Ptr object);
 
 			static bool isUndefined(IAny::Ptr object);
+
+			static unsigned int getIndex(IAny::Ptr object);
+
+			template <typename TargetType, int TargetRank>
+			static bool getIndex(IAny::Ptr object, unsigned int &value);
+
+			static IAny::Ptr getObjectInStorage(IStorage *storage);
 		};
+
+		template <typename TargetType, int TargetRank>
+		bool StructuredScript::Query::Object::getIndex(IAny::Ptr object, unsigned int &value){
+			auto target = dynamic_cast<Objects::TypedPrimitive<TargetType, TargetRank> *>(object->base());
+			if (target != nullptr){
+				value = static_cast<unsigned int>(target->value());
+				return true;
+			}
+
+			return false;
+		}
 	}
 }
 

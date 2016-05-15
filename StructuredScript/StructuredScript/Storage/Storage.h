@@ -20,6 +20,8 @@ namespace StructuredScript{
 			Storage(IStorage *parent)
 				: parent_(parent){}
 
+			virtual IStorage *parent() override;
+
 			virtual Ptr *addStorage(const std::string &name) override;
 
 			virtual IStorage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;

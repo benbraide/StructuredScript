@@ -13,6 +13,8 @@ namespace StructuredScript{
 
 			virtual Type::Ptr value() = 0;
 
+			virtual void states(unsigned short value) = 0;
+
 			virtual unsigned short states() const = 0;
 		};
 	}

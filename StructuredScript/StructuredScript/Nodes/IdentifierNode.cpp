@@ -69,11 +69,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentif
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierNode::clone(){
-	return std::make_shared<PrimitiveTypeIdentifierNode>(name_, IdentifierNode::str());
-}
-
-std::string StructuredScript::Nodes::PrimitiveTypeIdentifierNode::str(){
-	return name_;
+	return std::make_shared<PrimitiveTypeIdentifierNode>(IdentifierNode::str());
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TypenameIdentifierNode::ptr(){
