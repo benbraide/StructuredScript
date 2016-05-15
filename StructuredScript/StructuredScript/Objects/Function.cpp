@@ -133,6 +133,22 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (definition_ == nullptr){
+		auto attributes = (memory_ == nullptr) ? nullptr : memory_->attributes();
+		if (attributes == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
+		}
+
+		auto callAttribute = attributes->getAttribute("Call");//Check if there's a CallAttribute
+		if (callAttribute == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
+		}
+
+		auto call = storage->findExternalCall(dynamic_cast<IAttributeWithArgument *>(callAttribute.get())->arg()->str());
+		if (call != nullptr)//Forward call
+			return call(args, storage, exception, expr);
+
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
 	}

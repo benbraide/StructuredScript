@@ -16,6 +16,7 @@ namespace StructuredScript{
 		typedef std::map<std::string, IType::Ptr>				TypeListType;
 		typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
 		typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
+		typedef std::map<std::string, ExternalCallType>			ExternalCallListType;
 
 		Type(IStorage *storage, const std::string &name)
 			: storage_(storage), name_(name){}
@@ -68,6 +69,8 @@ namespace StructuredScript{
 
 		virtual bool remove(IMemory::Ptr target) override;
 
+		void addExternalCall(const std::string &name, ExternalCallType value);
+
 	private:
 		std::string name_;
 		IStorage *storage_;
@@ -76,6 +79,7 @@ namespace StructuredScript{
 		MemoryListType objects_;
 		MemoryAttributeListType attributes_;
 		ParentListType parents_;
+		ExternalCallListType externalCalls_;
 	};
 }
 

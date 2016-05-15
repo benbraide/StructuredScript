@@ -67,7 +67,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr
 			Query::ExceptionManager::combine("'" + str() + "': Failed to define function!", expr)));
 	}
 
-	if (dynamic_cast<IFunctionMemory *>(memory->get())->add(function, declaration_->attributes()) == nullptr){
+	if (dynamic_cast<IFunctionMemory *>(memory->get())->add(function, attributes_) == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Cannot duplicate function declaration/definition!", expr)));
 	}

@@ -202,9 +202,14 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttrib
 }
 
 StructuredScript::IStorage::ExternalCallType StructuredScript::Type::findExternalCall(const std::string &name){
-	return nullptr;
+	auto call = externalCalls_.find(name);
+	return (call == externalCalls_.end()) ? nullptr : call->second;
 }
 
 bool StructuredScript::Type::remove(IMemory::Ptr target){
 	return false;
+}
+
+void StructuredScript::Type::addExternalCall(const std::string &name, ExternalCallType value){
+	externalCalls_[name] = value;
 }

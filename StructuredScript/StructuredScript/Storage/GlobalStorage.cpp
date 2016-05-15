@@ -153,6 +153,38 @@ bool StructuredScript::Storage::GlobalStorage::createString_(){
 		parser.parse(well, scanner, nullptr)->evaluate(string.get(), nullptr, nullptr);
 	}
 
+	string->addExternalCall("at", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("append", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("insert", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("erase", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("clear", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("substr", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("find", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
+	string->addExternalCall("find_last", [](const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		return nullptr;
+	});
+
 	return true;
 }
 
