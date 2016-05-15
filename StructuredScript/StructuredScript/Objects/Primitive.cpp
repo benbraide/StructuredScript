@@ -63,7 +63,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 		}
 
 		if (value.size() > 1u){//Compound assignment
-			right = evaluate_(value.substr(0, value.size() - 1), false, promote_(dynamic_cast<Primitive *>(right.get())), exception, expr);
+			right = evaluateBinary_(value.substr(0, value.size() - 1), right, storage, exception, expr);
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;
 		}
@@ -74,19 +74,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 		return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
 	}
 
-	auto primitive = dynamic_cast<Primitive *>(right->base());
-	if (primitive == nullptr){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-			"'" + value + "': Operands mismatch!", expr)));
-	}
-
-	if (primitive->rank() < rank())
-		return evaluate_(value, false, promote_(primitive), exception, expr);
-
-	if (primitive->rank() > rank())
-		return primitive->evaluate_(value, true, primitive->promote_(this), exception, expr);
-
-	return evaluate_(value, false, right, exception, expr);
+	return evaluateBinary_(value, right, storage, exception, expr);
 }
 
 int StructuredScript::Objects::Primitive::rank(){
@@ -101,4 +89,25 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 	IExceptionManager *exception, INode *expr){
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value + "': Operands mismatch!", expr)));
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary_(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
+	auto primitive = dynamic_cast<Primitive *>(right->base());
+	if (primitive == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}
+
+	auto left = prepForExpression_();
+	auto primitiveLeft = dynamic_cast<Primitive *>(left->base());
+	
+	if (primitive->rank() > rank())
+		return primitive->evaluate_(value, true, primitive->promote_(primitiveLeft), exception, expr);
+
+	return primitiveLeft->evaluate_(value, false, primitiveLeft->promote_(primitive), exception, expr);
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::prepForExpression_(){
+	return shared_from_this();
 }

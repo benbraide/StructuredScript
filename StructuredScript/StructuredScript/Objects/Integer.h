@@ -43,7 +43,7 @@ namespace StructuredScript{
 					return PrimitiveFactory::createDouble(std::pow(left->value(), right->value()));
 
 				if (value == "%"){
-					if (right->value() == static_cast<ValueType>(0))
+					if (right->value() == static_cast<std::remove_reference<ValueType>::type>(0))
 						return PrimitiveFactory::createNaN();
 
 					return std::make_shared<ObjectType>(left->value() % right->value());
@@ -120,6 +120,43 @@ namespace StructuredScript{
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
 				return std::string(1, static_cast<char>(value_));
+			}
+		};
+
+		class LChar : public SignedInteger<Char, char &, Primitive::CHAR_RANK> {
+		public:
+			explicit LChar(char &value)
+				: SignedInteger(value){}
+
+			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override{
+				return std::string(1, value_);
+			}
+
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override{
+				if (value == "=" || value == "+=" || value == "-=" || value == "*=" || value == "/=" || value == "%=" || value == "&=" ||
+					value == "^=" || value == "|=" || value == "<<=" || value == ">>="){//Assignment
+					if (value.size() > 1u){//Compound assignment
+						right = Primitive::evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
+						if (Query::ExceptionManager::has(exception))
+							return nullptr;
+					}
+
+					right = promote_(dynamic_cast<Primitive *>(right->base()));
+					if (right == nullptr){
+						return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+							"'" + value + "': Operands mismatch!", expr)));
+					}
+
+					value_ = dynamic_cast<Char *>(right->base())->value();
+					return ptr();
+				}
+
+				return Primitive::evaluateBinary_(value, right, storage, exception, expr);
+			}
+
+		protected:
+			virtual Ptr prepForExpression_() override{
+				return std::make_shared<Char>(value_);
 			}
 		};
 

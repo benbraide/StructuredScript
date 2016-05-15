@@ -49,6 +49,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUChar(unsi
 	return std::make_shared<Objects::UChar>(value);
 }
 
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createLChar(char &value){
+	return std::make_shared<Objects::LChar>(value);
+}
+
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createShort(short value){
 	return std::make_shared<Objects::Short>(value);
 }

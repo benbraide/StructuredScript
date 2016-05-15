@@ -18,7 +18,7 @@ namespace StructuredScript{
 				: Primitive(type), value_(value){}
 
 			virtual bool truth(IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				return (value_ != static_cast<ValueType>(0));
+				return (value_ != static_cast<std::remove_reference<ValueType>::type>(0));
 			}
 
 			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override{

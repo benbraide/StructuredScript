@@ -29,6 +29,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createUChar(unsigned char value);
 
+		static IAny::Ptr createLChar(char &value);
+
 		static IAny::Ptr createShort(short value);
 
 		static IAny::Ptr createUShort(unsigned short value);

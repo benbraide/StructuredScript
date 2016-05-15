@@ -64,6 +64,10 @@ namespace StructuredScript{
 
 			virtual Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr);
 
+			virtual Ptr evaluateBinary_(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr);
+
+			virtual Ptr prepForExpression_();
+
 			IType::Ptr type_;
 			IMemory *memory_ = nullptr;
 		};

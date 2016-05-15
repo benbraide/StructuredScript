@@ -66,34 +66,37 @@ namespace StructuredScript{
 			}
 
 		protected:
-			virtual IAny::Ptr promote_(Primitive *target){
+			virtual IAny::Ptr promote_(Primitive *target) override{
+				if (dynamic_cast<Number *>(target) != nullptr)//Same type
+					return target->ptr();
+
 				switch (target->rank()){
 				case Primitive::CHAR_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::CHAR_RANK>::type *>(target)->value()));
+					return promoteChar_(target);
 				case Primitive::UCHAR_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::UCHAR_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::UCHAR_RANK>::type *>(target)->value()));
 				case Primitive::SHORT_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::SHORT_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::SHORT_RANK>::type *>(target)->value()));
 				case Primitive::USHORT_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::USHORT_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::USHORT_RANK>::type *>(target)->value()));
 				case Primitive::INT_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::INT_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::INT_RANK>::type *>(target)->value()));
 				case Primitive::UINT_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::UINT_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::UINT_RANK>::type *>(target)->value()));
 				case Primitive::LONG_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::LONG_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::LONG_RANK>::type *>(target)->value()));
 				case Primitive::ULONG_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::ULONG_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::ULONG_RANK>::type *>(target)->value()));
 				case Primitive::LLONG_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::LLONG_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::LLONG_RANK>::type *>(target)->value()));
 				case Primitive::ULLONG_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::ULLONG_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::ULLONG_RANK>::type *>(target)->value()));
 				case Primitive::FLOAT_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::FLOAT_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::FLOAT_RANK>::type *>(target)->value()));
 				case Primitive::DOUBLE_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::DOUBLE_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::DOUBLE_RANK>::type *>(target)->value()));
 				case Primitive::LDOUBLE_RANK:
-					return std::make_shared<ObjectType>(static_cast<ValueType>(dynamic_cast<PrimitiveType<Primitive::LDOUBLE_RANK>::type *>(target)->value()));
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(dynamic_cast<PrimitiveType<Primitive::LDOUBLE_RANK>::type *>(target)->value()));
 				default:
 					break;
 				}
@@ -112,13 +115,25 @@ namespace StructuredScript{
 					return std::make_shared<ObjectType>(left->value() * right->value());
 
 				if (value == "/"){
-					if (right->value() == static_cast<ValueType>(0))
+					if (right->value() == static_cast<std::remove_reference<ValueType>::type>(0))
 						return PrimitiveFactory::createNaN();
 
 					return std::make_shared<ObjectType>(left->value() / right->value());
 				}
 
 				return BaseType::evaluate_(value, left, right, exception, expr);
+			}
+
+			IAny::Ptr promoteChar_(Primitive *target){
+				auto object = dynamic_cast<PrimitiveType<Primitive::CHAR_RANK>::type *>(target);
+				if (object != nullptr)
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(object->value()));
+
+				auto lchar = dynamic_cast<TypedPrimitive<char &, Primitive::CHAR_RANK> *>(target);
+				if (lchar != nullptr)
+					return std::make_shared<ObjectType>(static_cast<std::remove_reference<ValueType>::type>(lchar->value()));
+
+				return nullptr;
 			}
 		};
 	}

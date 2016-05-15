@@ -22,9 +22,13 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::evalua
 			"'[]': Expected index to be an integral value!", expr)));
 	}
 
-	unsigned char index = '\0';
+	auto index = Query::Object::getIndex(right);
+	if (index >= value_.size()){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Index is out of bounds!", expr)));
+	}
 
-	return PrimitiveFactory::createIndexObject(type_, index, memory_);
+	return PrimitiveFactory::createLChar(value_[index]);
 }
 
 StructuredScript::IStorage *StructuredScript::Objects::String::parent(){
