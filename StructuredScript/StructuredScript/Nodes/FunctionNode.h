@@ -21,6 +21,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 			virtual Node::Ptr type() override;
 
 			virtual Node::Ptr name() override;
@@ -32,6 +36,7 @@ namespace StructuredScript{
 
 			Ptr declaration_;
 			Ptr parameters_;
+			IMemoryAttributes::Ptr attributes_;
 		};
 
 		class FunctionDeclarationNode : public FunctionNode, public IFunctionDeclarationNode{

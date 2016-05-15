@@ -115,14 +115,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::CommonDeclarati
 }
 
 void StructuredScript::Nodes::CommonDeclaration::attributes(IMemoryAttributes::Ptr value){
-	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
-	if (declaration != nullptr)
-		declaration->attributes(value);
+	declaration_->attributes(value);
 }
 
 StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::CommonDeclaration::attributes(){
-	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
-	return (declaration == nullptr) ? nullptr : declaration->attributes();
+	return declaration_->attributes();
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::InitializationNode::clone(){

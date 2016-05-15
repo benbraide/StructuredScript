@@ -32,6 +32,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 		protected:
 			IAny::Ptr evaluateNumber_(IStorage *storage, IExceptionManager *exception, INode *expr);
 

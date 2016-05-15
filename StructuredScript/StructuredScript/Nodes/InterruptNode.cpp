@@ -24,8 +24,20 @@ std::string StructuredScript::Nodes::ReturnNode::str(){
 	return Query::Node::isEmpty(value_) ? "return" : ("return " + value_->str());
 }
 
+void StructuredScript::Nodes::ReturnNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::ReturnNode::attributes(){
+	return nullptr;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::InterruptCommon::ptr(){
 	return shared_from_this();
+}
+
+void StructuredScript::Nodes::InterruptCommon::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::InterruptCommon::attributes(){
+	return nullptr;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BreakNode::clone(){

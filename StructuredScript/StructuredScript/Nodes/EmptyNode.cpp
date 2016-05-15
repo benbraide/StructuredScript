@@ -16,3 +16,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::EmptyNode::evaluate(IStorag
 std::string StructuredScript::Nodes::EmptyNode::str(){
 	return "";
 }
+
+void StructuredScript::Nodes::EmptyNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::EmptyNode::attributes(){
+	return nullptr;
+}

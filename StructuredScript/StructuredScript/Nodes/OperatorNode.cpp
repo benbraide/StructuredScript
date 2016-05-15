@@ -67,6 +67,12 @@ std::string StructuredScript::Nodes::UnaryOperatorNode::str(){
 	return left_ ? (value_ + operand_->str()) : (operand_->str() + value_);
 }
 
+void StructuredScript::Nodes::UnaryOperatorNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::UnaryOperatorNode::attributes(){
+	return nullptr;
+}
+
 std::string StructuredScript::Nodes::UnaryOperatorNode::value() const{
 	return value_;
 }
@@ -185,6 +191,12 @@ std::string StructuredScript::Nodes::BinaryOperatorNode::str(){
 		return (leftOperand_->str() + value_ + rightOperand_->str());
 
 	return (leftOperand_->str() + " " + value_ + " " + rightOperand_->str());
+}
+
+void StructuredScript::Nodes::BinaryOperatorNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::BinaryOperatorNode::attributes(){
+	return nullptr;
 }
 
 std::string StructuredScript::Nodes::BinaryOperatorNode::value() const{

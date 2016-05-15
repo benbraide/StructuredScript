@@ -18,6 +18,10 @@ namespace StructuredScript{
 			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual std::string str() override;
+
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
 		};
 	}
 }

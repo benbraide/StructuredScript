@@ -20,6 +20,10 @@ namespace StructuredScript{
 			virtual Any::Ptr evaluate(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual std::string str() = 0;
+
+			virtual void attributes(MemoryAttributes::Ptr attributes) = 0;
+
+			virtual MemoryAttributes::Ptr attributes() = 0;
 		};
 	}
 

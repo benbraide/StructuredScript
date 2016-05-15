@@ -61,6 +61,12 @@ std::string StructuredScript::Nodes::LiteralNode::str(){
 	return value_.str();
 }
 
+void StructuredScript::Nodes::LiteralNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::LiteralNode::attributes(){
+	return nullptr;
+}
+
 StructuredScript::IAny::Ptr StructuredScript::Nodes::LiteralNode::evaluateNumber_(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto suffix = Scanner::Suffix::get(value_.suffix());
 	if (suffix == Scanner::SuffixType::SUFFIX_TYPE_ERROR)

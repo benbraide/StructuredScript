@@ -27,6 +27,12 @@ std::string StructuredScript::Nodes::IdentifierNode::str(){
 	return value_;
 }
 
+void StructuredScript::Nodes::IdentifierNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::IdentifierNode::attributes(){
+	return nullptr;
+}
+
 std::string StructuredScript::Nodes::IdentifierNode::value() const{
 	return value_;
 }
@@ -45,6 +51,12 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::OperatorIdentifierNode::eva
 
 std::string StructuredScript::Nodes::OperatorIdentifierNode::str(){
 	return ("operator " + value_->str());
+}
+
+void StructuredScript::Nodes::OperatorIdentifierNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::OperatorIdentifierNode::attributes(){
+	return nullptr;
 }
 
 std::string StructuredScript::Nodes::OperatorIdentifierNode::value() const{
@@ -84,6 +96,12 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::TypenameIdentifierNode::eva
 
 std::string StructuredScript::Nodes::TypenameIdentifierNode::str(){
 	return ("typename " + value_->str());
+}
+
+void StructuredScript::Nodes::TypenameIdentifierNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::TypenameIdentifierNode::attributes(){
+	return nullptr;
 }
 
 std::string StructuredScript::Nodes::TypenameIdentifierNode::value() const{

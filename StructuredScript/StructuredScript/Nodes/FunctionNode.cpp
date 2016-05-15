@@ -8,6 +8,14 @@ std::string StructuredScript::Nodes::FunctionNode::str(){
 	return (declaration_->str() + "(" + parameters_->str() + ")");
 }
 
+void StructuredScript::Nodes::FunctionNode::attributes(IMemoryAttributes::Ptr attributes){
+	attributes_ = attributes;
+}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::FunctionNode::attributes(){
+	return attributes_;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::FunctionNode::type(){
 	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
 	return (declaration == nullptr) ? nullptr : declaration->type();
@@ -59,7 +67,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr
 			Query::ExceptionManager::combine("'" + str() + "': Failed to define function!", expr)));
 	}
 
-	dynamic_cast<IFunctionMemory *>(memory->get())->add(function, declaration->attributes());
+	if (dynamic_cast<IFunctionMemory *>(memory->get())->add(function, declaration_->attributes()) == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Cannot duplicate function declaration/definition!", expr)));
+	}
+
 	return function;
 }
 

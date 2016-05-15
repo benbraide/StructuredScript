@@ -24,8 +24,13 @@ namespace StructuredScript{
 
 			virtual Ptr value() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 		private:
 			Ptr value_;
+			IMemoryAttributes::Ptr attributes_;
 		};
 	}
 }

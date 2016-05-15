@@ -19,3 +19,11 @@ std::string StructuredScript::Nodes::BlockNode::str(){
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BlockNode::value(){
 	return value_;
 }
+
+void StructuredScript::Nodes::BlockNode::attributes(IMemoryAttributes::Ptr attributes){
+	attributes_ = attributes;
+}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::BlockNode::attributes(){
+	return attributes_;
+}

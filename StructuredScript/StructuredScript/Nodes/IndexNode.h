@@ -22,6 +22,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 			virtual Ptr value() override;
 
 		private:

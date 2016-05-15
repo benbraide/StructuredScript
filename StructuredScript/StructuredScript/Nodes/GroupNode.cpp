@@ -16,6 +16,12 @@ std::string StructuredScript::Nodes::GroupNode::str(){
 	return ("(" + value_->str() + ")");
 }
 
+void StructuredScript::Nodes::GroupNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::GroupNode::attributes(){
+	return nullptr;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::GroupNode::value(){
 	return value_;
 }

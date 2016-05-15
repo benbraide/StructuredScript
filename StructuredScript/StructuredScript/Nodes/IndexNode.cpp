@@ -16,6 +16,12 @@ std::string StructuredScript::Nodes::IndexNode::str(){
 	return ("[" + value_->str() + "]");
 }
 
+void StructuredScript::Nodes::IndexNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::IndexNode::attributes(){
+	return nullptr;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::IndexNode::value(){
 	return value_;
 }

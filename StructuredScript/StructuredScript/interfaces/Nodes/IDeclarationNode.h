@@ -17,10 +17,6 @@ namespace StructuredScript{
 			virtual Node::Ptr type() = 0;
 
 			virtual Node::Ptr value() = 0;
-
-			virtual void attributes(MemoryAttributes::Ptr value) = 0;
-
-			virtual MemoryAttributes::Ptr attributes() = 0;
 		};
 
 		class InitializationNode{

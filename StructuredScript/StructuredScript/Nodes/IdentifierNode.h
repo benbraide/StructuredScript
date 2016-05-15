@@ -27,6 +27,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 			virtual std::string value() const override;
 
 		private:
@@ -45,6 +49,10 @@ namespace StructuredScript{
 			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual std::string str() override;
+
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual std::string value() const override;
 
@@ -79,6 +87,10 @@ namespace StructuredScript{
 			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual std::string str() override;
+
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual std::string value() const override;
 

@@ -22,6 +22,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
+
 		private:
 			Ptr value_;
 		};
@@ -29,6 +33,10 @@ namespace StructuredScript{
 		class InterruptCommon : public INode{
 		public:
 			virtual Ptr ptr() override;
+
+			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
+
+			virtual IMemoryAttributes::Ptr attributes() override;
 		};
 
 		class BreakNode : public InterruptCommon{
