@@ -21,7 +21,7 @@
 #include "../Interfaces/Storages/IGlobalStorage.h"
 #include "../Objects/Primitive.h"
 
-#include "../Common/Types/Type.h"
+#include "../Common/Types/StringType.h"
 #include "../Common/Types/PrimitiveType.h"
 #include "../Common/Types/CompositePrimitiveType.h"
 #include "../Common/Types/DeclaredType.h"

@@ -113,7 +113,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	Scanner::Scanner scanner;
 	scanner.init();
 
-	auto string = std::make_shared<Type>(this, "string");
+	auto string = std::make_shared<StringType>(this);
 	primitives_[Typename::TYPE_NAME_STRING] = string;
 	Objects::String::init(string, scanner, parser);
 }
