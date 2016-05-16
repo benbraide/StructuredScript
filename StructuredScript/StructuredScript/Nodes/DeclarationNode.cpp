@@ -5,6 +5,10 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
+	auto object = memory->object();
+	if (object != nullptr)
+		return object;
+
 	auto type = memory->type();
 	Storage::MemoryState states((type == nullptr) ? Storage::MemoryState::STATE_NONE : type->states());
 	if (states.isConstant() || states.isFinal() || states.isReference() || states.isRValReference()){

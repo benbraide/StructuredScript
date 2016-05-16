@@ -126,14 +126,18 @@ void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFu
 		if (Query::ExceptionManager::has(exception))
 			break;
 
-		if (Query::Object::isUndefined(value)){
+		if (Query::Object::isUndefined(value) || Query::Object::isExpansion(value)){
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + arg->str() + "': Bad argument to function call!", expr)));
 
 			break;
 		}
 
-		resolved.push_back(value);
+		auto expanded = dynamic_cast<IExpanded *>(value.get());
+		if (expanded == nullptr)
+			resolved.push_back(value);
+		else//Expand value
+			expanded->expand(resolved);
 	}
 }
 

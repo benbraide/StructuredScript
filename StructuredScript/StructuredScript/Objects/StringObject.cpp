@@ -3,9 +3,9 @@
 StructuredScript::Objects::String::String(const std::string &value) : TypedPrimitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_STRING), value){
 	Parser::Parser parser;
 	Scanner::Scanner scanner;
-	scanner.init();
-
 	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+
+	scanner.init();
 	parser.parse(well, scanner, nullptr)->evaluate(this, nullptr, nullptr);
 }
 

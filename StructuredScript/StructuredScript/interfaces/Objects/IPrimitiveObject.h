@@ -97,6 +97,13 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Memory> add() = 0;
 		};
+
+		class Expanded{
+		public:
+			virtual ~Expanded(){}
+
+			virtual void expand(Function::ArgListType &args) = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -115,6 +122,7 @@ namespace StructuredScript{
 	typedef Interfaces::IndexTarget		IIndexTarget;
 	typedef Interfaces::Undefined		IUndefined;
 	typedef Interfaces::Expansion		IExpansion;
+	typedef Interfaces::Expanded		IExpanded;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

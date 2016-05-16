@@ -5,6 +5,7 @@
 
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
+#include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
 #include "../Common/Types/CompositeType.h"
 #include "../Common/Types/DeclaredType.h"

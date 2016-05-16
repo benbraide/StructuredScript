@@ -12,6 +12,7 @@
 #include "../Objects/StringObject.h"
 #include "../Objects/TypeObject.h"
 #include "../Objects/IndexObject.h"
+#include "../Objects/Expanded.h"
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUndefined(){
 	return std::make_shared<Objects::Undefined>();
@@ -107,6 +108,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createTypeObject
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){
 	return std::make_shared<Objects::IndexObject>(type, value, target);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createExpanded(IAny::Ptr value){
+	return std::make_shared<Objects::Expanded>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::create(int rank){

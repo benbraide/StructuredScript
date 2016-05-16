@@ -15,6 +15,8 @@ namespace StructuredScript{
 
 			static bool isUndefined(IAny::Ptr object);
 
+			static bool isExpansion(IAny::Ptr object);
+
 			static unsigned int getIndex(IAny::Ptr object);
 
 			template <typename TargetType, int TargetRank>
@@ -25,7 +27,7 @@ namespace StructuredScript{
 
 		template <typename TargetType, int TargetRank>
 		bool StructuredScript::Query::Object::getIndex(IAny::Ptr object, unsigned int &value){
-			auto objectBase = object->base();
+			auto objectBase = (object == nullptr) ? nullptr : object->base();
 			auto target = dynamic_cast<Objects::TypedPrimitive<TargetType, TargetRank> *>(objectBase.get());
 			if (target != nullptr){
 				value = static_cast<unsigned int>(target->value());

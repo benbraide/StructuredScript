@@ -116,6 +116,8 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	auto string = std::make_shared<StringType>(this);
 	primitives_[Typename::TYPE_NAME_STRING] = string;
 	Objects::String::init(string, scanner, parser);
+
+	Objects::Expansion::init();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){

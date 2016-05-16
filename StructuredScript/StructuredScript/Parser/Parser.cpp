@@ -169,6 +169,8 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	if (value == "..." && Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Expanded type | identifier
 		if (Query::Node::isTypeIdentifier(node))
 			node = std::make_shared<Nodes::ExpandedTypenameIdentifierNode>(node);
+		else
+			node = std::make_shared<Nodes::UnaryOperatorNode>(false, "...", node);
 		
 		return expression(node, well, scanner, exception, precedence, validator);
 	}

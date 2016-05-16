@@ -59,6 +59,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IMemory *target);
 
+		static IAny::Ptr createExpanded(IAny::Ptr value);
+
 		static IAny::Ptr create(int rank);
 
 		static IAny::Ptr create(Typename type);

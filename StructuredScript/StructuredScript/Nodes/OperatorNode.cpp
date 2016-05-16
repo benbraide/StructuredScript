@@ -62,6 +62,15 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (left_ && value_ == "!")
 		return PrimitiveFactory::createBool(!value->truth(storage, exception, expr));
 
+	if (!left_ && value_ == "..."){
+		if (!Query::Object::isExpansion(value)){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Expected an expansion object!", expr)));
+		}
+
+		return PrimitiveFactory::createExpanded(value);
+	}
+
 	return left_ ? value->evaluateLeftUnary(value_, storage, exception, expr) : value->evaluateRightUnary(value_, storage, exception, expr);
 }
 
@@ -226,7 +235,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	else
 		value = value_;
 
-	return leftValue->assign(value, rightValue, storage, exception, expr);
+	return leftValue->evaluateBinary(value, rightValue, storage, exception, expr);
 }
 
 std::string StructuredScript::Nodes::BinaryOperatorNode::str(){

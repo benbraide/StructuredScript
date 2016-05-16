@@ -15,11 +15,6 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::IdentifierNode::evaluate(IS
 			Query::ExceptionManager::combine("'" + str() + "': Could not resolve identifier!", expr)));
 	}
 
-	auto memoryOwner = memory->storage();
-	if (memoryOwner != nullptr){//Validate access
-
-	}
-
 	return memory->object();
 }
 

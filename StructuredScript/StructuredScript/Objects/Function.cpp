@@ -270,6 +270,12 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 	else
 		return nullptr;
 
+	value = value->base();
+	if (value == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Bad function return value!", expr)));
+	}
+
 	Storage::Memory converter(nullptr, type_, value, nullptr);//For converting return value
 	converter.assign(value, storage, exception, expr);
 

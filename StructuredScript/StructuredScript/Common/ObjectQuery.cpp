@@ -2,11 +2,18 @@
 #include "../Objects/TypedPrimitive.h"
 
 bool StructuredScript::Query::Object::isPrimitive(IAny::Ptr object){
-	return (dynamic_cast<IPrimitiveObject *>(object.get()) != nullptr);
+	auto objectBase = (object == nullptr) ? nullptr : object->base();
+	return (dynamic_cast<IPrimitiveObject *>(objectBase.get()) != nullptr);
 }
 
 bool StructuredScript::Query::Object::isUndefined(IAny::Ptr object){
-	return (dynamic_cast<IUndefined *>(object.get()) != nullptr);
+	auto objectBase = (object == nullptr) ? nullptr : object->base();
+	return (dynamic_cast<IUndefined *>(objectBase.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Object::isExpansion(IAny::Ptr object){
+	auto objectBase = (object == nullptr) ? nullptr : object->base();
+	return (dynamic_cast<IExpansion *>(objectBase.get()) != nullptr);
 }
 
 unsigned int StructuredScript::Query::Object::getIndex(IAny::Ptr object){
