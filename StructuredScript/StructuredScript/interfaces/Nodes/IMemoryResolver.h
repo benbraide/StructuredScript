@@ -11,7 +11,7 @@ namespace StructuredScript{
 		public:
 			virtual ~MemoryResolver(){}
 
-			virtual Memory::Ptr resolveMemory(Storage *storage) = 0;
+			virtual Memory::Ptr resolveMemory(Storage *storage, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
 		};
 	}
 

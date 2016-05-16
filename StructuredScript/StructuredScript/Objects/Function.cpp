@@ -101,26 +101,17 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 	if (args.empty())
 		return 1;
 
-	auto total = 0;
-	unsigned int index = 0;
-
 	auto arg = args.begin();
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = (*arg)->type();
-		if (type == nullptr)//Type expected
+		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
 			return 0;
 
-		if (owner_->isEqual(type))
-			total = 3;
-
-		if (type->isParent(owner_))
-			total = 2;
-
-		if (owner_->isCompatibleWith(type))
-			total = 1;
-
-		return 0;
+		++arg;
 	}
+
+	auto total = 0;
+	unsigned int index = 0;
 
 	for (; arg != args.end(); ++arg){
 		auto type = (*arg)->type();
@@ -144,26 +135,17 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 	if (args.empty())
 		return 1;
 
-	auto total = 0;
-	unsigned int index = 0;
-
 	auto arg = args.begin();
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = *arg;
-		if (type == nullptr)//Type expected
+		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
 			return 0;
 
-		if (owner_->isEqual(type))
-			total = 3;
-
-		if (type->isParent(owner_))
-			total = 2;
-
-		if (owner_->isCompatibleWith(type))
-			total = 1;
-
-		return 0;
+		++arg;
 	}
+
+	auto total = 0;
+	unsigned int index = 0;
 
 	for (; arg != args.end(); ++arg){
 		auto score = score_(*arg, index++);
@@ -200,6 +182,14 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	auto param = list_.begin();
 	auto arg = args.begin();
+	if (owner_ != nullptr){//Assume first argument is object
+		if (args.empty()){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Bad call to a member function!", expr)));
+		}
+
+		++arg;//Ignore
+	}
 
 	IMemory::Ptr expansionMemory;
 	IExpansion *expansion = nullptr;

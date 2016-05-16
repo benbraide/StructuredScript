@@ -14,7 +14,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class IdentifierNode : public INode, public IIdentifierNode, public IIdentifierExpressionNode{
+		class IdentifierNode : public INode, public IIdentifierNode, public IIdentifierExpressionNode, public IStorageResolver, public ITypeResolver, public IMemoryResolver{
 		public:
 			explicit IdentifierNode(const std::string &value)
 				: value_(value){}
@@ -33,11 +33,18 @@ namespace StructuredScript{
 
 			virtual std::string value() const override;
 
-		private:
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+		protected:
 			std::string value_;
 		};
 
-		class OperatorIdentifierNode : public INode, public IIdentifierNode, public IOperatorIdentifierNode, public IIdentifierExpressionNode{
+		class OperatorIdentifierNode : public INode, public IIdentifierNode, public IOperatorIdentifierNode, public IIdentifierExpressionNode,
+			public IStorageResolver, public ITypeResolver, public IMemoryResolver{
 		public:
 			explicit OperatorIdentifierNode(Ptr value)
 				: value_(value){}
@@ -58,6 +65,12 @@ namespace StructuredScript{
 
 			virtual INode::Ptr nodeValue() override;
 
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
 		private:
 			Ptr value_;
 		};
@@ -68,9 +81,14 @@ namespace StructuredScript{
 				: IdentifierNode(value){}
 
 			virtual Ptr clone() override;
+
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 		};
 
-		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode{
+		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode,
+			public IStorageResolver, public ITypeResolver{
 		public:
 			explicit TypenameIdentifierNode(Ptr value)
 				: value_(value){}
@@ -89,11 +107,15 @@ namespace StructuredScript{
 
 			virtual std::string value() const override;
 
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
 		protected:
 			Ptr value_;
 		};
 
-		class ExpandedTypenameIdentifierNode : public TypenameIdentifierNode, public IExpandedTypenameIdentifierNode, public ITypeResolver{
+		class ExpandedTypenameIdentifierNode : public TypenameIdentifierNode, public IExpandedTypenameIdentifierNode{
 		public:
 			explicit ExpandedTypenameIdentifierNode(Ptr value)
 				: TypenameIdentifierNode(value){}
@@ -104,10 +126,10 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
-			virtual IType::Ptr resolveType(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 		};
 
-		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode, public ITypeResolver{
+		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode{
 		public:
 			TemplatedTypenameIdentifierNode(Ptr type, Ptr value)
 				: TypenameIdentifierNode(type), value_(value){}
@@ -118,13 +140,13 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
-			virtual IType::Ptr resolveType(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		private:
 			Ptr value_;
 		};
 
-		class ModifiedTypenameIdentifierNode : public TypenameIdentifierNode, public IModifiedTypeIdentifierNode, public ITypeResolver{
+		class ModifiedTypenameIdentifierNode : public TypenameIdentifierNode, public IModifiedTypeIdentifierNode{
 		public:
 			ModifiedTypenameIdentifierNode(Ptr type, const Storage::MemoryState &value)
 				: TypenameIdentifierNode(type), value_(value){}
@@ -139,7 +161,9 @@ namespace StructuredScript{
 
 			virtual unsigned short states() const override;
 
-			virtual IType::Ptr resolveType(IStorage *storage) override;
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		private:
 			Storage::MemoryState value_;

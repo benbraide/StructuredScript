@@ -31,7 +31,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::cast
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::base(){
 	ExceptionManager xManager;
-	return (get_ == nullptr) ? nullptr : get_->call({}, memory_->storage(), &xManager, nullptr);
+	return (get_ == nullptr) ? nullptr : get_->call({ shared_from_this() }, memory_->storage(), &xManager, nullptr);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){

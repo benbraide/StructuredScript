@@ -33,11 +33,11 @@ namespace StructuredScript{
 
 			virtual Ptr operand() override;
 
-			virtual IStorage *resolveStorage(IStorage *storage) override;
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IType::Ptr resolveType(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr resolveMemory(IStorage *storage) override;
+			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		protected:
 			bool left_;
@@ -68,11 +68,11 @@ namespace StructuredScript{
 
 			virtual Ptr rightOperand() override;
 
-			virtual IStorage *resolveStorage(IStorage *storage) override;
+			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IType::Ptr resolveType(IStorage *storage) override;
+			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr resolveMemory(IStorage *storage) override;
+			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		protected:
 			std::string value_;

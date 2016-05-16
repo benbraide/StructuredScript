@@ -11,7 +11,7 @@ namespace StructuredScript{
 		public:
 			virtual ~TypeResolver(){}
 
-			virtual Type::Ptr resolveType(Storage *storage) = 0;
+			virtual Type::Ptr resolveType(Storage *storage, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
 		};
 	}
 

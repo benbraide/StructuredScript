@@ -10,7 +10,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::UnaryOperatorNo
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (left_ && value_ == "::"){
-		auto memory = Query::Node::resolveAsObject(operand_, storage);
+		auto memory = resolveMemory(storage);
 		if (memory == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
@@ -20,7 +20,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	}
 
 	if (!left_ && value_ == "()"){//Call
-		auto memory = Query::Node::resolveAsObject(operand_, storage);
+		auto resolver = dynamic_cast<IMemoryResolver *>(operand_.get());
+		auto memory = (resolver == nullptr) ? nullptr : resolver->resolveMemory(storage);
 		if (memory == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
@@ -28,6 +29,15 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 
 		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
 		if (functionMemory != nullptr){//Call function
+			IFunction::ArgListType args;
+
+			auto targetStorage = memory->storage();
+			if (targetStorage != nullptr){//Function a member -- add object to argument list
+				auto object = dynamic_cast<IAny *>(targetStorage);
+				if (object != nullptr)
+					args.push_front(object->ptr());
+			}
+
 			auto match = functionMemory->find(IFunction::ArgListType{});//Find matching function
 			if (match == nullptr){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
@@ -41,11 +51,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
 			}
 
-			auto targetStorage = dynamic_cast<IMemory *>(functionMemory)->storage();
-			if (targetStorage == nullptr)//Function is not a member -- use definition storage
-				targetStorage = match->storage();
-
-			return function->call(IFunction::ArgListType{}, targetStorage, exception, expr);
+			return function->call(args, (targetStorage == nullptr) ? match->storage() : targetStorage, exception, expr);
 		}
 	}
 
@@ -77,16 +83,40 @@ std::shared_ptr<StructuredScript::Interfaces::Node> StructuredScript::Nodes::Una
 	return operand_;
 }
 
-StructuredScript::IStorage *StructuredScript::Nodes::UnaryOperatorNode::resolveStorage(IStorage *storage){
-	return (left_ && value_ == "::") ? Query::Node::resolveAsStorage(operand_, dynamic_cast<IStorage *>(IGlobalStorage::globalStorage)) : nullptr;
+StructuredScript::IStorage *StructuredScript::Nodes::UnaryOperatorNode::resolveStorage(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (value_ == "::"){
+		auto resolver = dynamic_cast<IStorageResolver *>(operand_.get());
+		if (resolver == nullptr)
+			return nullptr;
+
+		return resolver->resolveStorage(dynamic_cast<IStorage *>(IGlobalStorage::globalStorage), IStorage::SEARCH_LOCAL);
+	}
+
+	return nullptr;
 }
 
-StructuredScript::IType::Ptr StructuredScript::Nodes::UnaryOperatorNode::resolveType(IStorage *storage){
-	return (left_ && value_ == "::") ? Query::Node::resolveAsType(operand_, dynamic_cast<IStorage *>(IGlobalStorage::globalStorage)) : nullptr;
+StructuredScript::IType::Ptr StructuredScript::Nodes::UnaryOperatorNode::resolveType(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (value_ == "::"){
+		auto resolver = dynamic_cast<ITypeResolver *>(operand_.get());
+		if (resolver == nullptr)
+			return nullptr;
+
+		return resolver->resolveType(dynamic_cast<IStorage *>(IGlobalStorage::globalStorage), IStorage::SEARCH_LOCAL);
+	}
+
+	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Nodes::UnaryOperatorNode::resolveMemory(IStorage *storage){
-	return (left_ && value_ == "::") ? Query::Node::resolveAsObject(operand_, dynamic_cast<IStorage *>(IGlobalStorage::globalStorage)) : nullptr;
+StructuredScript::IMemory::Ptr StructuredScript::Nodes::UnaryOperatorNode::resolveMemory(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (value_ == "::"){
+		auto resolver = dynamic_cast<IMemoryResolver *>(operand_.get());
+		if (resolver == nullptr)
+			return nullptr;
+
+		return resolver->resolveMemory(dynamic_cast<IStorage *>(IGlobalStorage::globalStorage), IStorage::SEARCH_LOCAL);
+	}
+
+	return nullptr;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BinaryOperatorNode::ptr(){
@@ -99,7 +129,15 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BinaryOperatorN
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (value_ == "::" || value_ == "()"){//Scope | Call
-		auto memory = (value_[0] == ':') ? resolveMemory(storage) : Query::Node::resolveAsObject(leftOperand_, storage);
+		IMemory::Ptr memory;
+		if (value_[0] == '('){
+			auto resolver = dynamic_cast<IMemoryResolver *>(leftOperand_.get());
+			if (resolver != nullptr)
+				memory = resolver->resolveMemory(storage);
+		}
+		else//Resolve both operands as memory
+			memory = resolveMemory(storage);
+
 		if (memory == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
@@ -116,6 +154,13 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;
 
+			auto targetStorage = memory->storage();
+			if (targetStorage != nullptr){//Function a member -- add object to argument list
+				auto object = dynamic_cast<IAny *>(targetStorage);
+				if (object != nullptr)
+					args.push_front(object->ptr());
+			}
+
 			auto match = functionMemory->find(args);//Find matching function
 			if (match == nullptr){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
@@ -129,11 +174,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
 			}
 
-			auto targetStorage = dynamic_cast<IMemory *>(functionMemory)->storage();
-			if (targetStorage == nullptr)//Function is not a member -- use definition storage
-				targetStorage = match->storage();
-
-			return function->call(args, targetStorage, exception, expr);
+			return function->call(args, (targetStorage == nullptr) ? match->storage() : targetStorage, exception, expr);
 		}
 	}
 
@@ -155,7 +196,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 		}
 
-		auto memory = Query::Node::resolveAsObject(rightOperand_, objectStorage);
+		auto resolver = dynamic_cast<IMemoryResolver *>(rightOperand_.get());
+		auto memory = (resolver == nullptr) ? nullptr : resolver->resolveMemory(objectStorage, IStorage::SEARCH_FAMILY);
 		if (memory == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
@@ -221,34 +263,63 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BinaryOperatorN
 	return rightOperand_;
 }
 
-StructuredScript::IStorage *StructuredScript::Nodes::BinaryOperatorNode::resolveStorage(IStorage *storage){
+StructuredScript::IStorage *StructuredScript::Nodes::BinaryOperatorNode::resolveStorage(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (storage == nullptr)
+		return nullptr;
+
 	if (value_ == "::"){
-		storage = Query::Node::resolveAsStorage(leftOperand_, storage);
-		return (storage == nullptr) ? nullptr : Query::Node::resolveAsStorage(rightOperand_, storage);
+		auto leftResolver = dynamic_cast<IStorageResolver *>(leftOperand_.get());
+		auto rightResolver = dynamic_cast<IStorageResolver *>(rightOperand_.get());
+		if (leftResolver == nullptr || rightResolver == nullptr)
+			return nullptr;
+
+		storage = leftResolver->resolveStorage(storage, searchScope);
+		return (storage == nullptr) ? nullptr : rightResolver->resolveStorage(storage, IStorage::SEARCH_LOCAL);
 	}
 
 	return nullptr;
 }
 
-StructuredScript::IType::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolveType(IStorage *storage){
+StructuredScript::IType::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolveType(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (storage == nullptr)
+		return nullptr;
+
 	if (value_ == "::"){
-		storage = Query::Node::resolveAsStorage(leftOperand_, storage);
-		return (storage == nullptr) ? nullptr : Query::Node::resolveAsType(rightOperand_, storage);
+		auto leftResolver = dynamic_cast<IStorageResolver *>(leftOperand_.get());
+		auto rightResolver = dynamic_cast<ITypeResolver *>(rightOperand_.get());
+		if (leftResolver == nullptr || rightResolver == nullptr)
+			return nullptr;
+
+		storage = leftResolver->resolveStorage(storage, searchScope);
+		return (storage == nullptr) ? nullptr : rightResolver->resolveType(storage, IStorage::SEARCH_LOCAL);
 	}
 
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolveMemory(IStorage *storage){
-	if (value_ == "."){//Member access
-		auto memory = Query::Node::resolveAsObject(leftOperand_, storage);
+StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolveMemory(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	if (storage == nullptr)
+		return nullptr;
+
+	if (value_ == "."){//Member access -- family search
+		auto leftResolver = dynamic_cast<IMemoryResolver *>(leftOperand_.get());
+		auto rightResolver = dynamic_cast<IMemoryResolver *>(rightOperand_.get());
+		if (leftResolver == nullptr || rightResolver == nullptr)
+			return nullptr;
+
+		auto memory = leftResolver->resolveMemory(storage, searchScope);
 		auto object = (memory == nullptr) ? nullptr : memory->object()->base();
 		
 		auto storageObject = dynamic_cast<IStorage *>(object.get());
 		if (storageObject == nullptr)
 			return nullptr;
 
-		memory = Query::Node::resolveAsObject(rightOperand_, storageObject);
+		memory = rightResolver->resolveMemory(storageObject, IStorage::SEARCH_FAMILY);
+		if (memory == nullptr)
+			return nullptr;
+
+		//TODO: Validate access
+
 		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
 		if (functionMemory != nullptr)//Set object as storage
 			functionMemory->setStorage(storageObject);
@@ -256,9 +327,14 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::reso
 		return memory;
 	}
 
-	if (value_ == "::"){
-		storage = Query::Node::resolveAsStorage(leftOperand_, storage);
-		return (storage == nullptr) ? nullptr : Query::Node::resolveAsObject(rightOperand_, storage);
+	if (value_ == "::"){//Local search
+		auto leftResolver = dynamic_cast<IStorageResolver *>(leftOperand_.get());
+		auto rightResolver = dynamic_cast<IMemoryResolver *>(rightOperand_.get());
+		if (leftResolver == nullptr || rightResolver == nullptr)
+			return nullptr;
+
+		storage = leftResolver->resolveStorage(storage, searchScope);
+		return (storage == nullptr) ? nullptr : rightResolver->resolveMemory(storage, IStorage::SEARCH_LOCAL);
 	}
 
 	return nullptr;

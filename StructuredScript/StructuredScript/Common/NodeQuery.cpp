@@ -117,94 +117,17 @@ void StructuredScript::Query::Node::split(const std::string &value, INode::Ptr n
 		list.push_back(node);
 }
 
-StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INode::Ptr node, IStorage *storage){
+StructuredScript::IStorage *StructuredScript::Query::Node::resolveAsStorage(INode::Ptr node, IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	auto resolver = dynamic_cast<IStorageResolver *>(node.get());
-	if (resolver != nullptr)
-		return resolver->resolveStorage(storage);
-
-	std::string value;
-	unsigned short scope;
-	
-	if (!resolvePartial_(node, storage, value, scope))
-		return nullptr;
-
-	return storage->findStorage(value, scope);
+	return (resolver == nullptr) ? nullptr : resolver->resolveStorage(storage, searchScope);
 }
 
-StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode::Ptr node, IStorage *storage){
+StructuredScript::IType::Ptr StructuredScript::Query::Node::resolveAsType(INode::Ptr node, IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	auto resolver = dynamic_cast<ITypeResolver *>(node.get());
-	if (resolver != nullptr)
-		return resolver->resolveType(storage);
-
-	std::string value;
-	unsigned short scope;
-
-	if (!resolvePartial_(node, storage, value, scope))
-		return nullptr;
-
-	return storage->findType(value, scope);
+	return (resolver == nullptr) ? nullptr : resolver->resolveType(storage, searchScope);
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsObject(INode::Ptr node, IStorage *storage){
+StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsMemory(INode::Ptr node, IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	auto resolver = dynamic_cast<IMemoryResolver *>(node.get());
-	if (resolver != nullptr)
-		return resolver->resolveMemory(storage);
-
-	std::string value;
-	unsigned short scope;
-
-	if (!resolvePartial_(node, storage, value, scope))
-		return nullptr;
-
-	return storage->findMemory(value, scope);
-}
-
-bool StructuredScript::Query::Node::resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, unsigned short &scope){
-	if (storage == nullptr)
-		return false;
-
-	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
-	if (operatorNode != nullptr){//Operator must be '::'
-		if (operatorNode->value() != "::")
-			return false;
-
-		auto binary = dynamic_cast<IBinaryOperatorNode *>(node.get());
-		if (binary == nullptr){//Unary
-			auto unary = dynamic_cast<IUnaryOperatorNode *>(node.get());
-			if (unary == nullptr)//Unknown
-				return false;
-
-			auto operand = unary->operand();
-			auto id = dynamic_cast<IIdentifierNode *>(operand.get());
-			if (id == nullptr)//Bad node
-				return false;
-
-			storage = dynamic_cast<IStorage *>(IGlobalStorage::globalStorage);
-			value = id->value();
-		}
-		else{
-			auto operand = binary->rightOperand();
-			auto id = dynamic_cast<IIdentifierNode *>(operand.get());
-			if (id == nullptr)//Bad node
-				return false;
-
-			storage = resolveAsStorage(binary->leftOperand(), storage);
-			if (storage == nullptr)//Failed to resolve
-				return false;
-
-			value = id->value();
-		}
-
-		scope = IStorage::SEARCH_LOCAL;
-	}
-	else{
-		auto id = dynamic_cast<IIdentifierNode *>(node.get());
-		if (id == nullptr)//Bad node
-			return false;
-
-		value = id->value();
-		scope = IStorage::SEARCH_DEFAULT;
-	}
-
-	return true;
+	return (resolver == nullptr) ? nullptr : resolver->resolveMemory(storage, searchScope);
 }

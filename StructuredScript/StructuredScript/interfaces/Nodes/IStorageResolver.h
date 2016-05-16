@@ -11,7 +11,7 @@ namespace StructuredScript{
 		public:
 			virtual ~StorageResolver(){}
 
-			virtual Storage *resolveStorage(Storage *storage) = 0;
+			virtual Storage *resolveStorage(Storage *storage, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
 		};
 	}
 

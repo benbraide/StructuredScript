@@ -68,14 +68,11 @@ namespace StructuredScript{
 
 			static void split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary = false);
 
-			static IStorage *resolveAsStorage(INode::Ptr node, IStorage *storage);
+			static IStorage *resolveAsStorage(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);
 
-			static IType::Ptr resolveAsType(INode::Ptr node, IStorage *storage);
+			static IType::Ptr resolveAsType(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);
 
-			static IMemory::Ptr resolveAsObject(INode::Ptr node, IStorage *storage);
-
-		private:
-			static bool resolvePartial_(INode::Ptr node, IStorage *&storage, std::string &value, unsigned short &scope);
+			static IMemory::Ptr resolveAsMemory(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);
 		};
 	}
 }
