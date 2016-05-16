@@ -25,7 +25,8 @@ namespace StructuredScript{
 
 		template <typename TargetType, int TargetRank>
 		bool StructuredScript::Query::Object::getIndex(IAny::Ptr object, unsigned int &value){
-			auto target = dynamic_cast<Objects::TypedPrimitive<TargetType, TargetRank> *>(object->base());
+			auto objectBase = object->base();
+			auto target = dynamic_cast<Objects::TypedPrimitive<TargetType, TargetRank> *>(objectBase.get());
 			if (target != nullptr){
 				value = static_cast<unsigned int>(target->value());
 				return true;

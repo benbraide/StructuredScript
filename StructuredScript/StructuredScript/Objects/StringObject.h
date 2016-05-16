@@ -101,8 +101,9 @@ namespace StructuredScript{
 			}
 
 			virtual IAny::Ptr evaluate_(const std::string &value, TypedPrimitive *left, TypedPrimitive *right, IExceptionManager *exception, INode *expr) override{
+				auto leftBase = left->base(), rightBase = right->base();
 				if (value == "+")
-					return std::make_shared<String>(dynamic_cast<String *>(left->base())->value_ + dynamic_cast<String *>(right->base())->value_);
+					return std::make_shared<String>(dynamic_cast<String *>(leftBase.get())->value_ + dynamic_cast<String *>(rightBase.get())->value_);
 
 				return TypedPrimitive::evaluate_(value, left, right, exception, expr);
 			}

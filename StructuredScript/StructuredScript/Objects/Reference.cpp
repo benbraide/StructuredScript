@@ -12,7 +12,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Reference::cas
 	return value_->object()->cast(type, storage, exception, expr);
 }
 
-StructuredScript::IAny *StructuredScript::Objects::Reference::base(){
+StructuredScript::IAny::Ptr StructuredScript::Objects::Reference::base(){
 	return value_->object()->base();
 }
 

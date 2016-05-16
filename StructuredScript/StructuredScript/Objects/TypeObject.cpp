@@ -13,7 +13,8 @@ StructuredScript::IType::Ptr StructuredScript::Objects::TypeObject::value(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::TypeObject::evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr){
-	auto alike = dynamic_cast<TypeObject *>(right->base());
+	auto rightBase = right->base();
+	auto alike = dynamic_cast<TypeObject *>(rightBase.get());
 	if (alike != nullptr){
 		if (value == "==" || value == "<=" || value == ">=")
 			return PrimitiveFactory::createBool(value_->isEqual(alike->value_));

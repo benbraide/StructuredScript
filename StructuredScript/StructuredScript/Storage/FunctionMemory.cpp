@@ -43,13 +43,15 @@ void StructuredScript::Storage::FunctionMemory::setStorage(IStorage *storage){
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IAny::Ptr function, IMemoryAttributes::Ptr attributes){
-	auto functionObject = dynamic_cast<IFunction *>(function->base());
+	auto functionBase = function->base();
+	auto functionObject = dynamic_cast<IFunction *>(functionBase.get());
 	if (functionObject == nullptr)//Function is required
 		return nullptr;
 
 	auto existing = find_(function);
 	if (existing != list_.end()){//Replace existing only if existing is declaration and new is not
-		if (dynamic_cast<IFunction *>((*existing)->object()->base())->isDefined() || !functionObject->isDefined())
+		auto existingBase = (*existing)->object()->base();
+		if (dynamic_cast<IFunction *>(existingBase.get())->isDefined() || !functionObject->isDefined())
 			return nullptr;
 
 		auto attributes = (*existing)->attributes();
@@ -73,7 +75,8 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	Ptr selected;
 
 	for (auto function : list_){//Get function with highest score
-		auto score = dynamic_cast<IFunction *>(function->object()->base())->score(args);
+		auto functionBase = function->object()->base();
+		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
 		if (score > 0 && score >= max){
 			max = score;
 			selected = function;
@@ -88,7 +91,8 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	Ptr selected;
 
 	for (auto function : list_){//Get function with highest score
-		auto score = dynamic_cast<IFunction *>(function->object()->base())->score(args);
+		auto functionBase = function->object()->base();
+		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
 		if (score > 0 && score >= max){
 			max = score;
 			selected = function;
@@ -135,7 +139,8 @@ void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list
 
 StructuredScript::Storage::FunctionMemory::ListType::iterator StructuredScript::Storage::FunctionMemory::find_(IAny::Ptr function){
 	for (auto item = list_.begin(); item != list_.end(); ++item){
-		auto functionObject = dynamic_cast<IFunction *>((*item)->object()->base());
+		auto functionBase = (*item)->object()->base();
+		auto functionObject = dynamic_cast<IFunction *>(functionBase.get());
 		if (functionObject != nullptr && functionObject->equals(function))
 			return item;
 	}

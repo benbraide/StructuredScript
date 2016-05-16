@@ -34,7 +34,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 					Query::ExceptionManager::combine("'" + str() + "': No function found taking the specified arguments!", expr)));
 			}
 
-			auto function = dynamic_cast<IFunction *>(match->object()->base());
+			auto matchBase = match->object()->base();
+			auto function = dynamic_cast<IFunction *>(matchBase.get());
 			if (function == nullptr){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
@@ -55,7 +56,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (left_ && value_ == "!")
 		return PrimitiveFactory::createBool(!value->truth(storage, exception, expr));
 
-	auto primitive = dynamic_cast<IPrimitiveObject *>(value->base());
+	auto valueBase = value->base();
+	auto primitive = dynamic_cast<IPrimitiveObject *>(valueBase.get());
 	if (primitive != nullptr)
 		return left_ ? primitive->evaluateLeftUnary(value_, exception, expr) : primitive->evaluateRightUnary(value_, exception, expr);
 
@@ -126,7 +128,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 					Query::ExceptionManager::combine("'" + str() + "': No function found taking the specified arguments!", expr)));
 			}
 
-			auto function = dynamic_cast<IFunction *>(match->object()->base());
+			auto matchBase = match->object()->base();
+			auto function = dynamic_cast<IFunction *>(matchBase.get());
 			if (function == nullptr){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
@@ -150,8 +153,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	if (value_ == "&&" && !leftValue->truth(storage, exception, expr))//Short-circuit evaluation
 		return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createBool(false);
 
+	auto leftValueBase = leftValue->base();
 	if (value_ == "."){//Member access -- don't evaluate right operand
-		auto objectStorage = dynamic_cast<IStorage *>(leftValue->base());
+		auto objectStorage = dynamic_cast<IStorage *>(leftValueBase.get());
 		if (objectStorage == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
@@ -181,7 +185,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	else
 		value = value_;
 
-	auto primitive = dynamic_cast<IPrimitiveObject *>(leftValue->base());
+	auto primitive = dynamic_cast<IPrimitiveObject *>(leftValueBase.get());
 	if (primitive != nullptr)
 		return primitive->evaluateBinary(value, rightValue, storage, exception, expr);
 
@@ -244,9 +248,9 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolv
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::resolveMemory(IStorage *storage){
 	if (value_ == "."){//Member access
 		auto memory = Query::Node::resolveAsObject(leftOperand_, storage);
-		auto object = (memory == nullptr) ? nullptr : memory->object();
+		auto object = (memory == nullptr) ? nullptr : memory->object()->base();
 		
-		auto storageObject = dynamic_cast<IStorage *>(object->base());
+		auto storageObject = dynamic_cast<IStorage *>(object.get());
 		if (storageObject == nullptr)
 			return nullptr;
 

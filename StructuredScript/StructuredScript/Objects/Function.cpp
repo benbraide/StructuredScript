@@ -66,7 +66,8 @@ bool StructuredScript::Objects::Function::isDefined(){
 }
 
 bool StructuredScript::Objects::Function::equals(Any::Ptr target){
-	auto function = dynamic_cast<Function *>(target->base());
+	auto targetBase = target->base();
+	auto function = dynamic_cast<Function *>(targetBase.get());
 	if (function == nullptr || !type_->isEqual(function->type_) || types_.size() != function->types_.size())
 		return false;
 
@@ -170,8 +171,8 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 		if (Query::ExceptionManager::has(exception))//Failed to allocate memory
 			return nullptr;
 
-		auto object = memory->object();
-		expansion = (object == nullptr) ? nullptr : dynamic_cast<IExpansion *>(object->base());
+		auto object = memory->object()->base();
+		expansion = (object == nullptr) ? nullptr : dynamic_cast<IExpansion *>(object.get());
 		if (expansion != nullptr){//Add entry
 			expansionMemory = memory;//Store memory reference for when memory is temporary
 			memory = expansion->add();
@@ -241,7 +242,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 int StructuredScript::Objects::Function::score_(IType::Ptr type, unsigned int index){
 	IType::Ptr target;
-	if (index < list_.size()){
+	if (index < types_.size()){
 		target = *std::next(types_.begin(), index);
 
 		auto stackedType = dynamic_cast<IStackedType *>(target.get());

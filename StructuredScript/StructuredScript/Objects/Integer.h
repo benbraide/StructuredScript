@@ -141,13 +141,14 @@ namespace StructuredScript{
 							return nullptr;
 					}
 
-					right = promote_(dynamic_cast<Primitive *>(right->base()));
+					auto rightBase = right->base();
+					right = promote_(dynamic_cast<Primitive *>(rightBase.get()));
 					if (right == nullptr){
 						return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 							"'" + value + "': Operands mismatch!", expr)));
 					}
 
-					value_ = dynamic_cast<Char *>(right->base())->value();
+					value_ = dynamic_cast<Char *>(rightBase.get())->value();
 					return ptr();
 				}
 

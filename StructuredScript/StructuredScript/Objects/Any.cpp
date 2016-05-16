@@ -13,8 +13,8 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::cast(ITyp
 	return type->isEqual(type_) ? ptr() : nullptr;
 }
 
-StructuredScript::IAny *StructuredScript::Objects::Any::base(){
-	return this;
+StructuredScript::IAny::Ptr StructuredScript::Objects::Any::base(){
+	return shared_from_this();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::Any::type(){

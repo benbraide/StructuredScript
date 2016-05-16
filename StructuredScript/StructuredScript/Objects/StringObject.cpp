@@ -17,7 +17,8 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::evalua
 	if (value != "[]")
 		return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
-	if (dynamic_cast<IInteger *>(right->base()) == nullptr){
+	auto rightBase = right->base();
+	if (dynamic_cast<IInteger *>(rightBase.get()) == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 			"'[]': Expected index to be an integral value!", expr)));
 	}
@@ -127,7 +128,8 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	}
 
 	type->addExternalCall("at", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -143,18 +145,27 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("append", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
 		}
 
-		string->value_.append(dynamic_cast<String *>(storage->findMemory("value")->object()->base())->value_);
+		auto valueBase = storage->findMemory("value")->object()->base();
+		auto value = dynamic_cast<String *>(valueBase.get());
+		if (value == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Error while calling function!", expr)));
+		}
+
+		string->value_.append(value->value_);
 		return string->ptr();
 	});
 
 	type->addExternalCall("insert", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -166,12 +177,20 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 				Query::ExceptionManager::combine("Index is out of bounds!", expr)));
 		}
 
-		string->value_.insert(index, dynamic_cast<String *>(storage->findMemory("value")->object()->base())->value_);
+		auto valueBase = storage->findMemory("value")->object()->base();
+		auto value = dynamic_cast<String *>(valueBase.get());
+		if (value == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Error while calling function!", expr)));
+		}
+
+		string->value_.insert(index, value->value_);
 		return string->ptr();
 	});
 
 	type->addExternalCall("erase", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -188,7 +207,8 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("clear", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -199,7 +219,8 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("substr", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -215,7 +236,8 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("find", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -227,11 +249,19 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 				Query::ExceptionManager::combine("Offset is out of bounds!", expr)));
 		}
 
-		return PrimitiveFactory::createUInt(string->value_.find(dynamic_cast<String *>(storage->findMemory("value")->object()->base())->value_, offset));
+		auto valueBase = storage->findMemory("value")->object()->base();
+		auto value = dynamic_cast<String *>(valueBase.get());
+		if (value == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Error while calling function!", expr)));
+		}
+
+		return PrimitiveFactory::createUInt(string->value_.find(value->value_, offset));
 	});
 
 	type->addExternalCall("find_last", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto string = dynamic_cast<String *>(Query::Object::getObjectInStorage(storage)->base());
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -243,6 +273,13 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 				Query::ExceptionManager::combine("Offset is out of bounds!", expr)));
 		}
 
-		return PrimitiveFactory::createUInt(string->value_.find_last_of(dynamic_cast<String *>(storage->findMemory("value")->object()->base())->value_, offset));
+		auto valueBase = storage->findMemory("value")->object()->base();
+		auto value = dynamic_cast<String *>(valueBase.get());
+		if (value == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Error while calling function!", expr)));
+		}
+
+		return PrimitiveFactory::createUInt(string->value_.find_last_of(value->value_, offset));
 	});
 }

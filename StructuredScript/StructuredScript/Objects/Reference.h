@@ -22,7 +22,7 @@ namespace StructuredScript{
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual IAny *base() override;
+			virtual Ptr base() override;
 
 			virtual IType::Ptr type() override;
 

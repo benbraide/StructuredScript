@@ -25,12 +25,13 @@ namespace StructuredScript{
 				if (value != "[]")
 					return Primitive::evaluateBinary(value, right, storage, exception, expr);
 
-				if (dynamic_cast<IInteger *>(right->base()) == nullptr){
+				auto rightBase = right->base();
+				if (dynamic_cast<IInteger *>(rightBase.get()) == nullptr){
 					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 						"'[]': Expected index to be an integral value!", expr)));
 				}
 
-				auto index = getIndex(right);
+				auto index = getIndex(rightBase);
 				if (index >= sizeof value_){
 					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 						"'[]': Index is out of bounds!", expr)));
@@ -74,7 +75,8 @@ namespace StructuredScript{
 
 			template <typename TargetType, int TargetRank>
 			static bool getIndex(Ptr target, unsigned int &value){
-				auto object = dynamic_cast<TypedPrimitive<TargetType, TargetRank> *>(target->base());
+				auto targetBase = target->base();
+				auto object = dynamic_cast<TypedPrimitive<TargetType, TargetRank> *>(targetBase.get());
 				if (object != nullptr){
 					value = static_cast<unsigned int>(object->value());
 					return true;
@@ -89,7 +91,8 @@ namespace StructuredScript{
 			}
 
 			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto primitive = (right == nullptr) ? nullptr : dynamic_cast<TypedPrimitive *>(right->base());
+				auto rightBase = (right == nullptr) ? nullptr : right->base();
+				auto primitive = dynamic_cast<TypedPrimitive *>(rightBase.get());
 				if (primitive == nullptr){
 					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 						"'" + value + "': Operands mismatch!", expr)));

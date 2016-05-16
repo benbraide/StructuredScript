@@ -13,8 +13,8 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::cas
 	return type->isEqual(type_) ? ptr() : nullptr;
 }
 
-StructuredScript::IAny *StructuredScript::Objects::Primitive::base(){
-	return this;
+StructuredScript::IAny::Ptr StructuredScript::Objects::Primitive::base(){
+	return shared_from_this();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::Primitive::type(){
@@ -93,14 +93,15 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary_(const std::string &value, Ptr right, IStorage *storage,
 	IExceptionManager *exception, INode *expr){
-	auto primitive = dynamic_cast<Primitive *>(right->base());
+	auto rightBase = right->base();
+	auto primitive = dynamic_cast<Primitive *>(rightBase.get());
 	if (primitive == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 			"'" + value + "': Operands mismatch!", expr)));
 	}
 
-	auto left = prepForExpression_();
-	auto primitiveLeft = dynamic_cast<Primitive *>(left->base());
+	auto left = prepForExpression_()->base();
+	auto primitiveLeft = dynamic_cast<Primitive *>(left.get());
 	
 	if (primitive->rank() > rank())
 		return primitive->evaluate_(value, true, primitive->promote_(primitiveLeft), exception, expr);
