@@ -174,6 +174,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
+	if (value_ == "=" || value_ == "+=" || value_ == "-=" || value_ == "*=" || value_ == "/=" || value_ == "%=" || value_ == "&=" ||
+		value_ == "^=" || value_ == "|=" || value_ == "<<=" || value_ == ">>="){//Assignment
+		return leftValue->assign(value_, rightValue, storage, exception, expr);
+	}
+
 	std::string value;
 	if (value_ == "===" || value_ == "!=="){//Compare types first
 		auto leftType = leftValue->type(), rightType = rightValue->type();

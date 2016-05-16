@@ -25,6 +25,8 @@ namespace StructuredScript{
 
 			virtual Ptr base() = 0;
 
+			virtual Ptr assign(const std::string &value, Ptr right, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
 			virtual Type::Ptr type() = 0;
 
 			virtual void setMemory(Memory *memory) = 0;

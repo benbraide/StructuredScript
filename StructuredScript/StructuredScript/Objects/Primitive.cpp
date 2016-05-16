@@ -17,6 +17,24 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Primitive::base(){
 	return shared_from_this();
 }
 
+StructuredScript::IAny::Ptr StructuredScript::Objects::Primitive::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (memory_ == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Assignment requires an lvalue object!", expr)));
+	}
+
+	if (value.size() > 1u){//Compound assignment
+		right = evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	auto memory = memory_;
+	memory->assign(right, storage, exception, expr);
+
+	return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Primitive::type(){
 	return type_;
 }
@@ -55,26 +73,20 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
 	IExceptionManager *exception, INode *expr){
-	if (value == "=" || value == "+=" || value == "-=" || value == "*=" || value == "/=" || value == "%=" || value == "&=" ||
-		value == "^=" || value == "|=" || value == "<<=" || value == ">>="){//Assignment
-		if (memory_ == nullptr){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-				"'" + value + "': Assignment requires an lvalue object!", expr)));
-		}
-
-		if (value.size() > 1u){//Compound assignment
-			right = evaluateBinary_(value.substr(0, value.size() - 1), right, storage, exception, expr);
-			if (Query::ExceptionManager::has(exception))
-				return nullptr;
-		}
-
-		auto memory = memory_;
-		memory->assign(right, storage, exception, expr);
-
-		return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
+	auto rightBase = right->base();
+	auto primitive = dynamic_cast<Primitive *>(rightBase.get());
+	if (primitive == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
 	}
 
-	return evaluateBinary_(value, right, storage, exception, expr);
+	auto left = prepForExpression_()->base();
+	auto primitiveLeft = dynamic_cast<Primitive *>(left.get());
+
+	if (primitive->rank() > rank())
+		return primitive->evaluate_(value, true, primitive->promote_(primitiveLeft), exception, expr);
+
+	return primitiveLeft->evaluate_(value, false, primitiveLeft->promote_(primitive), exception, expr);
 }
 
 int StructuredScript::Objects::Primitive::rank(){
@@ -89,24 +101,6 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 	IExceptionManager *exception, INode *expr){
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value + "': Operands mismatch!", expr)));
-}
-
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateBinary_(const std::string &value, Ptr right, IStorage *storage,
-	IExceptionManager *exception, INode *expr){
-	auto rightBase = right->base();
-	auto primitive = dynamic_cast<Primitive *>(rightBase.get());
-	if (primitive == nullptr){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-			"'" + value + "': Operands mismatch!", expr)));
-	}
-
-	auto left = prepForExpression_()->base();
-	auto primitiveLeft = dynamic_cast<Primitive *>(left.get());
-	
-	if (primitive->rank() > rank())
-		return primitive->evaluate_(value, true, primitive->promote_(primitiveLeft), exception, expr);
-
-	return primitiveLeft->evaluate_(value, false, primitiveLeft->promote_(primitive), exception, expr);
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::prepForExpression_(){

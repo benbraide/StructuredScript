@@ -132,27 +132,22 @@ namespace StructuredScript{
 				return std::string(1, value_);
 			}
 
-			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override{
-				if (value == "=" || value == "+=" || value == "-=" || value == "*=" || value == "/=" || value == "%=" || value == "&=" ||
-					value == "^=" || value == "|=" || value == "<<=" || value == ">>="){//Assignment
-					if (value.size() > 1u){//Compound assignment
-						right = Primitive::evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
-						if (Query::ExceptionManager::has(exception))
-							return nullptr;
-					}
-
-					auto rightBase = right->base();
-					right = promote_(dynamic_cast<Primitive *>(rightBase.get()));
-					if (right == nullptr){
-						return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-							"'" + value + "': Operands mismatch!", expr)));
-					}
-
-					value_ = dynamic_cast<Char *>(rightBase.get())->value();
-					return ptr();
+			virtual Ptr assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override{
+				if (value.size() > 1u){//Compound assignment
+					right = Primitive::evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
+					if (Query::ExceptionManager::has(exception))
+						return nullptr;
 				}
 
-				return Primitive::evaluateBinary_(value, right, storage, exception, expr);
+				auto rightBase = right->base();
+				right = promote_(dynamic_cast<Primitive *>(rightBase.get()));
+				if (right == nullptr){
+					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+						"'" + value + "': Operands mismatch!", expr)));
+				}
+
+				value_ = dynamic_cast<Char *>(rightBase.get())->value();
+				return ptr();
 			}
 
 		protected:
