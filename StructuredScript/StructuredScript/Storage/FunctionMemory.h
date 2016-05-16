@@ -43,6 +43,8 @@ namespace StructuredScript{
 
 			virtual Ptr find(const IFunction::TypeListType &args) override;
 
+			virtual Memory::Ptr first() override;
+
 			virtual void resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			unsigned int count() const;

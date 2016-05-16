@@ -171,8 +171,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 		if (Query::ExceptionManager::has(exception))//Failed to allocate memory
 			return nullptr;
 
-		auto object = memory->object()->base();
-		expansion = (object == nullptr) ? nullptr : dynamic_cast<IExpansion *>(object.get());
+		auto object = memory->object();
+		auto objectBase = (object == nullptr) ? nullptr : object->base();
+
+		expansion = (objectBase == nullptr) ? nullptr : dynamic_cast<IExpansion *>(objectBase.get());
 		if (expansion != nullptr){//Add entry
 			expansionMemory = memory;//Store memory reference for when memory is temporary
 			memory = expansion->add();

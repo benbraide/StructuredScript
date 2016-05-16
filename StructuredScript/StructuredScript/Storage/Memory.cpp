@@ -111,3 +111,10 @@ StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Storage::M
 StructuredScript::IStorage *StructuredScript::Storage::Memory::storage(){
 	return storage_;
 }
+
+void StructuredScript::Storage::Memory::assign(IAny::Ptr object){
+	if (value_ != nullptr)//Unbind previous
+		value_->setMemory(nullptr);
+
+	(value_ = object)->setMemory(this);
+}

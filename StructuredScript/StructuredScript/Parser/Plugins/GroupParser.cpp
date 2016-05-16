@@ -22,22 +22,28 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse(IChara
 StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse_(ICharacterWell &well, IScanner &scanner, IParser &parser,
 	IExceptionManager *exception, const std::string &symbol, bool unary){
 	if (node_ == nullptr){
-		if (unary)
-			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + symbol + "': Bad expression!"));
+		INode::Ptr value;
+		if (!unary){
+			if (!scanner.open(well, symbol[0], symbol[1]))
+				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
 
-		if (!scanner.open(well, symbol[0], symbol[1]))
-			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
+			value = parser.expression(nullptr, well, scanner, exception);
+			if (!scanner.close(well)){
+				if (Query::ExceptionManager::has(exception))
+					return nullptr;
 
-		auto value = parser.expression(nullptr, well, scanner, exception);
-		if (!scanner.close(well)){
-			if (Query::ExceptionManager::has(exception))
+				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+					"'" + symbol.substr(0, 1) + value->str() + "...': Bad expression!"));
+			}
+			else if (Query::ExceptionManager::has(exception))
 				return nullptr;
-
-			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
-				"'" + symbol.substr(0, 1) + value->str() + "...': Bad expression!"));
 		}
-		else if (Query::ExceptionManager::has(exception))
-			return nullptr;
+		else{//Empty content
+			if (symbol[0] == '(')
+				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + symbol + "': Bad expression!"));
+
+			value = std::make_shared<Nodes::EmptyNode>();
+		}
 
 		switch (symbol[0]){
 		case '('://Grouped expression
@@ -57,17 +63,18 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse_(IChar
 				"'" + node_->str() + symbol.substr(0, 1) + "': Bad expression!"));
 		}
 
-		if (unary)//Save symbol
-			scanner.save(Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, symbol));
-
 		INode::Ptr value;
 		switch (symbol[0]){
 		case '('://Function declaration | definition
+			if (unary)//Save symbol
+				scanner.save(Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, symbol));
 			value = FunctionParser(node_).parse(well, scanner, parser, exception);
 			break;
 		case '['://Array declaration
+			value = parseArray_(well, scanner, parser, exception, unary);
 			break;
 		default://Property definition
+			value = parseProperty_(well, scanner, parser, exception, unary);
 			break;
 		}
 		
@@ -102,4 +109,52 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse_(IChar
 	}
 
 	return std::make_shared<Nodes::UnaryOperatorNode>(false, symbol, node_);
+}
+
+StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parseArray_(ICharacterWell &well, IScanner &scanner, IParser &parser,
+	IExceptionManager *exception, bool unary){
+	INode::Ptr value;
+	if (!unary){
+		if (!scanner.open(well, '{', '}'))
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
+
+		value = parser.expression(nullptr, well, scanner, exception);
+		if (!scanner.close(well)){
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'{" + value->str() + "...': Bad expression!"));
+		}
+		else if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+	else//Empty content
+		value = std::make_shared<Nodes::EmptyNode>();
+
+	return nullptr;
+}
+
+StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parseProperty_(ICharacterWell &well, IScanner &scanner, IParser &parser,
+	IExceptionManager *exception, bool unary){
+	INode::Ptr value;
+	if (!unary){
+		if (!scanner.open(well, '{', '}'))
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
+
+		value = parser.expression(nullptr, well, scanner, exception);
+		if (!scanner.close(well)){
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'{" + value->str() + "...': Bad expression!"));
+		}
+		else if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+	else//Empty content
+		value = std::make_shared<Nodes::EmptyNode>();
+
+	return std::make_shared<Nodes::PropertyNode>(node_, value);
 }

@@ -9,6 +9,7 @@
 #include "../../Nodes/GroupNode.h"
 #include "../../Nodes/IndexNode.h"
 #include "../../Nodes/BlockNode.h"
+#include "../../Nodes/PropertyNode.h"
 #include "../../Nodes/DeclarationNode.h"
 
 #include "FunctionParser.h"
@@ -24,6 +25,10 @@ namespace StructuredScript{
 
 		private:
 			INode::Ptr parse_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception, const std::string &symbol, bool unary);
+
+			INode::Ptr parseArray_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception, bool unary);
+
+			INode::Ptr parseProperty_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception, bool unary);
 
 			INode::Ptr node_;
 			IOperatorInfo *info_;

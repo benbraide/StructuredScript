@@ -9,11 +9,13 @@
 #include "../Common/Factory.h"
 
 #include "../Interfaces/INode.h"
+#include "../Interfaces/Storages/IMemoryBackdoor.h"
+
 #include "MemoryState.h"
 
 namespace StructuredScript{
 	namespace Storage{
-		class Memory : public IMemory{
+		class Memory : public IMemory, public IMemoryBackdoor{
 		public:
 			Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes);
 
@@ -28,6 +30,8 @@ namespace StructuredScript{
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual IStorage *storage() override;
+
+			virtual void assign(IAny::Ptr object) override;
 
 		private:
 			IStorage *storage_;

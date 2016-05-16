@@ -29,11 +29,6 @@
 
 #include "../Objects/StringObject.h"
 
-#include "../Scanner/Scanner.h"
-#include "../Scanner/Wells/StringCharacterWell.h"
-
-#include "../Parser/Parser.h"
-
 namespace StructuredScript{
 	namespace Storage{
 		class GlobalStorage : public Storage, public IGlobalStorage{

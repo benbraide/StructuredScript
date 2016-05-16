@@ -20,6 +20,8 @@ namespace StructuredScript{
 
 			virtual Memory::Ptr find(const Function::TypeListType &args) = 0;
 
+			virtual Memory::Ptr first() = 0;
+
 			virtual void resolveArgs(Node::Ptr args, Function::ArgListType &resolved, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}

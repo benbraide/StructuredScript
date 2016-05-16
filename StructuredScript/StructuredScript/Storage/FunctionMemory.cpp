@@ -86,6 +86,10 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	return selected;
 }
 
+StructuredScript::Storage::Memory::Ptr StructuredScript::Storage::FunctionMemory::first(){
+	return list_.empty() ? nullptr : *list_.begin();
+}
+
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::TypeListType &args){
 	auto max = 0;
 	Ptr selected;

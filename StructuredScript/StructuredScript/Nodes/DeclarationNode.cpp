@@ -2,7 +2,26 @@
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto memory = allocate(storage, exception, expr);
-	return (memory == nullptr) ? nullptr : memory->object();
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	auto type = memory->type();
+	Storage::MemoryState states((type == nullptr) ? Storage::MemoryState::STATE_NONE : type->states());
+	if (states.isConstant() || states.isFinal() || states.isReference() || states.isRValReference()){
+		memory->storage()->remove(memory);//Rollback
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Declaration requires initialization!", expr)));
+	}
+
+	auto backdoor = dynamic_cast<IMemoryBackdoor *>(memory.get());
+	if (backdoor == nullptr){
+		memory->storage()->remove(memory);//Rollback
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Failed to define object!", expr)));
+	}
+
+	backdoor->assign(PrimitiveFactory::createUndefined());
+	return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::allocate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -39,7 +58,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::createMemory_(IStorage *storage, IType::Ptr type){
 	auto expandedType = dynamic_cast<IExpandedType *>(type.get());
 	if (expandedType == nullptr)
-		return std::make_shared<Storage::Memory>(storage, type, PrimitiveFactory::createUndefined(), attributes());
+		return std::make_shared<Storage::Memory>(storage, type, nullptr, attributes());
 
 	auto expansion = std::make_shared<Objects::Expansion>(dynamic_cast<IStackedType *>(expandedType)->value());
 	return std::make_shared<Storage::Memory>(storage, type, expansion, attributes());
@@ -134,7 +153,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::InitializationNode::evaluat
 	}
 
 	auto memory = declaration->allocate(storage, exception, expr);
-	if (memory == nullptr)
+	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
 	if (dynamic_cast<IFunctionMemory *>(memory.get()) != nullptr){
@@ -157,14 +176,13 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::InitializationNode::evaluat
 		return nullptr;
 	}
 
-	auto undefined = memory->object();
 	memory->assign(value, storage, exception, expr);
 	if (Query::ExceptionManager::has(exception)){
 		memory->storage()->remove(memory);//Rollback
 		return nullptr;
 	}
 
-	return undefined;
+	return PrimitiveFactory::createUndefined();
 }
 
 std::string StructuredScript::Nodes::InitializationNode::str(){

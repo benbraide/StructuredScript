@@ -1,5 +1,14 @@
 #include "StringObject.h"
 
+StructuredScript::Objects::String::String(const std::string &value) : TypedPrimitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_STRING), value){
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+	scanner.init();
+
+	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+	parser.parse(well, scanner, nullptr)->evaluate(this, nullptr, nullptr);
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return std::make_shared<String>(value_);
 }
@@ -61,10 +70,13 @@ StructuredScript::IType::Ptr StructuredScript::Objects::String::findType(const s
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Objects::String::addMemory(const std::string &name){
-	return nullptr;
+	return (name == "length" && length_ == nullptr) ? &length_ : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::String::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	if (name == "length")
+		return length_;
+
 	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
 	return (compoundType == nullptr) ? nullptr : compoundType->findMemberMemory(name, searchScope);
 }
@@ -282,4 +294,58 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 
 		return PrimitiveFactory::createUInt(string->value_.find_last_of(value->value_, offset));
 	});
+
+	type->addExternalCall("length.get", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
+		if (string == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Bad member function call!", expr)));
+		}
+
+		return PrimitiveFactory::createUInt(string->value_.size());
+	});
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::String::promote_(Primitive *target){
+	switch (target->rank()){
+	case Primitive::CHAR_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::CHAR_RANK>::type *>(target)->value()));
+	case Primitive::UCHAR_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::UCHAR_RANK>::type *>(target)->value()));
+	case Primitive::SHORT_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::SHORT_RANK>::type *>(target)->value()));
+	case Primitive::USHORT_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::USHORT_RANK>::type *>(target)->value()));
+	case Primitive::INT_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::INT_RANK>::type *>(target)->value()));
+	case Primitive::UINT_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::UINT_RANK>::type *>(target)->value()));
+	case Primitive::LONG_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::LONG_RANK>::type *>(target)->value()));
+	case Primitive::ULONG_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::ULONG_RANK>::type *>(target)->value()));
+	case Primitive::LLONG_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::LLONG_RANK>::type *>(target)->value()));
+	case Primitive::ULLONG_RANK:
+		return std::make_shared<String>(std::to_string(dynamic_cast<PrimitiveType<Primitive::ULLONG_RANK>::type *>(target)->value()));
+	case Primitive::FLOAT_RANK:
+		return std::make_shared<String>(Float::toString(dynamic_cast<PrimitiveType<Primitive::FLOAT_RANK>::type *>(target)->value()));
+	case Primitive::DOUBLE_RANK:
+		return std::make_shared<String>(Double::toString(dynamic_cast<PrimitiveType<Primitive::DOUBLE_RANK>::type *>(target)->value()));
+	case Primitive::LDOUBLE_RANK:
+		return std::make_shared<String>(LDouble::toString(dynamic_cast<PrimitiveType<Primitive::LDOUBLE_RANK>::type *>(target)->value()));
+	default:
+		break;
+	}
+
+	return nullptr;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::String::evaluate_(const std::string &value, TypedPrimitive *left, TypedPrimitive *right, IExceptionManager *exception, INode *expr){
+	auto leftBase = left->base(), rightBase = right->base();
+	if (value == "+")
+		return std::make_shared<String>(dynamic_cast<String *>(leftBase.get())->value_ + dynamic_cast<String *>(rightBase.get())->value_);
+
+	return TypedPrimitive::evaluate_(value, left, right, exception, expr);
 }
