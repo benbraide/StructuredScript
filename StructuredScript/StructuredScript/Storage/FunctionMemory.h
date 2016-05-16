@@ -39,6 +39,8 @@ namespace StructuredScript{
 
 			virtual Ptr add(IAny::Ptr function, IMemoryAttributes::Ptr attributes) override;
 
+			virtual bool remove(Memory::Ptr function) override;
+
 			virtual Ptr find(const IFunction::ArgListType &args) override;
 
 			virtual Ptr find(const IFunction::TypeListType &args) override;

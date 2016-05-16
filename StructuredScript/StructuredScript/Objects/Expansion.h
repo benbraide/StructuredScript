@@ -3,7 +3,7 @@
 #ifndef STRUCTURED_SCRIPT_EXPANSION_OBJECT_H
 #define STRUCTURED_SCRIPT_EXPANSION_OBJECT_H
 
-#include <list>
+#include <vector>
 
 #include "Primitive.h"
 #include "../Storage/Memory.h"
@@ -12,10 +12,9 @@ namespace StructuredScript{
 	namespace Objects{
 		class Expansion : public Primitive, public IExpansion{
 		public:
-			typedef std::list<IMemory::Ptr> MemoryListType;
+			typedef std::vector<IMemory::Ptr> MemoryListType;
 
-			Expansion(IType::Ptr type)
-				: Primitive(type){}
+			Expansion(IType::Ptr type);
 
 			virtual void expand(IFunction::ArgListType &args) override;
 

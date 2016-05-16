@@ -6,6 +6,7 @@
 #include "Any.h"
 #include "../Common/ExceptionManager.h"
 #include "../Interfaces/Storages/IFunctionMemory.h"
+#include "../Nodes/OperatorNode.h"
 
 namespace StructuredScript{
 	namespace Objects{
@@ -20,6 +21,8 @@ namespace StructuredScript{
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr base() override;
+
+			virtual Ptr assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual IType::Ptr type() override;
 

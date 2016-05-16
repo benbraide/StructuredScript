@@ -30,11 +30,11 @@ std::string StructuredScript::Objects::Bit::str(IStorage *storage, IExceptionMan
 	return value_ ? "bit::one" : "bit::zero";
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Bit::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Bit::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (value == "~")
 		return std::make_shared<Bit>(!value_);
 
-	return TypedPrimitive::evaluateLeftUnary(value, exception, expr);
+	return TypedPrimitive::evaluateLeftUnary(value, storage, exception, expr);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Bit::evaluate_(const std::string &value, TypedPrimitive *left, TypedPrimitive *right, IExceptionManager *exception, INode *expr){

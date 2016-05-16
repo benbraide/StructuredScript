@@ -37,7 +37,7 @@ std::string StructuredScript::Objects::IndexObject::str(IStorage *storage, IExce
 	return target->getIndexValue(value_)->str(storage, exception, expr);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto objectBase = memory_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
@@ -46,10 +46,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 	}
 
 	auto indexValue = target->getIndexValue(value_)->base();
-	return dynamic_cast<IPrimitiveObject *>(indexValue.get())->evaluateLeftUnary(value, exception, expr);
+	return indexValue->evaluateLeftUnary(value, storage, exception, expr);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto objectBase = memory_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
@@ -58,7 +58,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 	}
 
 	auto indexValue = target->getIndexValue(value_)->base();
-	return dynamic_cast<IPrimitiveObject *>(indexValue.get())->evaluateRightUnary(value, exception, expr);
+	return indexValue->evaluateRightUnary(value, storage, exception, expr);
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
@@ -71,7 +71,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 	}
 
 	auto indexValue = target->getIndexValue(value_)->base();
-	return dynamic_cast<IPrimitiveObject *>(indexValue.get())->evaluateBinary(value, right, storage, exception, expr);
+	return indexValue->evaluateBinary(value, right, storage, exception, expr);
 }
 
 int StructuredScript::Objects::IndexObject::rank(){

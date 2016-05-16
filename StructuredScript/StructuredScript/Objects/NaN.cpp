@@ -12,21 +12,21 @@ std::string StructuredScript::Objects::NaN::str(IStorage *storage, IExceptionMan
 	return "NaN";
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (value == "+" || value == "-" || value == "~")
 		return std::make_shared<NaN>();
 
 	if (value == "++" || value == "--")
 		return (memory_ == nullptr) ? nullptr : std::make_shared<NaN>();
 
-	return Primitive::evaluateLeftUnary(value, exception, expr);
+	return Primitive::evaluateLeftUnary(value, storage, exception, expr);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (value == "++" || value == "--")
 		return (memory_ == nullptr) ? nullptr : std::make_shared<NaN>();
 
-	return Primitive::evaluateRightUnary(value, exception, expr);
+	return Primitive::evaluateRightUnary(value, storage, exception, expr);
 }
 
 int StructuredScript::Objects::NaN::rank(){

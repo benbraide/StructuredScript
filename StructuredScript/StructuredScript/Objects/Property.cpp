@@ -34,6 +34,27 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::base
 	return (get_ == nullptr) ? nullptr : get_->call({}, memory_->storage(), &xManager, nullptr);
 }
 
+StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (set_ == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Property has no setter!", expr)));
+	}
+
+	if (value.size() > 1u){//Compound assignment
+		auto left = base();
+		if (left == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Property has no getter!", expr)));
+		}
+
+		right = left->evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	return set_->call(IFunction::ArgListType{ right }, memory_->storage(), exception, expr);
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Property::type(){
 	auto target = base();
 	return (target == nullptr) ? nullptr : target->type();

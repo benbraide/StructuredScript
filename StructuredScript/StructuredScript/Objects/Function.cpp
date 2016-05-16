@@ -58,6 +58,14 @@ bool StructuredScript::Objects::Function::init(IStorage *storage, IExceptionMana
 	else//Empty parameter list
 		limits_ = { 0, 0 };
 
+	auto storageType = dynamic_cast<IType *>(storage);
+	if (storageType != nullptr){
+		owner_ = storageType->ptr();
+		++limits_.first;
+		if (limits_.second != -1)
+			++limits_.second;
+	}
+
 	return true;
 }
 
@@ -96,8 +104,26 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 	auto total = 0;
 	unsigned int index = 0;
 
-	for (auto arg : args){
-		auto type = arg->type();
+	auto arg = args.begin();
+	if (owner_ != nullptr){//Compare first argument with owner type
+		auto type = (*arg)->type();
+		if (type == nullptr)//Type expected
+			return 0;
+
+		if (owner_->isEqual(type))
+			total = 3;
+
+		if (type->isParent(owner_))
+			total = 2;
+
+		if (owner_->isCompatibleWith(type))
+			total = 1;
+
+		return 0;
+	}
+
+	for (; arg != args.end(); ++arg){
+		auto type = (*arg)->type();
 		if (type == nullptr)//Type expected
 			return 0;
 
@@ -121,8 +147,26 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 	auto total = 0;
 	unsigned int index = 0;
 
-	for (auto type : args){
-		auto score = score_(type, index++);
+	auto arg = args.begin();
+	if (owner_ != nullptr){//Compare first argument with owner type
+		auto type = *arg;
+		if (type == nullptr)//Type expected
+			return 0;
+
+		if (owner_->isEqual(type))
+			total = 3;
+
+		if (type->isParent(owner_))
+			total = 2;
+
+		if (owner_->isCompatibleWith(type))
+			total = 1;
+
+		return 0;
+	}
+
+	for (; arg != args.end(); ++arg){
+		auto score = score_(*arg, index++);
 		if (score < 1)
 			return 0;
 

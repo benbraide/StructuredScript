@@ -20,21 +20,21 @@ namespace StructuredScript{
 				return std::to_string(value_);
 			}
 
-			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override{
+			virtual Ptr evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override{
 				if (value == "~")
 					return std::make_shared<ObjectType>(~value_);
 
 				if (value == "++" || value == "--")
 					return step_(value[0] == '+', false, exception, expr);
 
-				return BaseType::evaluateLeftUnary(value, exception, expr);
+				return BaseType::evaluateLeftUnary(value, storage, exception, expr);
 			}
 
-			virtual Ptr evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr) override{
+			virtual Ptr evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override{
 				if (value == "++" || value == "--")
 					return step_(value[0] == '+', true, exception, expr);
 
-				return BaseType::evaluateRightUnary(value, exception, expr);
+				return BaseType::evaluateRightUnary(value, storage, exception, expr);
 			}
 
 		protected:
@@ -92,14 +92,14 @@ namespace StructuredScript{
 			explicit SignedInteger(ValueType value)
 				: BaseType(value){}
 
-			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override{
+			virtual Ptr evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override{
 				if (value == "+")
 					return std::make_shared<ObjectType>(value_);
 
 				if (value == "-")
 					return std::make_shared<ObjectType>(-value_);
 
-				return BaseType::evaluateLeftUnary(value, exception, expr);
+				return BaseType::evaluateLeftUnary(value, storage, exception, expr);
 			}
 		};
 

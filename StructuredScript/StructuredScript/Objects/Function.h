@@ -36,6 +36,8 @@ namespace StructuredScript{
 			int score_(IType::Ptr type, unsigned int index);
 
 			IType::Ptr type_;
+			IType::Ptr owner_;
+
 			INode::Ptr parameters_;
 			INode::Ptr definition_;
 

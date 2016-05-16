@@ -16,6 +16,8 @@ namespace StructuredScript{
 
 			virtual Memory::Ptr add(Any::Ptr function, MemoryAttributes::Ptr attributes) = 0;
 
+			virtual bool remove(Memory::Ptr function) = 0;
+
 			virtual Memory::Ptr find(const Function::ArgListType &args) = 0;
 
 			virtual Memory::Ptr find(const Function::TypeListType &args) = 0;

@@ -20,6 +20,18 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Reference::assign(const s
 	return value_->object()->assign(value, right, storage, exception, expr);
 }
 
+StructuredScript::IAny::Ptr StructuredScript::Objects::Reference::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return value_->object()->evaluateLeftUnary(value, storage, exception, expr);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Reference::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return value_->object()->evaluateRightUnary(value, storage, exception, expr);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Reference::evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return value_->object()->evaluateBinary(value, right, storage, exception, expr);
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Reference::type(){
 	return value_->object()->type();
 }

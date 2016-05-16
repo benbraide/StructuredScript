@@ -61,12 +61,12 @@ std::string StructuredScript::Objects::Primitive::str(IStorage *storage, IExcept
 	return "";
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value + "': Operands mismatch!", expr)));
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value + "': Operands mismatch!", expr)));
 }

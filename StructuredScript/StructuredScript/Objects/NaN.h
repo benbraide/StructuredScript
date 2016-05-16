@@ -21,9 +21,9 @@ namespace StructuredScript{
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr evaluateRightUnary(const std::string &value, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual int rank() override;
 

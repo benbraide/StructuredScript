@@ -70,6 +70,17 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IA
 	return *list_.rbegin();
 }
 
+bool StructuredScript::Storage::FunctionMemory::remove(Memory::Ptr function){
+	for (auto item = list_.begin(); item != list_.end(); ++item){
+		if (*item == function){
+			list_.erase(item);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::ArgListType &args){
 	auto max = 0;
 	Ptr selected;

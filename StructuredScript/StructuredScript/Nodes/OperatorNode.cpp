@@ -56,13 +56,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (left_ && value_ == "!")
 		return PrimitiveFactory::createBool(!value->truth(storage, exception, expr));
 
-	auto valueBase = value->base();
-	auto primitive = dynamic_cast<IPrimitiveObject *>(valueBase.get());
-	if (primitive != nullptr)
-		return left_ ? primitive->evaluateLeftUnary(value_, exception, expr) : primitive->evaluateRightUnary(value_, exception, expr);
-
-	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-		"'" + value_ + "': Operand mismatch!", expr)));
+	return left_ ? value->evaluateLeftUnary(value_, storage, exception, expr) : value->evaluateRightUnary(value_, storage, exception, expr);
 }
 
 std::string StructuredScript::Nodes::UnaryOperatorNode::str(){
@@ -190,12 +184,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 	else
 		value = value_;
 
-	auto primitive = dynamic_cast<IPrimitiveObject *>(leftValueBase.get());
-	if (primitive != nullptr)
-		return primitive->evaluateBinary(value, rightValue, storage, exception, expr);
-
-	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-		"'" + value_ + "': Operand mismatch!", expr)));
+	return leftValue->assign(value, rightValue, storage, exception, expr);
 }
 
 std::string StructuredScript::Nodes::BinaryOperatorNode::str(){

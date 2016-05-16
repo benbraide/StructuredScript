@@ -27,7 +27,11 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse_(IChar
 			if (!scanner.open(well, symbol[0], symbol[1]))
 				return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
 
-			value = parser.expression(nullptr, well, scanner, exception);
+			if (symbol[0] == '{')
+				value = parser.parse(well, scanner, exception);
+			else
+				value = parser.expression(nullptr, well, scanner, exception);
+
 			if (!scanner.close(well)){
 				if (Query::ExceptionManager::has(exception))
 					return nullptr;
@@ -142,7 +146,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parsePropert
 		if (!scanner.open(well, '{', '}'))
 			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("Unexpected error!"));
 
-		value = parser.expression(nullptr, well, scanner, exception);
+		value = parser.parse(well, scanner, exception);
 		if (!scanner.close(well)){
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;

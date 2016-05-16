@@ -27,6 +27,12 @@ namespace StructuredScript{
 
 			virtual Ptr assign(const std::string &value, Ptr right, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
+			virtual Ptr evaluateLeftUnary(const std::string &value, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual Ptr evaluateRightUnary(const std::string &value, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
 			virtual Type::Ptr type() = 0;
 
 			virtual void setMemory(Memory *memory) = 0;

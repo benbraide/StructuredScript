@@ -52,11 +52,11 @@ std::string StructuredScript::Objects::Byte::str(IStorage *storage, IExceptionMa
 	return ("0b" + value);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluateLeftUnary(const std::string &value, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (value == "~")
 		return std::make_shared<Byte>(~value_);
 
-	return TypedPrimitive::evaluateLeftUnary(value, exception, expr);
+	return TypedPrimitive::evaluateLeftUnary(value, storage, exception, expr);
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
