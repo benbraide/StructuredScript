@@ -10,12 +10,18 @@ namespace StructuredScript{
 		class BlockNode{
 		public:
 			virtual ~BlockNode(){}
+		};
+
+		class PlainBlockNode{
+		public:
+			virtual ~PlainBlockNode(){}
 
 			virtual Node::Ptr value() = 0;
 		};
 	}
 
-	typedef Interfaces::BlockNode IBlockNode;
+	typedef Interfaces::BlockNode		IBlockNode;
+	typedef Interfaces::PlainBlockNode	IPlainBlockNode;
 }
 
 #endif /* !STRUCTURED_SCRIPT_BLOCK_NODE_INTERFACE_H */

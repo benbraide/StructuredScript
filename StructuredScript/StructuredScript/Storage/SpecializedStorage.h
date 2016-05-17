@@ -42,6 +42,8 @@ namespace StructuredScript{
 
 			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
+			virtual ExternalCallType findExternalCall(const std::string &name) override;
+
 			virtual bool remove(IMemory::Ptr target) override;
 
 		private:

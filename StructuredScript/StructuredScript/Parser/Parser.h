@@ -16,6 +16,8 @@
 #include "Plugins/SourceParser.h"
 #include "Plugins/ExpressionParser.h"
 #include "Plugins/AtSymbolParser.h"
+#include "Plugins/SelectionParser.h"
+#include "Plugins/ConditionalParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"
@@ -25,6 +27,7 @@
 #include "../Nodes/EmptyNode.h"
 #include "../Nodes/IdentifierNode.h"
 #include "../Nodes/InterruptNode.h"
+#include "../Nodes/EchoNode.h"
 
 #include "../Storage/MemoryAttributes.h"
 
@@ -47,8 +50,7 @@ namespace StructuredScript{
 			static OperatorInfo operatorInfo;
 
 		private:
-			Scanner::Plugins::SignedNumber signedNumber_;
-
+			static Scanner::Plugins::SignedNumber signedNumber_;
 			static PluginListType plugins_;
 		};
 	}

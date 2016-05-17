@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "CppUnitLite/TestHarness.h"
 
 #include "Storage/GlobalStorage.h"
@@ -40,25 +38,12 @@ int main(){
 			continue;
 		}
 
-		auto value = node->evaluate(&globalStorage, &xManager, nullptr);
+		node->evaluate(&globalStorage, &xManager, nullptr);
 		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
 			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
 			xManager.clear();
 			continue;
 		}
-
-		std::cout << node->str() << "\n";
-		if (value != nullptr){
-			auto str = value->str(nullptr, &xManager, nullptr);
-			if (StructuredScript::Query::ExceptionManager::has(&xManager)){
-				std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
-				xManager.clear();
-			}
-			else
-				std::cout << str << "\n";
-		}
-		else
-			std::cout << "Error!\n";
 	}
 
 	return 0;

@@ -66,6 +66,11 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Storage::SharedStorage
 	return (value == nullptr) ? then_->findMemoryAttribute(name, searchScope) : value;
 }
 
+StructuredScript::Storage::SharedStorage::ExternalCallType StructuredScript::Storage::SharedStorage::findExternalCall(const std::string &name){
+	auto value = first_->findExternalCall(name);
+	return (value == nullptr) ? then_->findExternalCall(name) : value;
+}
+
 bool StructuredScript::Storage::SharedStorage::remove(IMemory::Ptr target){
 	return first_->remove(target);
 }

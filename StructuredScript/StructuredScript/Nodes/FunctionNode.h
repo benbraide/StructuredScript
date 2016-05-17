@@ -49,7 +49,7 @@ namespace StructuredScript{
 			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 		};
 
-		class FunctionDefinitionNode : public FunctionNode, public IFunctionDefinitionNode{
+		class FunctionDefinitionNode : public FunctionNode, public IFunctionDefinitionNode, public IBlockNode{
 		public:
 			FunctionDefinitionNode(Ptr declaration, Ptr parameters, Ptr definition)
 				: FunctionNode(declaration, parameters), definition_(definition){}

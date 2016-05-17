@@ -1,17 +1,23 @@
 #pragma once
 
-#ifndef STRUCTURED_SCRIPT_BLOCK_NODE_H
-#define STRUCTURED_SCRIPT_BLOCK_NODE_H
+#ifndef STRUCTURED_SCRIPT_ECHO_NODE_H
+#define STRUCTURED_SCRIPT_ECHO_NODE_H
+
+#include <iostream>
 
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
+#include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
+
+#include "../Objects/Integer.h"
+#include "../Objects/Real.h"
 
 namespace StructuredScript{
 	namespace Nodes{
-		class BlockNode : public INode, public IPlainBlockNode, public IBlockNode{
+		class EchoNode : public INode{
 		public:
-			explicit BlockNode(Ptr value)
+			explicit EchoNode(Ptr value)
 				: value_(value){}
 
 			virtual Ptr ptr() override;
@@ -22,17 +28,14 @@ namespace StructuredScript{
 
 			virtual std::string str() override;
 
-			virtual Ptr value() override;
-
 			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
 
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 		private:
 			Ptr value_;
-			IMemoryAttributes::Ptr attributes_;
 		};
 	}
 }
 
-#endif /* !STRUCTURED_SCRIPT_BLOCK_NODE_H */
+#endif /* !STRUCTURED_SCRIPT_ECHO_NODE_H */

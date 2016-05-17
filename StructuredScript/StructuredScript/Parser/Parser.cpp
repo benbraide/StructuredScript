@@ -228,6 +228,14 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	}
 
 	if (info->first.isBinary()){
+		if (value == "?"){//Conditional operator
+			node = ConditionalParser(node).parse(well, scanner, *this, exception);
+			if (Query::ExceptionManager::has(exception))
+				return node;
+
+			return expression(node, well, scanner, exception, precedence, validator);
+		}
+
 		auto right = expression(nullptr, well, scanner, exception, info->second.precedence, validator);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
@@ -247,11 +255,19 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 
 void StructuredScript::Parser::Parser::init(){
 	plugins_["typename"] = std::make_shared<TypenameParser>();
+
+	plugins_["if"] = std::make_shared<SelectionParser>("if");
+	plugins_["unless"] = std::make_shared<SelectionParser>("unless");
+	plugins_["else"] = std::make_shared<SelectionParser>("else");
+
 	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true> >("return");
+	plugins_["echo"] = std::make_shared< SourceParser<Nodes::EchoNode, false> >("echo");
 
 	operatorInfo.init();
 }
 
 StructuredScript::OperatorInfo StructuredScript::Parser::Parser::operatorInfo;
+
+StructuredScript::Scanner::Plugins::SignedNumber StructuredScript::Parser::Parser::signedNumber_;
 
 StructuredScript::Parser::Parser::PluginListType StructuredScript::Parser::Parser::plugins_;
