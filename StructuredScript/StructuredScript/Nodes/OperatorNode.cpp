@@ -59,6 +59,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
+	if (value_ == ";")
+		return PrimitiveFactory::createUndefined();
+
 	if (left_ && value_ == "!")
 		return PrimitiveFactory::createBool(!value->truth(storage, exception, expr));
 
@@ -196,6 +199,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 
 	if (value_ == "&&" && !leftValue->truth(storage, exception, expr))//Short-circuit evaluation
 		return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createBool(false);
+
+	if (value_ == ";"){
+		rightOperand_->evaluate(storage, exception, expr);
+		return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createUndefined();
+	}
 
 	auto leftValueBase = leftValue->base();
 	if (value_ == "."){//Member access -- don't evaluate right operand

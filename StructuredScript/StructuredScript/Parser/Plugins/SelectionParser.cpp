@@ -26,7 +26,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::SelectionParser::parse(IC
 		if (scanner.peek(well, { &signedNumber_ }).value() == "else"){
 			scanner.next(well);//Ignore
 
-			auto elseNode = SelectionParser("else").parse(well, scanner, parser, exception);
+			auto elseNode = SelectionParser("else", true).parse(well, scanner, parser, exception);
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;
 
@@ -40,6 +40,11 @@ StructuredScript::INode::Ptr StructuredScript::Parser::SelectionParser::parse(IC
 			return std::make_shared<Nodes::IfNode>(predicate, value);
 
 		return std::make_shared<Nodes::UnlessNode>(predicate, value);
+	}
+
+	if (!matched_){
+		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+			"'else': Found without matching control block!"));
 	}
 	
 	auto value = parseValue_(nullptr, well, scanner, parser, exception);

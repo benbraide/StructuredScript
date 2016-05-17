@@ -260,8 +260,13 @@ void StructuredScript::Parser::Parser::init(){
 	plugins_["unless"] = std::make_shared<SelectionParser>("unless");
 	plugins_["else"] = std::make_shared<SelectionParser>("else");
 
-	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true> >("return");
-	plugins_["echo"] = std::make_shared< SourceParser<Nodes::EchoNode, false> >("echo");
+	plugins_["do"] = std::make_shared<IterationParser>("do");
+	plugins_["while"] = std::make_shared<IterationParser>("while");
+	plugins_["for"] = std::make_shared<IterationParser>("for");
+
+	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true, false> >("return");
+	plugins_["echo"] = std::make_shared< SourceParser<Nodes::EchoNode, false, false> >("echo");
+	plugins_["throw"] = std::make_shared< SourceParser<Nodes::ThrowNode, true, false> >("throw");
 
 	operatorInfo.init();
 }

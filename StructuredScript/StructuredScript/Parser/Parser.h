@@ -18,6 +18,7 @@
 #include "Plugins/AtSymbolParser.h"
 #include "Plugins/SelectionParser.h"
 #include "Plugins/ConditionalParser.h"
+#include "Plugins/IterationParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"
@@ -28,6 +29,7 @@
 #include "../Nodes/IdentifierNode.h"
 #include "../Nodes/InterruptNode.h"
 #include "../Nodes/EchoNode.h"
+#include "../Nodes/ThrowNode.h"
 
 #include "../Storage/MemoryAttributes.h"
 

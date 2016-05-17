@@ -25,8 +25,14 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumbe
 }
 
 bool StructuredScript::Scanner::Plugins::SignedNumber::matches(const ICharacterWell &well) const{
-	auto next = well.peek();
-	return (next == '+' || next == '-');
+	auto next = well.peek(2);
+	if (next.empty() || (next[0] != '+' && next[0] != '-'))
+		return false;
+
+	if (next.size() == 1u)
+		return true;
+
+	return (::ispunct(next[1]) == 0);
 }
 
 StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::SignedNumber::type() const{

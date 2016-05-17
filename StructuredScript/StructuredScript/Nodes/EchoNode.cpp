@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::EchoNode::ptr()
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::EchoNode::clone(){
-	return std::make_shared<EchoNode>(value_);
+	return std::make_shared<EchoNode>(value_->clone());
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::EchoNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){

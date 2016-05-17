@@ -11,8 +11,8 @@ namespace StructuredScript{
 	namespace Parser{
 		class SelectionParser : public IParserPlugin{
 		public:
-			explicit SelectionParser(const std::string &name)
-				: name_(name){}
+			SelectionParser(const std::string &name, bool matched = false)
+				: name_(name), matched_(matched){}
 
 			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception) override;
 
@@ -20,6 +20,7 @@ namespace StructuredScript{
 			INode::Ptr parseValue_(INode::Ptr predicate, ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception);
 
 			std::string name_;
+			bool matched_;
 
 			static Scanner::Plugins::SignedNumber signedNumber_;
 		};

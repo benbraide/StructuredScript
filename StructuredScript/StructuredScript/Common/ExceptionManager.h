@@ -12,6 +12,10 @@ namespace StructuredScript{
 
 		virtual void clear() override;
 
+		virtual void suppress() override;
+
+		virtual bool unsuppress() override;
+
 		virtual void set(IAny::Ptr exception) override;
 
 		virtual void setOnce() override;
@@ -44,6 +48,7 @@ namespace StructuredScript{
 		static const unsigned short RETURN		= 0x0003;
 		static const unsigned short BREAK		= 0x0004;
 		static const unsigned short CONTINUE	= 0x0005;
+		static const unsigned short SUPPRESSED	= 0x0006;
 
 	private:
 		IAny::Ptr exception_;

@@ -5,6 +5,20 @@ void StructuredScript::ExceptionManager::clear(){
 	code_ = NONE;
 }
 
+void StructuredScript::ExceptionManager::suppress(){
+	if (exception_ != nullptr && code_ == NONE)
+		code_ = SUPPRESSED;
+}
+
+bool StructuredScript::ExceptionManager::unsuppress(){
+	if (code_ == SUPPRESSED){
+		code_ = NONE;
+		return true;
+	}
+
+	return false;
+}
+
 void StructuredScript::ExceptionManager::set(IAny::Ptr exception){
 	exception_ = exception;
 }
@@ -36,7 +50,7 @@ StructuredScript::IAny::Ptr StructuredScript::ExceptionManager::get() const{
 }
 
 bool StructuredScript::ExceptionManager::has() const{
-	return (exception_ != nullptr || code_ != NONE);
+	return (exception_ != nullptr || (code_ != NONE && code_ != SUPPRESSED));
 }
 
 bool StructuredScript::ExceptionManager::hasOnce() const{

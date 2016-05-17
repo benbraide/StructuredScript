@@ -15,6 +15,10 @@ namespace StructuredScript{
 
 			virtual void clear() = 0;
 
+			virtual void suppress() = 0;
+
+			virtual bool unsuppress() = 0;
+
 			virtual void set(Any::Ptr exception) = 0;
 
 			virtual void setOnce() = 0;
