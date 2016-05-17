@@ -69,6 +69,7 @@ namespace StructuredScript{
 			virtual IAny::Ptr evaluate_(const std::string &value, TypedPrimitive *left, TypedPrimitive *right, IExceptionManager *exception, INode *expr) override;
 
 			IMemory::Ptr length_;
+			static INode::Ptr lengthNode_;
 		};
 	}
 }

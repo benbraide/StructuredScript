@@ -21,6 +21,10 @@ namespace StructuredScript{
 
 			Expansion(IType::Ptr type);
 
+			virtual Ptr assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
 			virtual IStorage *parent() override;
 
 			virtual std::shared_ptr<IStorage> *addStorage(const std::string &name) override;
@@ -63,6 +67,7 @@ namespace StructuredScript{
 			IMemory::Ptr length_;
 			MemoryListType entries_;
 
+			static INode::Ptr lengthNode_;
 			static ExternalCallType lengthCallback_;
 		};
 	}

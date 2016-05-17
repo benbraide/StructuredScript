@@ -2,12 +2,32 @@
 
 StructuredScript::Objects::Expansion::Expansion(IType::Ptr type)
 	: Primitive(type){
-	Parser::Parser parser;
-	Scanner::Scanner scanner;
-	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+	lengthNode_->evaluate(this, nullptr, nullptr);
+}
 
-	scanner.init();
-	parser.parse(well, scanner, nullptr)->evaluate(this, nullptr, nullptr);
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Expansion::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+		Query::ExceptionManager::combine("Cannot assign to an expansion object!", expr)));
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Expansion::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
+	IExceptionManager *exception, INode *expr){
+	if (value != "[]")
+		return Primitive::evaluateBinary(value, right, storage, exception, expr);
+
+	auto rightBase = right->base();
+	if (dynamic_cast<IInteger *>(rightBase.get()) == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'[]': Expected index to be an integral value!", expr)));
+	}
+
+	auto index = Query::Object::getIndex(right);
+	if (index >= entries_.size()){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Index is out of bounds!", expr)));
+	}
+
+	return entries_[index]->object();
 }
 
 StructuredScript::IStorage *StructuredScript::Objects::Expansion::parent(){
@@ -86,6 +106,12 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::add(){
 }
 
 void StructuredScript::Objects::Expansion::init(){
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+
+	lengthNode_ = parser.parse(well, scanner, nullptr);
+
 	lengthCallback_ = [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
 		auto exspansion = dynamic_cast<Expansion *>(storageBase.get());
@@ -97,5 +123,7 @@ void StructuredScript::Objects::Expansion::init(){
 		return PrimitiveFactory::createUInt(exspansion->entries_.size());
 	};
 }
+
+StructuredScript::INode::Ptr StructuredScript::Objects::Expansion::lengthNode_;
 
 StructuredScript::Objects::Expansion::ExternalCallType StructuredScript::Objects::Expansion::lengthCallback_;

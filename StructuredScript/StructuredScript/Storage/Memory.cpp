@@ -28,6 +28,13 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 		return;
 	}
 
+	if (Query::Object::isUndefined(object) || Query::Object::isExpansion(object) || Query::Object::isExpanded(object)){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Cannot assign an invalid object!", expr)));
+
+		return;
+	}
+
 	auto type = object->type();
 	if (type == nullptr){//Expected type
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(

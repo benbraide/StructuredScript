@@ -1,15 +1,5 @@
 #include "Scanner.h"
 
-void StructuredScript::Scanner::Scanner::init(){
-	plugins_.clear();
-
-	plugins_.push_back(&identifierPlugin_);
-	plugins_.push_back(&stringPlugin_);
-
-	plugins_.push_back(&numberPlugin_);
-	plugins_.push_back(&symbolPlugin_);
-}
-
 StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::next(ICharacterWell &well, const PluginListType &plugins){
 	if (!hasMore(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
@@ -110,6 +100,18 @@ const StructuredScript::IScannerPlugin *StructuredScript::Scanner::Scanner::getP
 		return &skipPlugin_;
 
 	return nullptr;
+}
+
+void StructuredScript::Scanner::Scanner::init(){
+	plugins_.clear();
+
+	plugins_.push_back(&identifierPlugin_);
+	plugins_.push_back(&stringPlugin_);
+
+	plugins_.push_back(&numberPlugin_);
+	plugins_.push_back(&symbolPlugin_);
+
+	operatorSymbols.init();
 }
 
 StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::get_(ICharacterWell &well, const PluginListType &plugins){
@@ -319,6 +321,8 @@ bool StructuredScript::Scanner::tokenIsLiteralType(TokenType type){
 }
 
 StructuredScript::Symbols StructuredScript::Scanner::Scanner::operatorSymbols;
+
+StructuredScript::Scanner::Scanner::PluginListType StructuredScript::Scanner::Scanner::plugins_;
 
 StructuredScript::Scanner::Plugins::Identifier StructuredScript::Scanner::Scanner::identifierPlugin_;
 StructuredScript::Scanner::Plugins::TypenameIdentifier StructuredScript::Scanner::Scanner::typenameIdentifierPlugin_;

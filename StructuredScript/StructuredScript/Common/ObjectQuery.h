@@ -17,6 +17,8 @@ namespace StructuredScript{
 
 			static bool isExpansion(IAny::Ptr object);
 
+			static bool isExpanded(IAny::Ptr object);
+
 			static unsigned int getIndex(IAny::Ptr object);
 
 			template <typename TargetType, int TargetRank>

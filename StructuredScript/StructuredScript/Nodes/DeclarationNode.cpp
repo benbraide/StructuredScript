@@ -6,8 +6,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate
 		return nullptr;
 
 	auto object = memory->object();
-	if (object != nullptr)
-		return object;
+	if (object != nullptr){//Expansions are only allowed as function parameters
+		memory->storage()->remove(memory);//Rollback
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Expansions are only allowed as function parameters!", expr)));
+	}
 
 	auto type = memory->type();
 	Storage::MemoryState states((type == nullptr) ? Storage::MemoryState::STATE_NONE : type->states());
@@ -25,7 +28,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate
 	}
 
 	backdoor->assign(PrimitiveFactory::createUndefined());
-	return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
+	return memory->object();
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::allocate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -150,13 +153,7 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::InitializationN
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::InitializationNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
-	if (declaration == nullptr){//Declaration is required
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Bad initialization!", expr)));
-	}
-
-	auto memory = declaration->allocate(storage, exception, expr);
+	auto memory = allocate(storage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
@@ -200,7 +197,20 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::InitializationNode::allo
 			Query::ExceptionManager::combine("'" + str() + "': Bad initialization!", expr)));
 	}
 
-	return declaration->allocate(storage, exception, expr);
+	auto memory = declaration->allocate(storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	auto object = memory->object();
+	if (object != nullptr){//Expansions cannot have initializers
+		memory->storage()->remove(memory);//Rollback
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Expansions cannot have initializers!", expr)));
+
+		return nullptr;
+	}
+
+	return memory;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DependentDeclarationNode::clone(){

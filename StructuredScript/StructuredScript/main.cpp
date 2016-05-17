@@ -25,8 +25,6 @@ int main(){
 	StructuredScript::Parser::Parser parser;
 	StructuredScript::Scanner::Scanner scanner;
 
-	scanner.init();
-
 	std::string input;
 	StructuredScript::ExceptionManager xManager;
 

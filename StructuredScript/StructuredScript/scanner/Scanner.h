@@ -36,8 +36,6 @@ namespace StructuredScript{
 			typedef std::list<Token>		TokenListType;
 			typedef std::list<CloseInfo>	OpenListType;
 
-			virtual void init() override;
-
 			virtual Token next(ICharacterWell &well, const PluginListType &plugins = {}) override;
 
 			virtual Token peek(ICharacterWell &well, const PluginListType &plugins = {}) override;
@@ -55,6 +53,8 @@ namespace StructuredScript{
 			virtual bool hasMore(ICharacterWell &well) override;
 
 			virtual const IScannerPlugin *getPlugin(TokenType target) const override;
+
+			static void init();
 
 			static Symbols operatorSymbols;
 
@@ -83,9 +83,9 @@ namespace StructuredScript{
 
 			OpenListType openList_;
 			CloseInfo closeWith_ = CloseInfo{ "", true, false };
-
 			TokenListType savedTokens_;
-			PluginListType plugins_;
+
+			static PluginListType plugins_;
 
 			static Plugins::Identifier identifierPlugin_;
 			static Plugins::TypenameIdentifier typenameIdentifierPlugin_;

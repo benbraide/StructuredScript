@@ -16,6 +16,11 @@ bool StructuredScript::Query::Object::isExpansion(IAny::Ptr object){
 	return (dynamic_cast<IExpansion *>(objectBase.get()) != nullptr);
 }
 
+bool StructuredScript::Query::Object::isExpanded(IAny::Ptr object){
+	auto objectBase = (object == nullptr) ? nullptr : object->base();
+	return (dynamic_cast<IExpanded *>(objectBase.get()) != nullptr);
+}
+
 unsigned int StructuredScript::Query::Object::getIndex(IAny::Ptr object){
 	unsigned int value;
 

@@ -98,9 +98,6 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
-	if (args.empty())
-		return 1;
-
 	auto arg = args.begin();
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = (*arg)->type();
@@ -110,9 +107,12 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 		++arg;
 	}
 
+	if (arg == args.end())
+		return 1;
+
 	auto total = 0;
 	unsigned int index = 0;
-
+	
 	for (; arg != args.end(); ++arg){
 		auto type = (*arg)->type();
 		if (type == nullptr)//Type expected
@@ -132,9 +132,6 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
-	if (args.empty())
-		return 1;
-
 	auto arg = args.begin();
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = *arg;
@@ -143,6 +140,9 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 
 		++arg;
 	}
+
+	if (arg == args.end())
+		return 1;
 
 	auto total = 0;
 	unsigned int index = 0;
@@ -159,6 +159,11 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (storage == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Bad function call!", expr)));
+	}
+
 	IStorage::ExternalCallType call = nullptr;
 	if (definition_ == nullptr){
 		auto attributes = (memory_ == nullptr) ? nullptr : memory_->attributes();
@@ -221,14 +226,25 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	if (param != list_.end()){//Parameters must be initialization declarations
 		for (; param != list_.end(); ++param){
-			if (!Query::Node::isInitialization(*param) && !Query::Node::isExpandedTypeIdentifier(dynamic_cast<IDeclarationNode *>(param->get())->type())){
+			auto declaration = dynamic_cast<IDeclarationNode *>(param->get());
+			if (!Query::Node::isInitialization(*param) && !Query::Node::isExpandedTypeIdentifier(declaration->type())){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
 			}
 
-			(*param)->evaluate(&parameterStorage, exception, expr);
+			auto memory = declaration->allocate(&parameterStorage, exception, expr);
 			if (Query::ExceptionManager::has(exception))//Failed to create object
 				return nullptr;
+
+			if (memory->object() == nullptr){
+				auto backdoor = dynamic_cast<IMemoryBackdoor *>(memory.get());
+				if (backdoor == nullptr){
+					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+						Query::ExceptionManager::combine("Error during function call!", expr)));
+				}
+
+				backdoor->assign(PrimitiveFactory::createUndefined());
+			}
 		}
 	}
 	else if (arg != args.end()){//Expanded memory must have been be created

@@ -1,12 +1,7 @@
 #include "StringObject.h"
 
 StructuredScript::Objects::String::String(const std::string &value) : TypedPrimitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_STRING), value){
-	Parser::Parser parser;
-	Scanner::Scanner scanner;
-	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
-
-	scanner.init();
-	parser.parse(well, scanner, nullptr)->evaluate(this, nullptr, nullptr);
+	lengthNode_->evaluate(this, nullptr, nullptr);
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -131,6 +126,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		"@[Call(substr)]string substr(integral_type index, integral_type count = npos)",
 		"@[Call(find)]int find(const ref val string value, integral_type offset = 0)",
 		"@[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
+		"@[Call(empty)]bool empty()",
 		"static const unsigned int npos = -1u"
 	});
 
@@ -138,6 +134,9 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		Scanner::StringCharacterWell well(line);
 		parser.parse(well, scanner, nullptr)->evaluate(type.get(), nullptr, nullptr);
 	}
+
+	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+	lengthNode_ = parser.parse(well, scanner, nullptr);
 
 	type->addExternalCall("at", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
@@ -295,6 +294,17 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createUInt(string->value_.find_last_of(value->value_, offset));
 	});
 
+	type->addExternalCall("empty", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
+		auto string = dynamic_cast<String *>(storageBase.get());
+		if (string == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Bad member function call!", expr)));
+		}
+
+		return PrimitiveFactory::createBool(string->value_.empty());
+	});
+
 	type->addExternalCall("length.get", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
 		auto string = dynamic_cast<String *>(storageBase.get());
@@ -349,3 +359,5 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::String::evaluate_(const s
 
 	return TypedPrimitive::evaluate_(value, left, right, exception, expr);
 }
+
+StructuredScript::INode::Ptr StructuredScript::Objects::String::lengthNode_;

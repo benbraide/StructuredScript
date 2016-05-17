@@ -248,6 +248,8 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 void StructuredScript::Parser::Parser::init(){
 	plugins_["typename"] = std::make_shared<TypenameParser>();
 	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true> >("return");
+
+	operatorInfo.init();
 }
 
 StructuredScript::OperatorInfo StructuredScript::Parser::Parser::operatorInfo;

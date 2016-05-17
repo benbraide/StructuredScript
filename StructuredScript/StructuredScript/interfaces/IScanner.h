@@ -17,8 +17,6 @@ namespace StructuredScript{
 
 			virtual ~Scanner(){}
 
-			virtual void init() = 0;
-
 			virtual Token next(CharacterWell &well, const PluginListType &plugins = {}) = 0;
 
 			virtual Token peek(CharacterWell &well, const PluginListType &plugins = {}) = 0;

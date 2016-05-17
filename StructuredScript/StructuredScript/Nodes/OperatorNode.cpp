@@ -38,7 +38,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 					args.push_front(object->ptr());
 			}
 
-			auto match = functionMemory->find(IFunction::ArgListType{});//Find matching function
+			auto match = functionMemory->find(args);//Find matching function
 			if (match == nullptr){
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + str() + "': No function found taking the specified arguments!", expr)));

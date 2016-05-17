@@ -9,6 +9,8 @@
 #include "../Interfaces/Types/IStackedType.h"
 #include "../Interfaces/Types/ICompoundType.h"
 
+#include "../Storage/MemoryState.h"
+
 namespace StructuredScript{
 	namespace Query{
 		class Type{
@@ -22,6 +24,18 @@ namespace StructuredScript{
 			static bool isExpanded(IType::Ptr type);
 
 			static bool isArray(IType::Ptr type);
+
+			static bool isConstant(IType::Ptr type);
+
+			static bool isFinal(IType::Ptr type);
+
+			static bool isMutable(IType::Ptr type);
+
+			static bool isPrivate(IType::Ptr type);
+
+			static bool isProtected(IType::Ptr type);
+
+			static bool isStatic(IType::Ptr type);
 		};
 	}
 }
