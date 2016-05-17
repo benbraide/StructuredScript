@@ -21,6 +21,7 @@ bool StructuredScript::ExceptionManager::unsuppress(){
 
 void StructuredScript::ExceptionManager::set(IAny::Ptr exception){
 	exception_ = exception;
+	code_ = NONE;
 }
 
 void StructuredScript::ExceptionManager::setOnce(){
@@ -50,7 +51,7 @@ StructuredScript::IAny::Ptr StructuredScript::ExceptionManager::get() const{
 }
 
 bool StructuredScript::ExceptionManager::has() const{
-	return (exception_ != nullptr || (code_ != NONE && code_ != SUPPRESSED));
+	return (code_ != SUPPRESSED && (exception_ != nullptr || code_ != NONE));
 }
 
 bool StructuredScript::ExceptionManager::hasOnce() const{

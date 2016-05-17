@@ -41,6 +41,9 @@ bool StructuredScript::PrimitiveType::isParent(Ptr target){
 }
 
 bool StructuredScript::PrimitiveType::isCompatibleWith(Ptr target, bool family/* = false*/){
+	if (family)
+		return isEqual(target);
+
 	if (isAny() || target->isAny())
 		return true;
 

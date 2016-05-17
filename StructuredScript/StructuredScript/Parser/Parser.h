@@ -19,6 +19,7 @@
 #include "Plugins/SelectionParser.h"
 #include "Plugins/ConditionalParser.h"
 #include "Plugins/IterationParser.h"
+#include "Plugins/ExceptionParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"

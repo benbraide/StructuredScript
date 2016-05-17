@@ -18,6 +18,7 @@
 #include "../Interfaces/Nodes/ITypeResolver.h"
 #include "../Interfaces/Nodes/IMemoryResolver.h"
 #include "../Interfaces/Nodes/IControlNode.h"
+#include "../Interfaces/Nodes/IExceptionHandler.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 

@@ -264,6 +264,10 @@ void StructuredScript::Parser::Parser::init(){
 	plugins_["while"] = std::make_shared<IterationParser>("while");
 	plugins_["for"] = std::make_shared<IterationParser>("for");
 
+	plugins_["try"] = std::make_shared<ExceptionParser>("try");
+	plugins_["catch"] = std::make_shared<ExceptionParser>("catch");
+	plugins_["finally"] = std::make_shared<ExceptionParser>("finally");
+
 	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true, false> >("return");
 	plugins_["echo"] = std::make_shared< SourceParser<Nodes::EchoNode, false, false> >("echo");
 	plugins_["throw"] = std::make_shared< SourceParser<Nodes::ThrowNode, true, false> >("throw");

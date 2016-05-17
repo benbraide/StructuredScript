@@ -17,7 +17,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parse(ICh
 			});
 
 			if (!Query::Node::isDeclaration(node)){//Check unnamed parameter
-				if (Query::Node::isEmpty(node) || !Query::Node::isIdentifier(node) || Query::Node::isOperatorIdentifier(node)){
+				if (!Query::Node::isIdentifier(node) || Query::Node::isOperatorIdentifier(node)){
 					return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
 						"'" + node->str() + "': Expected function parameter to be a declaration!"));
 				}
