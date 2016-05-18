@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_GLOBAL_STORAGE_INTERFACE_H
 
 #include "../../Common/Typename.h"
+#include "../IAny.h"
 
 namespace StructuredScript{
 	namespace Interfaces{
@@ -12,6 +13,10 @@ namespace StructuredScript{
 			virtual Type::Ptr getPrimitiveType(Typename type) = 0;
 
 			virtual Type::Ptr getPrimitiveType(int rank) = 0;
+
+			virtual Type::Ptr getRightUnaryPlaceholderType() = 0;
+
+			virtual Any::Ptr getRightUnaryPlaceholder() = 0;
 
 			static GlobalStorage *globalStorage;
 		};

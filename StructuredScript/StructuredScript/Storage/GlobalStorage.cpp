@@ -5,9 +5,10 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	Scanner::Scanner::init();
 
 	primitives_.clear();
+	rightUnaryPlaceholderType_ = std::make_shared<PrimitiveType>("", Typename::TYPE_NAME_NONE);
+	rightUnaryPlaceholder_ = std::make_shared<Objects::Undefined>(rightUnaryPlaceholderType_);
 
 	auto bit = std::make_shared<Type>(this, "bit");
-
 	primitives_[Typename::TYPE_NAME_BIT]		= bit;
 
 	primitives_[Typename::TYPE_NAME_ANY]		= std::make_shared<AnyType>();
@@ -38,6 +39,8 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	attributes_["Override"]						= std::make_shared<OverrideAttribute>();
 	attributes_["AssumeType"]					= std::make_shared<AssumeTypeAttribute>();
 	attributes_["AssumeConstness"]				= std::make_shared<AssumeConstnessAttribute>();
+	attributes_["RightUnary"]					= std::make_shared<RightUnaryAttribute>();
+	attributes_["UnaryRight"]					= std::make_shared<RightUnaryAttribute>();
 	attributes_["Call"]							= std::make_shared< AttributeSpawner<CallAttribute> >();
 
 	types_["integral_type"]						= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
@@ -136,6 +139,14 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(Typename type){
 	auto value = primitives_.find(type);
 	return (value == primitives_.end()) ? nullptr : value->second;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getRightUnaryPlaceholderType(){
+	return rightUnaryPlaceholderType_;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Storage::GlobalStorage::getRightUnaryPlaceholder(){
+	return rightUnaryPlaceholder_;
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){

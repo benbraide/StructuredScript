@@ -18,7 +18,7 @@ namespace StructuredScript{
 			Function(IType::Ptr type, INode::Ptr parameters, INode::Ptr definition)
 				: Primitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_FUNCTION)), type_(type), parameters_(parameters), definition_(definition){}
 
-			virtual bool init(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+			virtual bool init(bool isRightUnary, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual bool isDefined() override;
 
@@ -37,6 +37,7 @@ namespace StructuredScript{
 
 			IType::Ptr type_;
 			IType::Ptr owner_;
+			IType::Ptr rightUnary_;
 
 			INode::Ptr parameters_;
 			INode::Ptr definition_;

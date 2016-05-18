@@ -16,7 +16,7 @@ namespace StructuredScript{
 
 			virtual ~Function(){}
 
-			virtual bool init(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual bool init(bool isRightUnary, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual bool isDefined() = 0;
 

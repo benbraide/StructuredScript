@@ -60,7 +60,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr
 		*memory = std::make_shared<Storage::FunctionMemory>(storage);
 
 	auto function = std::make_shared<Objects::Function>(type, parameters_, definition);
-	if (!function->init((*memory)->storage(), exception, expr)){//Error
+	auto isRightUnary = (attributes_ == nullptr) ? false : (attributes_->hasAttribute("RightUnary") || attributes_->hasAttribute("UnaryRight"));
+
+	if (!function->init(isRightUnary, (*memory)->storage(), exception, expr)){//Error
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 

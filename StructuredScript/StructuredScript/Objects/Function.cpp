@@ -1,6 +1,6 @@
 #include "Function.h"
 
-bool StructuredScript::Objects::Function::init(IStorage *storage, IExceptionManager *exception, INode *expr){
+bool StructuredScript::Objects::Function::init(bool isRightUnary, IStorage *storage, IExceptionManager *exception, INode *expr){
 	Query::Node::split(",", parameters_, list_);
 
 	if (!list_.empty()){
@@ -58,6 +58,13 @@ bool StructuredScript::Objects::Function::init(IStorage *storage, IExceptionMana
 	else//Empty parameter list
 		limits_ = { 0, 0 };
 
+	if (isRightUnary){
+		rightUnary_ = IGlobalStorage::globalStorage->getRightUnaryPlaceholderType();
+		++limits_.first;
+		if (limits_.second != -1)
+			++limits_.second;
+	}
+
 	auto storageType = dynamic_cast<IType *>(storage);
 	if (storageType != nullptr){
 		owner_ = storageType->ptr();
@@ -76,11 +83,11 @@ bool StructuredScript::Objects::Function::isDefined(){
 bool StructuredScript::Objects::Function::equals(Any::Ptr target){
 	auto targetBase = target->base();
 	auto function = dynamic_cast<Function *>(targetBase.get());
-	if (function == nullptr || !type_->isEqual(function->type_) || types_.size() != function->types_.size())
+	if (function == nullptr || types_.size() != function->types_.size())
 		return false;
 
 	for (auto type = types_.begin(), targetType = function->types_.begin(); type != types_.end() && targetType != function->types_.end(); ++type, ++targetType){
-		if (!(*type)->isEqual(*targetType))
+		if ((*type)->isAny() != (*targetType)->isAny() || !(*type)->isEqual(*targetType))
 			return false;
 	}
 
@@ -99,6 +106,14 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 		return 0;
 
 	auto arg = args.begin();
+	if (rightUnary_ != nullptr){//Compare first argument with right unary type
+		auto type = (*arg)->type();
+		if (type == nullptr || !rightUnary_->isEqual(type))//Exact type expected
+			return 0;
+
+		++arg;
+	}
+
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = (*arg)->type();
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
@@ -133,6 +148,14 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 		return 0;
 
 	auto arg = args.begin();
+	if (rightUnary_ != nullptr){//Compare first argument with right unary type
+		auto type = *arg;
+		if (type == nullptr || !rightUnary_->isEqual(type))//Exact type expected
+			return 0;
+
+		++arg;
+	}
+
 	if (owner_ != nullptr){//Compare first argument with owner type
 		auto type = *arg;
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected

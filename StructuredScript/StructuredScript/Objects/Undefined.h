@@ -9,8 +9,8 @@ namespace StructuredScript{
 	namespace Objects{
 		class Undefined : public Primitive, public IUndefined{
 		public:
-			Undefined()
-				: Primitive(nullptr){}
+			Undefined(IType::Ptr type = nullptr)
+				: Primitive(type){}
 
 			virtual IType::Ptr type() override;
 

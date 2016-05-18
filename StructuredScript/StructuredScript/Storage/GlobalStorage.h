@@ -13,6 +13,7 @@
 #include "Attributes/OverrideAttribute.h"
 #include "Attributes/AssumeTypeAttribute.h"
 #include "Attributes/AssumeConstnessAttribute.h"
+#include "Attributes/RightUnaryAttribute.h"
 #include "Attributes/CallAttribute.h"
 
 #include "Attributes/ParameterizedAttribute.h"
@@ -28,6 +29,7 @@
 #include "../Common/Factory.h"
 
 #include "../Objects/StringObject.h"
+#include "../Objects/Undefined.h"
 
 namespace StructuredScript{
 	namespace Storage{
@@ -46,7 +48,14 @@ namespace StructuredScript{
 
 			virtual IType::Ptr getPrimitiveType(int rank) override;
 
+			virtual IType::Ptr getRightUnaryPlaceholderType() override;
+
+			virtual IAny::Ptr getRightUnaryPlaceholder() override;
+
 		private:
+			IType::Ptr rightUnaryPlaceholderType_;
+			IAny::Ptr rightUnaryPlaceholder_;
+
 			ListType primitives_;
 		};
 	}

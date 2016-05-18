@@ -9,7 +9,7 @@ bool StructuredScript::Storage::CallAttribute::appliesTo(IMemory::Ptr memory, IS
 }
 
 bool StructuredScript::Storage::CallAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return Query::Node::isFunction(node);
+	return Query::Node::isFunctionDeclaration(node);
 }
 
 void StructuredScript::Storage::CallAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}
