@@ -9,10 +9,18 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::IdentifierNode:
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::IdentifierNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto memory = (storage == nullptr) ? nullptr : storage->findMemory(value_, IStorage::SEARCH_DEFAULT);
+	if (storage == nullptr)
+		return nullptr;
+
+	auto memory = storage->findMemory(value_);
 	if (memory == nullptr){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Could not resolve identifier!", expr)));
+		auto type = storage->findType(value_);
+		if (type == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve identifier!", expr)));
+		}
+
+		return PrimitiveFactory::createTypeObject(type);
 	}
 
 	return memory->object();
@@ -50,6 +58,16 @@ StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addMemo
 
 StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return storage->addMemory(value_);
+}
+
+bool StructuredScript::Nodes::IdentifierNode::use(IPureStorage *target, IStorage *storage){
+	auto memory = resolveMemory(storage);
+	if (memory == nullptr){
+		auto type = storage->findType(value_);
+		return (type == nullptr) ? false : target->use(value_, type);
+	}
+
+	return target->use(value_, memory);
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentifierNode::ptr(){
@@ -92,20 +110,8 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::OperatorIdentifierNode::re
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::OperatorIdentifierNode::resolveMemory(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
-	if (storage == nullptr)
-		return nullptr;
-
-	auto base = Query::Node::getBaseId(value_);
-	if (dynamic_cast<IIdentifierNode *>(base.get()) == nullptr)
-		return nullptr;
-
-	if (dynamic_cast<ITypeIdentifierNode *>(value_.get()) == nullptr && dynamic_cast<ITypeIdentifierNode *>(base.get()) == nullptr)
-		return storage->findOperatorMemory(value_->str(), searchScope);
-
-	auto resolver = dynamic_cast<ITypeResolver *>(value_.get());
-	auto type = (resolver == nullptr) ? nullptr : resolver->resolveType(storage);
-
-	return (type == nullptr) ? nullptr : storage->findTypenameOperatorMemory(type, searchScope);
+	IType::Ptr type;
+	return resolveMemory_(type, storage, searchScope);
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addMemory(IStorage *storage){
@@ -127,6 +133,32 @@ StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode:
 
 StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return nullptr;
+}
+
+bool StructuredScript::Nodes::OperatorIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	IType::Ptr type;
+	auto memory = resolveMemory_(type, storage, IStorage::SEARCH_DEFAULT);
+	if (memory == nullptr)
+		return false;
+
+	return (type == nullptr) ? target->useOperator(value_->str(), memory) : target->useTypenameOperator(type, memory);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Nodes::OperatorIdentifierNode::resolveMemory_(IType::Ptr &type, IStorage *storage, unsigned short searchScope){
+	if (storage == nullptr)
+		return nullptr;
+
+	auto base = Query::Node::getBaseId(value_);
+	if (dynamic_cast<IIdentifierNode *>(base.get()) == nullptr)
+		return nullptr;
+
+	if (dynamic_cast<ITypeIdentifierNode *>(value_.get()) == nullptr && dynamic_cast<ITypeIdentifierNode *>(base.get()) == nullptr)
+		return storage->findOperatorMemory(value_->str(), searchScope);
+
+	auto resolver = dynamic_cast<ITypeResolver *>(value_.get());
+	type = (resolver == nullptr) ? nullptr : resolver->resolveType(storage);
+
+	return (type == nullptr) ? nullptr : storage->findTypenameOperatorMemory(type, searchScope);
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierNode::clone(){
@@ -151,6 +183,10 @@ StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifier
 
 StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return nullptr;
+}
+
+bool StructuredScript::Nodes::PrimitiveTypeIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	return false;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TypenameIdentifierNode::ptr(){
@@ -193,6 +229,11 @@ StructuredScript::IStorage *StructuredScript::Nodes::TypenameIdentifierNode::res
 
 StructuredScript::IType::Ptr StructuredScript::Nodes::TypenameIdentifierNode::resolveType(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	return (storage == nullptr) ? nullptr : storage->findType(value(), searchScope);
+}
+
+bool StructuredScript::Nodes::TypenameIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	auto type = resolveType(storage);
+	return (type == nullptr) ? false : target->use(value(), type);
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifierNode::clone(){
@@ -238,6 +279,10 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::TemplatedTypenameIdentifie
 	return nullptr;
 }
 
+bool StructuredScript::Nodes::TemplatedTypenameIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	return false;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ModifiedTypenameIdentifierNode::clone(){
 	return std::make_shared<ModifiedTypenameIdentifierNode>(TypenameIdentifierNode::value_->clone(), value_);
 }
@@ -274,6 +319,10 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ModifiedTypenameIdentifier
 	return (type == nullptr) ? nullptr : std::make_shared<DeclaredType>(type, value_);
 }
 
+bool StructuredScript::Nodes::ModifiedTypenameIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	return false;
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ExpandedTypenameIdentifierNode::clone(){
 	return std::make_shared<ExpandedTypenameIdentifierNode>(TypenameIdentifierNode::value_->clone());
 }
@@ -295,4 +344,8 @@ std::string StructuredScript::Nodes::ExpandedTypenameIdentifierNode::str(){
 StructuredScript::IType::Ptr StructuredScript::Nodes::ExpandedTypenameIdentifierNode::resolveType(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	auto type = TypenameIdentifierNode::resolveType(storage, searchScope);
 	return (type == nullptr) ? nullptr : std::make_shared<ExpandedType>(type);
+}
+
+bool StructuredScript::Nodes::ExpandedTypenameIdentifierNode::use(IPureStorage *target, IStorage *storage){
+	return false;
 }

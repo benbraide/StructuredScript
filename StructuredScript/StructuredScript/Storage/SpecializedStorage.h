@@ -7,7 +7,7 @@
 
 namespace StructuredScript{
 	namespace Storage{
-		class SharedStorage : public IStorage{
+		class SharedStorage : public IStorage, public IPureStorage{
 		public:
 			typedef std::shared_ptr<IStorage> Ptr;
 
@@ -45,6 +45,16 @@ namespace StructuredScript{
 			virtual ExternalCallType findExternalCall(const std::string &name) override;
 
 			virtual bool remove(IMemory::Ptr target) override;
+
+			virtual bool use(IStorage *storage) override;
+
+			virtual bool use(const std::string &name, IType::Ptr value) override;
+
+			virtual bool use(const std::string &name, IMemory::Ptr value) override;
+
+			virtual bool useOperator(const std::string &name, Memory::Ptr value) override;
+
+			virtual bool useTypenameOperator(IType::Ptr name, IMemory::Ptr value) override;
 
 		private:
 			IStorage *first_;

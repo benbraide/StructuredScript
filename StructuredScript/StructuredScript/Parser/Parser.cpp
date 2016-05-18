@@ -254,6 +254,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 void StructuredScript::Parser::Parser::init(){
 	plugins_["typename"] = std::make_shared<TypenameParser>();
 	plugins_["operator"] = std::make_shared<OperatorParser>();
+	plugins_["using"] = std::make_shared<UseParser>();
 
 	plugins_["if"] = std::make_shared<SelectionParser>("if");
 	plugins_["unless"] = std::make_shared<SelectionParser>("unless");

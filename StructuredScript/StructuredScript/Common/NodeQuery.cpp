@@ -140,3 +140,26 @@ StructuredScript::IMemory::Ptr StructuredScript::Query::Node::resolveAsMemory(IN
 	auto resolver = dynamic_cast<IMemoryResolver *>(node.get());
 	return (resolver == nullptr) ? nullptr : resolver->resolveMemory(storage, searchScope);
 }
+
+bool StructuredScript::Query::Node::use(INode::Ptr node, IPureStorage *target, IStorage *storage){
+	auto adder = dynamic_cast<IUseAdder *>(node.get());
+	if (adder != nullptr)
+		return adder->use(target, storage);
+
+	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
+	if (operatorNode == nullptr || operatorNode->value() != "::")
+		return false;
+
+	auto binary = dynamic_cast<IBinaryOperatorNode *>(operatorNode);
+	if (binary != nullptr){
+		storage = resolveAsStorage(binary->leftOperand(), storage);
+		if (storage == nullptr)
+			return false;
+
+		adder = dynamic_cast<IUseAdder *>(binary->rightOperand().get());
+		return (adder == nullptr) ? false : adder->use(target, storage);
+	}
+
+	adder = dynamic_cast<IUseAdder *>(dynamic_cast<IUnaryOperatorNode *>(operatorNode)->operand().get());
+	return (adder == nullptr) ? false : adder->use(target, dynamic_cast<IStorage *>(IGlobalStorage::globalStorage));
+}

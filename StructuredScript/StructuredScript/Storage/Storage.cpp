@@ -20,6 +20,12 @@ StructuredScript::IStorage *StructuredScript::Storage::Storage::findStorage(cons
 	if (type != nullptr)
 		return dynamic_cast<IStorage *>(type.get());
 
+	for (auto item : usedStorages_){
+		auto storage = item->findStorage(name, IStorage::SEARCH_LOCAL);
+		if (storage != nullptr)
+			return storage;
+	}
+
 	return (searchScope != IStorage::SEARCH_DEFAULT || parent_ == nullptr) ? nullptr : parent_->findStorage(name, IStorage::SEARCH_DEFAULT);
 }
 
@@ -34,6 +40,16 @@ StructuredScript::IType::Ptr StructuredScript::Storage::Storage::findType(const 
 	auto type = types_.find(name);
 	if (type != types_.end())
 		return type->second;
+
+	type = usedTypes_.find(name);
+	if (type != usedTypes_.end())
+		return type->second;
+
+	for (auto item : usedStorages_){
+		auto type = item->findType(name, IStorage::SEARCH_LOCAL);
+		if (type != nullptr)
+			return type;
+	}
 
 	return (searchScope != IStorage::SEARCH_DEFAULT || parent_ == nullptr) ? nullptr : parent_->findType(name, IStorage::SEARCH_DEFAULT);
 }
@@ -56,6 +72,16 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 			return object->second;
 
 		std::list<IMemory::Ptr> list({ object->second });
+		object = usedObjects_.find(name);
+		if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
+			list.push_back(object->second);
+
+		for (auto item : usedStorages_){
+			auto memory = item->findFunctionMemory(name, IStorage::SEARCH_LOCAL);
+			if (memory != nullptr)
+				list.push_back(memory);
+		}
+
 		if (searchScope == IStorage::SEARCH_DEFAULT && parent_ != nullptr){//Get all functions with same name
 			auto memory = parent_->findFunctionMemory(name, IStorage::SEARCH_DEFAULT);
 			if (memory != nullptr)
@@ -63,6 +89,16 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 		}
 
 		return std::make_shared<FunctionMemory>(list);
+	}
+
+	object = usedObjects_.find(name);
+	if (object != usedObjects_.end())
+		return object->second;
+
+	for (auto item : usedStorages_){
+		auto memory = item->findMemory(name, IStorage::SEARCH_LOCAL);
+		if (memory != nullptr)
+			return memory;
 	}
 
 	auto type = findType(name, IStorage::SEARCH_LOCAL);
@@ -81,6 +117,16 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findFunctionM
 	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
 		list.push_back(object->second);
 
+	object = usedObjects_.find(name);
+	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
+		list.push_back(object->second);
+
+	for (auto item : usedStorages_){
+		auto memory = item->findFunctionMemory(name, IStorage::SEARCH_LOCAL);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+
 	if (searchScope == IStorage::SEARCH_DEFAULT && parent_ != nullptr){//Get all functions with same name
 		auto memory = parent_->findFunctionMemory(name, IStorage::SEARCH_DEFAULT);
 		if (memory != nullptr)
@@ -91,19 +137,63 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findFunctionM
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addOperatorMemory(const std::string &name){
-	return nullptr;
+	return &operators_[name];
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return nullptr;
+	std::list<IMemory::Ptr> list;
+
+	auto object = operators_.find(name);
+	if (object != operators_.end())
+		list.push_back(object->second);
+
+	object = usedOperators_.find(name);
+	if (object != usedOperators_.end())
+		list.push_back(object->second);
+
+	for (auto item : usedStorages_){
+		auto memory = item->findOperatorMemory(name, IStorage::SEARCH_LOCAL);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+
+	if (searchScope == IStorage::SEARCH_DEFAULT && parent_ != nullptr){//Get all functions with same name
+		auto memory = parent_->findOperatorMemory(name, IStorage::SEARCH_DEFAULT);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+
+	return list.empty() ? nullptr : std::make_shared<FunctionMemory>(list);
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addTypenameOperatorMemory(IType::Ptr name){
-	return nullptr;
+	return &typeOperators_[name];
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return nullptr;
+	std::list<IMemory::Ptr> list;
+
+	auto object = findTypeOperator_(name);
+	if (object != typeOperators_.end())
+		list.push_back(object->second);
+
+	object = findUsedTypeOperator_(name);
+	if (object != typeOperators_.end())
+		list.push_back(object->second);
+
+	for (auto item : usedStorages_){
+		auto memory = item->findTypenameOperatorMemory(name, IStorage::SEARCH_LOCAL);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+
+	if (searchScope == IStorage::SEARCH_DEFAULT && parent_ != nullptr){//Get all functions with same name
+		auto memory = parent_->findTypenameOperatorMemory(name, IStorage::SEARCH_DEFAULT);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+
+	return list.empty() ? nullptr : std::make_shared<FunctionMemory>(list);
 }
 
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Storage::Storage::addMemoryAttribute(const std::string &name){
@@ -140,6 +230,48 @@ bool StructuredScript::Storage::Storage::use(IStorage *storage){
 	return true;
 }
 
-bool StructuredScript::Storage::Storage::use(const std::string &name, IMemory::Ptr value){
+bool StructuredScript::Storage::Storage::use(const std::string &name, IType::Ptr value){
+	if (usedTypes_.find(name) == usedTypes_.end())
+		usedTypes_[name] = value;
+
 	return true;
+}
+
+bool StructuredScript::Storage::Storage::use(const std::string &name, IMemory::Ptr value){
+	if (usedObjects_.find(name) == usedObjects_.end())
+		usedObjects_[name] = value;
+
+	return true;
+}
+
+bool StructuredScript::Storage::Storage::useOperator(const std::string &name, Memory::Ptr value){
+	if (usedOperators_.find(name) == usedOperators_.end())
+		usedOperators_[name] = value;
+
+	return true;
+}
+
+bool StructuredScript::Storage::Storage::useTypenameOperator(IType::Ptr name, IMemory::Ptr value){
+	if (findUsedTypeOperator_(name) == usedTypeOperators_.end())
+		usedTypeOperators_[name] = value;
+
+	return true;
+}
+
+StructuredScript::Storage::Storage::TypenameOperatorMemoryListType::iterator StructuredScript::Storage::Storage::findTypeOperator_(IType::Ptr name){
+	for (auto item = typeOperators_.begin(); item != typeOperators_.end(); ++item){
+		if (item->first->isEqual(name))
+			return item;
+	}
+
+	return typeOperators_.end();
+}
+
+StructuredScript::Storage::Storage::UsedTypenameOperatorMemoryListType::iterator StructuredScript::Storage::Storage::findUsedTypeOperator_(IType::Ptr name){
+	for (auto item = usedTypeOperators_.begin(); item != usedTypeOperators_.end(); ++item){
+		if (item->first->isEqual(name))
+			return item;
+	}
+
+	return usedTypeOperators_.end();
 }

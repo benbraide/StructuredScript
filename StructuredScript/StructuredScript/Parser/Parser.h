@@ -21,6 +21,7 @@
 #include "Plugins/ConditionalParser.h"
 #include "Plugins/IterationParser.h"
 #include "Plugins/ExceptionParser.h"
+#include "Plugins/UseParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"

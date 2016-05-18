@@ -19,6 +19,8 @@
 #include "../Interfaces/Nodes/IMemoryResolver.h"
 #include "../Interfaces/Nodes/IControlNode.h"
 #include "../Interfaces/Nodes/IExceptionHandler.h"
+#include "../Interfaces/Nodes/IMemoryAdder.h"
+#include "../Interfaces/Nodes/IUseAdder.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 
@@ -77,6 +79,8 @@ namespace StructuredScript{
 			static IType::Ptr resolveAsType(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);
 
 			static IMemory::Ptr resolveAsMemory(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);
+
+			static bool use(INode::Ptr node, IPureStorage *target, IStorage *storage);
 		};
 	}
 }

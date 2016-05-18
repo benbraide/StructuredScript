@@ -14,11 +14,18 @@ namespace StructuredScript{
 		public:
 			typedef std::shared_ptr<IStorage>						Ptr;
 			typedef std::map<std::string, IType::Ptr>				TypeListType;
-			typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
 			typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
 			typedef std::map<std::string, Ptr>						StorageListType;
 
+			typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
+			typedef std::map<std::string, IMemory::Ptr>				OperatorMemoryListType;
+			typedef std::map<IType::Ptr, IMemory::Ptr>				TypenameOperatorMemoryListType;
+
 			typedef std::map<std::string, IMemory::Ptr>				UsedMemoryListType;
+			typedef std::map<std::string, IMemory::Ptr>				UsedOperatorMemoryListType;
+			typedef std::map<IType::Ptr, IMemory::Ptr>				UsedTypenameOperatorMemoryListType;
+
+			typedef std::map<std::string, IType::Ptr>				UsedTypeListType;
 			typedef std::list<IStorage *>							UsedStorageListType;
 
 			Storage(IStorage *parent)
@@ -58,15 +65,33 @@ namespace StructuredScript{
 
 			virtual bool use(IStorage *storage) override;
 
+			virtual bool use(const std::string &name, IType::Ptr value) override;
+
 			virtual bool use(const std::string &name, IMemory::Ptr value) override;
 
+			virtual bool useOperator(const std::string &name, Memory::Ptr value) override;
+
+			virtual bool useTypenameOperator(IType::Ptr name, IMemory::Ptr value) override;
+
 		protected:
+			TypenameOperatorMemoryListType::iterator findTypeOperator_(IType::Ptr name);
+
+			UsedTypenameOperatorMemoryListType::iterator findUsedTypeOperator_(IType::Ptr name);
+
 			IStorage *parent_;
 			TypeListType types_;
-			MemoryListType objects_;
 			MemoryAttributeListType attributes_;
 			StorageListType storages_;
+
+			MemoryListType objects_;
+			OperatorMemoryListType operators_;
+			TypenameOperatorMemoryListType typeOperators_;
+
 			UsedMemoryListType usedObjects_;
+			UsedOperatorMemoryListType usedOperators_;
+			UsedTypenameOperatorMemoryListType usedTypeOperators_;
+
+			UsedTypeListType usedTypes_;
 			UsedStorageListType usedStorages_;
 		};
 	}

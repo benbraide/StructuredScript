@@ -12,12 +12,11 @@
 #include "../Common/Types/StackedType.h"
 
 #include "../Storage/MemoryState.h"
-#include "../Interfaces/Nodes/IMemoryAdder.h"
 
 namespace StructuredScript{
 	namespace Nodes{
 		class IdentifierNode : public INode, public IIdentifierNode, public IIdentifierExpressionNode, public IStorageResolver,
-			public ITypeResolver, public IMemoryResolver, public IMemoryAdder{
+			public ITypeResolver, public IMemoryResolver, public IMemoryAdder, public IUseAdder{
 		public:
 			explicit IdentifierNode(const std::string &value)
 				: value_(value){}
@@ -46,12 +45,14 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
 
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
+
 		protected:
 			std::string value_;
 		};
 
 		class OperatorIdentifierNode : public INode, public IIdentifierNode, public IOperatorIdentifierNode, public IIdentifierExpressionNode,
-			public IStorageResolver, public ITypeResolver, public IMemoryResolver, public IMemoryAdder{
+			public IStorageResolver, public ITypeResolver, public IMemoryResolver, public IMemoryAdder, public IUseAdder{
 		public:
 			explicit OperatorIdentifierNode(Ptr value)
 				: value_(value){}
@@ -82,7 +83,11 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
 
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
+
 		private:
+			IMemory::Ptr resolveMemory_(IType::Ptr &type, IStorage *storage, unsigned short searchScope);
+
 			Ptr value_;
 		};
 
@@ -100,10 +105,12 @@ namespace StructuredScript{
 			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
 
 			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
 		};
 
 		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode,
-			public IStorageResolver, public ITypeResolver{
+			public IStorageResolver, public ITypeResolver, public IUseAdder{
 		public:
 			explicit TypenameIdentifierNode(Ptr value)
 				: value_(value){}
@@ -126,6 +133,8 @@ namespace StructuredScript{
 
 			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
+
 		protected:
 			Ptr value_;
 		};
@@ -142,6 +151,8 @@ namespace StructuredScript{
 			virtual std::string str() override;
 
 			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
 		};
 
 		class TemplatedTypenameIdentifierNode : public TypenameIdentifierNode{
@@ -156,6 +167,8 @@ namespace StructuredScript{
 			virtual std::string str() override;
 
 			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
 
 		private:
 			Ptr value_;
@@ -179,6 +192,8 @@ namespace StructuredScript{
 			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual bool use(IPureStorage *target, IStorage *storage) override;
 
 		private:
 			Storage::MemoryState value_;

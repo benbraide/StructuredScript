@@ -16,5 +16,10 @@ StructuredScript::INode::Ptr StructuredScript::Parser::TypenameParser::parse(ICh
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
+	if (Query::Node::isEmpty(value)){
+		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+			"'typename': Missing identifer!"));
+	}
+
 	return std::make_shared<Nodes::TypenameIdentifierNode>(value);
 }

@@ -74,3 +74,28 @@ StructuredScript::Storage::SharedStorage::ExternalCallType StructuredScript::Sto
 bool StructuredScript::Storage::SharedStorage::remove(IMemory::Ptr target){
 	return first_->remove(target);
 }
+
+bool StructuredScript::Storage::SharedStorage::use(IStorage *storage){
+	auto pure = dynamic_cast<IPureStorage *>(first_);
+	return (pure == nullptr) ? false : pure->use(storage);
+}
+
+bool StructuredScript::Storage::SharedStorage::use(const std::string &name, IType::Ptr value){
+	auto pure = dynamic_cast<IPureStorage *>(first_);
+	return (pure == nullptr) ? false : pure->use(name, value);
+}
+
+bool StructuredScript::Storage::SharedStorage::use(const std::string &name, IMemory::Ptr value){
+	auto pure = dynamic_cast<IPureStorage *>(first_);
+	return (pure == nullptr) ? false : pure->use(name, value);
+}
+
+bool StructuredScript::Storage::SharedStorage::useOperator(const std::string &name, Memory::Ptr value){
+	auto pure = dynamic_cast<IPureStorage *>(first_);
+	return (pure == nullptr) ? false : pure->useOperator(name, value);
+}
+
+bool StructuredScript::Storage::SharedStorage::useTypenameOperator(IType::Ptr name, IMemory::Ptr value){
+	auto pure = dynamic_cast<IPureStorage *>(first_);
+	return (pure == nullptr) ? false : pure->useTypenameOperator(name, value);
+}
