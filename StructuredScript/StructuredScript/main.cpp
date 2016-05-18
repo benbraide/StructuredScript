@@ -20,15 +20,15 @@ int main(){
 
 	globalStorage.init();
 
-	StructuredScript::Parser::Parser parser;
-	StructuredScript::Scanner::Scanner scanner;
-
 	std::string input;
+	StructuredScript::Parser::Parser parser;
 	StructuredScript::ExceptionManager xManager;
 
 	while (true){
 		std::cout << "> ";
 		std::getline(std::cin, input);
+
+		StructuredScript::Scanner::Scanner scanner;
 		StructuredScript::Scanner::StringCharacterWell well(input);
 
 		auto node = parser.parse(well, scanner, &xManager);

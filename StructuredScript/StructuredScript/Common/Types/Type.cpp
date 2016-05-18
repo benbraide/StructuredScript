@@ -58,7 +58,8 @@ StructuredScript::Interfaces::Type::Ptr StructuredScript::Type::getCompatibleTyp
 }
 
 std::string StructuredScript::Type::name() const{
-	return name_;
+	auto nmspc = dynamic_cast<INamespace *>(storage_);
+	return (nmspc == nullptr) ? name_ : (nmspc->name() + "::" + name_);
 }
 
 unsigned short StructuredScript::Type::states() const {

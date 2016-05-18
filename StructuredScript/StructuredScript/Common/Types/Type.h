@@ -9,6 +9,7 @@
 #include "../TypeQuery.h"
 #include "../../Storage/MemoryState.h"
 #include "../../Storage/FunctionMemory.h"
+#include "../../Interfaces/Storages/INamespace.h"
 
 namespace StructuredScript{
 	class Type : public IType, public IStorage, public ICompoundType{
