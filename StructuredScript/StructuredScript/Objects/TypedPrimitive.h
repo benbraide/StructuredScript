@@ -86,13 +86,8 @@ namespace StructuredScript{
 			}
 
 		protected:
-			virtual Ptr promote_(Primitive *target) override{
-				return nullptr;
-			}
-
 			virtual IAny::Ptr evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr) override{
-				auto rightBase = (right == nullptr) ? nullptr : right->base();
-				auto primitive = dynamic_cast<TypedPrimitive *>(rightBase.get());
+				auto primitive = dynamic_cast<TypedPrimitive *>(right.get());
 				if (primitive == nullptr){
 					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 						"'" + value + "': Operands mismatch!", expr)));

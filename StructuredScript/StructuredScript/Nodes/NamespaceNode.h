@@ -3,8 +3,6 @@
 #ifndef STRUCTURED_SCRIPT_NAMESPACE_NODE_H
 #define STRUCTURED_SCRIPT_NAMESPACE_NODE_H
 
-#include <iostream>
-
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
 #include "../Common/ObjectQuery.h"
@@ -14,7 +12,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class NamespaceNode : public INode{
+		class NamespaceNode : public INode, public IBlockNode{
 		public:
 			NamespaceNode(Ptr name, Ptr value)
 				: name_(name), value_(value){}

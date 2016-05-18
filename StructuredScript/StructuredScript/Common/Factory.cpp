@@ -2,6 +2,7 @@
 
 #include "../Objects/Reference.h"
 #include "../Objects/Undefined.h"
+#include "../Objects/Enum.h"
 #include "../Objects/Void.h"
 #include "../Objects/NaN.h"
 #include "../Objects/Bool.h"
@@ -24,6 +25,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createVoid(){
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNaN(){
 	return std::make_shared<Objects::NaN>();
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createEnum(IType::Ptr type, const std::string &name, int value){
+	return std::make_shared<Objects::Enum>(type, name, value);;
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createReference(IMemory::Ptr value){

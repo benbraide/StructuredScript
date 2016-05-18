@@ -1,8 +1,8 @@
 #include "Memory.h"
 
-StructuredScript::Storage::Memory::Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes)
+StructuredScript::Storage::Memory::Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes, bool assignMemory /*= true*/)
 	: storage_(storage), type_(type), value_(value), attributes_(attributes){
-	if (value_ != nullptr)
+	if (assignMemory && value_ != nullptr)
 		value_->setMemory(this);
 }
 

@@ -23,6 +23,7 @@
 #include "Plugins/ExceptionParser.h"
 #include "Plugins/UseParser.h"
 #include "Plugins/NamespaceParser.h"
+#include "Plugins/EnumParser.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Scanner/Plugins/Number/SignedNumber.h"

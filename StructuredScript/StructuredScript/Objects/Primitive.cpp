@@ -86,7 +86,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::eva
 	if (primitive->rank() > rank())
 		return primitive->evaluate_(value, true, primitive->promote_(primitiveLeft), exception, expr);
 
-	return primitiveLeft->evaluate_(value, false, primitiveLeft->promote_(primitive), exception, expr);
+	if (primitive->rank() < rank())
+		return primitiveLeft->evaluate_(value, false, primitiveLeft->promote_(primitive), exception, expr);
+
+	return primitiveLeft->evaluate_(value, false, rightBase, exception, expr);
 }
 
 int StructuredScript::Objects::Primitive::rank(){
@@ -94,7 +97,7 @@ int StructuredScript::Objects::Primitive::rank(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::promote_(Primitive *target){
-	return nullptr;
+	return (rank() == target->rank()) ? target->ptr() : nullptr;
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Primitive::evaluate_(const std::string &value, bool reversed, Ptr right,

@@ -15,6 +15,13 @@ namespace StructuredScript{
 			virtual int rank() = 0;
 		};
 
+		class Enum{
+		public:
+			virtual ~Enum(){}
+
+			virtual std::string name() const = 0;
+		};
+
 		class Void{
 		public:
 			virtual ~Void(){}
@@ -107,6 +114,7 @@ namespace StructuredScript{
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
+	typedef Interfaces::Enum			IEnum;
 	typedef Interfaces::Void			IVoid;
 	typedef Interfaces::Bool			IBool;
 	typedef Interfaces::Bit				IBit;

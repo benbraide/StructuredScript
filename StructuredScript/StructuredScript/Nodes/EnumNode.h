@@ -1,22 +1,22 @@
 #pragma once
 
-#ifndef STRUCTURED_SCRIPT_PROPERTY_NODE_H
-#define STRUCTURED_SCRIPT_PROPERTY_NODE_H
+#ifndef STRUCTURED_SCRIPT_ENUM_NODE_H
+#define STRUCTURED_SCRIPT_ENUM_NODE_H
 
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
+#include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
-#include "../Common/Types/Type.h"
 
-#include "../Storage/MemoryState.h"
-#include "../Objects/Property.h"
+#include "../Common/Types/Type.h"
+#include "../Common/Types/DeclaredType.h"
 
 namespace StructuredScript{
 	namespace Nodes{
-		class PropertyNode : public INode, public IPropertyNode, public IBlockNode{
+		class EnumNode : public INode, public IBlockNode{
 		public:
-			PropertyNode(Ptr declaration, Ptr value)
-				: declaration_(declaration), value_(value){}
+			EnumNode(Ptr name, Ptr value)
+				: name_(name), value_(value){}
 
 			virtual Ptr ptr() override;
 
@@ -31,11 +31,10 @@ namespace StructuredScript{
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 		private:
-			Ptr declaration_;
+			Ptr name_;
 			Ptr value_;
-			IMemoryAttributes::Ptr attributes_;
 		};
 	}
 }
 
-#endif /* !STRUCTURED_SCRIPT_PROPERTY_NODE_H */
+#endif /* !STRUCTURED_SCRIPT_ENUM_NODE_H */

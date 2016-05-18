@@ -19,6 +19,12 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::EchoNode::evaluate(IStorage
 			"Cannot echo an invalid object!", expr)));
 	}
 
+	auto enumObject = dynamic_cast<IEnum *>(value.get());
+	if (enumObject != nullptr){
+		std::cout << enumObject->name() << "\n";
+		return PrimitiveFactory::createUndefined();
+	}
+
 	auto str = value->str(storage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;

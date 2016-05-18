@@ -15,9 +15,14 @@ StructuredScript::INode::Ptr StructuredScript::Parser::NamespaceParser::parse(IC
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
+	if (Query::Node::isEmpty(name)){
+		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+			"'namespace...': Expected an identifier!"));
+	}
+
 	if (!scanner.open(well, '{', '}')){
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
-			"'namespace...': Bad expression!"));
+			"'namespace " + name->str() + "...': Bad expression!"));
 	}
 
 	auto value = parser.parse(well, scanner, exception);
@@ -26,7 +31,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::NamespaceParser::parse(IC
 			return nullptr;
 
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
-			"'namespace{...': Bad expression!"));
+			"'namespace " + name->str() + "{...': Bad expression!"));
 	}
 
 	if (Query::ExceptionManager::has(exception))

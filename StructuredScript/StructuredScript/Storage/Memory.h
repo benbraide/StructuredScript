@@ -17,7 +17,7 @@ namespace StructuredScript{
 	namespace Storage{
 		class Memory : public IMemory, public IMemoryBackdoor{
 		public:
-			Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes);
+			Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes, bool assignMemory = true);
 
 			virtual Ptr ptr() override;
 

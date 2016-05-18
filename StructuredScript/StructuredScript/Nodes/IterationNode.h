@@ -8,7 +8,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class WhileNode : public IteratorNode{
+		class WhileNode : public IteratorNode, public IBlockNode{
 		public:
 			WhileNode(Ptr predicate, Ptr value)
 				: IteratorNode(value, predicate){}
@@ -37,7 +37,7 @@ namespace StructuredScript{
 			virtual std::string str() override;
 		};
 
-		class ForNode : public IteratorNode{
+		class ForNode : public IteratorNode, public IBlockNode{
 		public:
 			ForNode(Ptr predicate, Ptr value);
 

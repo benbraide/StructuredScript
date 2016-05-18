@@ -22,7 +22,7 @@ namespace StructuredScript{
 			}
 		};
 
-		class IfNode : public NonIteratorNode<false>{
+		class IfNode : public NonIteratorNode<false>, public IBlockNode{
 		public:
 			IfNode(Ptr predicate, Ptr value)
 				: NonIteratorNode(predicate, value){}
@@ -41,7 +41,7 @@ namespace StructuredScript{
 			return std::make_shared<ExtensionType>(elseNode->clone(), predicate_->clone(), value_->clone());
 		}
 
-		class UnlessNode : public NonIteratorNode<false>{
+		class UnlessNode : public NonIteratorNode<false>, public IBlockNode{
 		public:
 			UnlessNode(Ptr predicate, Ptr value)
 				: NonIteratorNode(predicate, value){}
@@ -62,7 +62,7 @@ namespace StructuredScript{
 			return std::make_shared<ExtensionType>(elseNode->clone(), predicate_->clone(), value_->clone());
 		}
 
-		class ElseNode : public NonIteratorNode<false>{
+		class ElseNode : public NonIteratorNode<false>, public IBlockNode{
 		public:
 			ElseNode(Ptr value)
 				: NonIteratorNode(nullptr, value){}

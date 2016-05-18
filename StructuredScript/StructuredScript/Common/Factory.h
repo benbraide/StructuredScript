@@ -17,6 +17,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createNaN();
 
+		static IAny::Ptr createEnum(IType::Ptr type, const std::string &name, int value);
+
 		static IAny::Ptr createReference(IMemory::Ptr value);
 
 		static IAny::Ptr createBool(bool value);
