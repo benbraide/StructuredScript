@@ -73,7 +73,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findMemory(co
 
 		std::list<IMemory::Ptr> list({ object->second });
 		object = usedObjects_.find(name);
-		if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
+		if (object != usedObjects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
 			list.push_back(object->second);
 
 		for (auto item : usedStorages_){
@@ -118,7 +118,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findFunctionM
 		list.push_back(object->second);
 
 	object = usedObjects_.find(name);
-	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
+	if (object != usedObjects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
 		list.push_back(object->second);
 
 	for (auto item : usedStorages_){
@@ -178,7 +178,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameO
 		list.push_back(object->second);
 
 	object = findUsedTypeOperator_(name);
-	if (object != typeOperators_.end())
+	if (object != usedTypeOperators_.end())
 		list.push_back(object->second);
 
 	for (auto item : usedStorages_){

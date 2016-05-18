@@ -58,7 +58,8 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IA
 		if (attributes != nullptr && (attributes->hasAttribute("Locked") || attributes->hasAttribute("Call")))//Restricted | Defined
 			return nullptr;
 
-		list_.erase(existing);
+		(*existing)->assign(function, nullptr, nullptr, nullptr);
+		return *existing;
 	}
 
 	list_.push_back(std::make_shared<StructuredScript::Storage::Memory>(storage_, IGlobalStorage::globalStorage->getPrimitiveType(
@@ -85,12 +86,28 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	auto max = 0;
 	Ptr selected;
 
-	for (auto function : list_){//Get function with highest score
-		auto functionBase = function->object()->base();
+	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
+		auto functionBase = (*function)->object()->base();
 		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
 		if (score > 0 && score >= max){
 			max = score;
-			selected = function;
+			selected = *function;
+		}
+	}
+
+	return selected;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::TypeListType &args){
+	auto max = 0;
+	Ptr selected;
+
+	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
+		auto functionBase = (*function)->object()->base();
+		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
+		if (score > 0 && score >= max){
+			max = score;
+			selected = *function;
 		}
 	}
 
@@ -99,22 +116,6 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 
 StructuredScript::Storage::Memory::Ptr StructuredScript::Storage::FunctionMemory::first(){
 	return list_.empty() ? nullptr : *list_.begin();
-}
-
-StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::TypeListType &args){
-	auto max = 0;
-	Ptr selected;
-
-	for (auto function : list_){//Get function with highest score
-		auto functionBase = function->object()->base();
-		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
-		if (score > 0 && score >= max){
-			max = score;
-			selected = function;
-		}
-	}
-
-	return selected;
 }
 
 void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr){

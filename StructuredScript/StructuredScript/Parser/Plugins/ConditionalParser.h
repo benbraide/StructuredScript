@@ -10,13 +10,14 @@ namespace StructuredScript{
 	namespace Parser{
 		class ConditionalParser : public IParserPlugin{
 		public:
-			explicit ConditionalParser(INode::Ptr predicate)
-				: predicate_(predicate){}
+			ConditionalParser(INode::Ptr predicate, short precedence)
+				: predicate_(predicate), precedence_(precedence){}
 
 			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception) override;
 
 		private:
 			INode::Ptr predicate_;
+			short precedence_;
 		};
 	}
 }

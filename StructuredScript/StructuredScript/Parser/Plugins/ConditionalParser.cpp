@@ -9,9 +9,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ConditionalParser::parse(
 		return nullptr;
 
 	scanner.next(well);//Ignore ':'
-	auto elseNode = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
-		return (next.value() != ";");
-	});
+	auto elseNode = parser.expression(nullptr, well, scanner, exception, precedence_);
 
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;

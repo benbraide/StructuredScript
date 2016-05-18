@@ -62,7 +62,11 @@ void StructuredScript::OperatorInfo::init(){
 	};
 
 	entries_["?"] = MatchedListType{
-		{ OperatorType(OperatorType::BINARY), Info{ 4, true } }
+		{ OperatorType(OperatorType::BINARY), Info{ 4, false } }
+	};
+
+	entries_["throw"] = MatchedListType{
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 4, false } }
 	};
 
 	entries_["||"] = MatchedListType{
@@ -158,6 +162,22 @@ void StructuredScript::OperatorInfo::init(){
 		{ OperatorType(OperatorType::BINARY), Info{ 16, true } }
 	};
 
+	entries_["new"] = MatchedListType{
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, false } }
+	};
+
+	entries_["delete"] = MatchedListType{
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, false } }
+	};
+
+	entries_["sizeof"] = MatchedListType{
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, false } }
+	};
+
+	entries_["typeof"] = MatchedListType{
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, false } }
+	};
+
 	entries_["~"] = MatchedListType{
 		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 17, true } }
 	};
@@ -196,7 +216,7 @@ void StructuredScript::OperatorInfo::init(){
 
 	entries_["::"] = MatchedListType{
 		{ OperatorType(OperatorType::BINARY), Info{ 21, true } },
-		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 22, true } }
+		{ OperatorType(OperatorType::LEFT_UNARY), Info{ 21, true } }
 	};
 }
 

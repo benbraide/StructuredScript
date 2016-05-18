@@ -52,24 +52,6 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 	if (type == Scanner::Plugins::TypenameTokenType::type)
 		return std::make_shared<Nodes::PrimitiveTypeIdentifierNode>(value);
 
-	if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER){
-		auto plugin = plugins_.find(value);
-		if (plugin != plugins_.end())//Use plugin
-			return plugin->second->parse(well, scanner, *this, exception);
-
-		if (value == "break")
-			return std::make_shared<Nodes::BreakNode>();
-
-		if (value == "continue")
-			return std::make_shared<Nodes::ContinueNode>();
-
-		DeclaredTypeParser declaredTypeParser(value);//Check if id is a modifier
-		if (declaredTypeParser.state().states() != Storage::MemoryState::STATE_NONE)
-			return declaredTypeParser.parse(well, scanner, *this, exception);
-
-		return std::make_shared<Nodes::IdentifierNode>(value);
-	}
-
 	if (value == "@"){
 		auto node = AtSymbolParser(validator).parse(well, scanner, *this, exception);
 		if (node != nullptr || Query::ExceptionManager::has(exception))
@@ -83,13 +65,35 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 
 	OperatorInfo::MatchedListType list;
 	operatorInfo.find(value, OperatorType(OperatorType::LEFT_UNARY), list);
-	if (list.empty())
+	if (list.empty()){
+		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER){
+			auto plugin = plugins_.find(value);
+			if (plugin != plugins_.end())//Use plugin
+				return plugin->second->parse(well, scanner, *this, exception);
+
+			if (value == "break")
+				return std::make_shared<Nodes::BreakNode>();
+
+			if (value == "continue")
+				return std::make_shared<Nodes::ContinueNode>();
+
+			DeclaredTypeParser declaredTypeParser(value);//Check if id is a modifier
+			if (declaredTypeParser.state().states() != Storage::MemoryState::STATE_NONE)
+				return declaredTypeParser.parse(well, scanner, *this, exception);
+
+			return std::make_shared<Nodes::IdentifierNode>(value);
+		}
+
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Unrecognized symbol!"));
+	}
 
 	auto info = list[OperatorType(OperatorType::LEFT_UNARY)];
 	auto operand = expression(nullptr, well, scanner, exception, info.precedence, validator);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
+
+	if (value == "throw")
+		return std::make_shared<Nodes::ThrowNode>(operand);
 
 	if (Query::Node::isEmpty(operand))
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Missing operand!"));
@@ -188,8 +192,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	}
 
 	OperatorInfo::MatchedListType list;
-	if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
-		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
+	operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
 	if (list.empty()){//Check declaration
 		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER && Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
@@ -227,7 +230,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 
 	if (info->first.isBinary()){
 		if (value == "?"){//Conditional operator
-			node = ConditionalParser(node).parse(well, scanner, *this, exception);
+			node = ConditionalParser(node, info->second.precedence).parse(well, scanner, *this, exception);
 			if (Query::ExceptionManager::has(exception))
 				return node;
 
@@ -272,7 +275,6 @@ void StructuredScript::Parser::Parser::init(){
 
 	plugins_["return"] = std::make_shared< SourceParser<Nodes::ReturnNode, true, false> >("return");
 	plugins_["echo"] = std::make_shared< SourceParser<Nodes::EchoNode, false, false> >("echo");
-	plugins_["throw"] = std::make_shared< SourceParser<Nodes::ThrowNode, true, false> >("throw");
 
 	operatorInfo.init();
 }
