@@ -87,6 +87,15 @@ bool StructuredScript::Query::Node::isPlainBlock(INode::Ptr node){
 	return false;
 }
 
+StructuredScript::INode::Ptr StructuredScript::Query::Node::getBaseId(INode::Ptr node){
+	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
+	if (operatorNode == nullptr || operatorNode->value() != "::")
+		return node;
+
+	auto unary = dynamic_cast<IUnaryOperatorNode *>(operatorNode);
+	return (unary == nullptr) ? dynamic_cast<IBinaryOperatorNode *>(operatorNode)->rightOperand() : unary->operand();
+}
+
 void StructuredScript::Query::Node::split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary /*= false*/){
 	if (node == nullptr)
 		return;

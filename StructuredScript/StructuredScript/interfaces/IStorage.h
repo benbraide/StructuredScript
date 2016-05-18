@@ -44,9 +44,9 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Memory> findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> *addTypenameOperatorMemory(const std::string &name) = 0;
+			virtual std::shared_ptr<Memory> *addTypenameOperatorMemory(std::shared_ptr<Type> name) = 0;
 
-			virtual std::shared_ptr<Memory> findTypenameOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
+			virtual std::shared_ptr<Memory> findTypenameOperatorMemory(std::shared_ptr<Type> name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<MemoryAttribute> *addMemoryAttribute(const std::string &name) = 0;
 

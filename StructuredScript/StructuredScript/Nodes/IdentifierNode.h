@@ -12,10 +12,12 @@
 #include "../Common/Types/StackedType.h"
 
 #include "../Storage/MemoryState.h"
+#include "../Interfaces/Nodes/IMemoryAdder.h"
 
 namespace StructuredScript{
 	namespace Nodes{
-		class IdentifierNode : public INode, public IIdentifierNode, public IIdentifierExpressionNode, public IStorageResolver, public ITypeResolver, public IMemoryResolver{
+		class IdentifierNode : public INode, public IIdentifierNode, public IIdentifierExpressionNode, public IStorageResolver,
+			public ITypeResolver, public IMemoryResolver, public IMemoryAdder{
 		public:
 			explicit IdentifierNode(const std::string &value)
 				: value_(value){}
@@ -40,12 +42,16 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
+			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+
+			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+
 		protected:
 			std::string value_;
 		};
 
 		class OperatorIdentifierNode : public INode, public IIdentifierNode, public IOperatorIdentifierNode, public IIdentifierExpressionNode,
-			public IStorageResolver, public ITypeResolver, public IMemoryResolver{
+			public IStorageResolver, public ITypeResolver, public IMemoryResolver, public IMemoryAdder{
 		public:
 			explicit OperatorIdentifierNode(Ptr value)
 				: value_(value){}
@@ -72,6 +78,10 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
+			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+
+			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+
 		private:
 			Ptr value_;
 		};
@@ -86,6 +96,10 @@ namespace StructuredScript{
 			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+
+			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
 		};
 
 		class TypenameIdentifierNode : public INode, public IIdentifierNode, public ITypeIdentifierNode, public IIdentifierExpressionNode,

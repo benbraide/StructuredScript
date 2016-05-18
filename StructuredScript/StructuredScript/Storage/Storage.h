@@ -6,16 +6,20 @@
 #include <map>
 
 #include "FunctionMemory.h"
+#include "../Interfaces/Storages/IPureStorage.h"
 
 namespace StructuredScript{
 	namespace Storage{
-		class Storage : public IStorage{
+		class Storage : public IStorage, public IPureStorage{
 		public:
 			typedef std::shared_ptr<IStorage>						Ptr;
 			typedef std::map<std::string, IType::Ptr>				TypeListType;
 			typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
 			typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
 			typedef std::map<std::string, Ptr>						StorageListType;
+
+			typedef std::map<std::string, IMemory::Ptr>				UsedMemoryListType;
+			typedef std::list<IStorage *>							UsedStorageListType;
 
 			Storage(IStorage *parent)
 				: parent_(parent){}
@@ -40,9 +44,9 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addTypenameOperatorMemory(const std::string &name) override;
+			virtual IMemory::Ptr *addTypenameOperatorMemory(IType::Ptr name) override;
 
-			virtual IMemory::Ptr findTypenameOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+			virtual IMemory::Ptr findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 			virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
 
@@ -52,12 +56,18 @@ namespace StructuredScript{
 
 			virtual bool remove(IMemory::Ptr target) override;
 
+			virtual bool use(IStorage *storage) override;
+
+			virtual bool use(const std::string &name, IMemory::Ptr value) override;
+
 		protected:
 			IStorage *parent_;
 			TypeListType types_;
 			MemoryListType objects_;
 			MemoryAttributeListType attributes_;
 			StorageListType storages_;
+			UsedMemoryListType usedObjects_;
+			UsedStorageListType usedStorages_;
 		};
 	}
 }

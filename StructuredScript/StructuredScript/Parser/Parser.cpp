@@ -192,15 +192,13 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
 	if (list.empty()){//Check declaration
-		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || value == "operator"){
-			if (Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
-				scanner.save(next);
-				node = DeclarationParser(node).parse(well, scanner, *this, exception);
-				if (Query::ExceptionManager::has(exception))
-					return node;
+		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER && Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
+			scanner.save(next);
+			node = DeclarationParser(node).parse(well, scanner, *this, exception);
+			if (Query::ExceptionManager::has(exception))
+				return node;
 
-				return expression(node, well, scanner, exception, precedence, validator);
-			}
+			return expression(node, well, scanner, exception, precedence, validator);
 		}
 
 		if (type == Scanner::TokenType::TOKEN_TYPE_SYMBOL)
@@ -255,6 +253,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 
 void StructuredScript::Parser::Parser::init(){
 	plugins_["typename"] = std::make_shared<TypenameParser>();
+	plugins_["operator"] = std::make_shared<OperatorParser>();
 
 	plugins_["if"] = std::make_shared<SelectionParser>("if");
 	plugins_["unless"] = std::make_shared<SelectionParser>("unless");

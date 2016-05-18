@@ -44,9 +44,9 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addTypenameOperatorMemory(const std::string &name) override;
+			virtual IMemory::Ptr *addTypenameOperatorMemory(IType::Ptr name) override;
 
-			virtual IMemory::Ptr findTypenameOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+			virtual IMemory::Ptr findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 			virtual IMemoryAttribute::Ptr *addMemoryAttribute(const std::string &name) override;
 

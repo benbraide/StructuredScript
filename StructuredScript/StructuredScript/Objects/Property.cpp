@@ -155,11 +155,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findOperator
 	return (searchScope == SEARCH_DEFAULT) ? memory_->storage()->findOperatorMemory(name, searchScope) : nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Property::addTypenameOperatorMemory(const std::string &name){
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::Property::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto compoundType = dynamic_cast<ICompoundType *>(type_.get());
 	if (compoundType != nullptr){
 		auto value = compoundType->findMemberTypenameOperatorMemory(name, SEARCH_FAMILY);

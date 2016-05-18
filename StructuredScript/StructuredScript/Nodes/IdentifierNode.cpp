@@ -44,6 +44,14 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::IdentifierNode::resolveM
 	return (storage == nullptr) ? nullptr : storage->findMemory(value_, searchScope);
 }
 
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addMemory(IStorage *storage){
+	return storage->addMemory(value_);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addNonOperatorMemory(IStorage *storage){
+	return storage->addMemory(value_);
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::OperatorIdentifierNode::ptr(){
 	return shared_from_this();
 }
@@ -87,14 +95,38 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::OperatorIdentifierNode::
 	if (storage == nullptr)
 		return nullptr;
 
-	auto id = dynamic_cast<IIdentifierNode *>(value_.get());
-	if (id == nullptr)
+	auto base = Query::Node::getBaseId(value_);
+	if (dynamic_cast<IIdentifierNode *>(base.get()) == nullptr)
 		return nullptr;
 
-	if (dynamic_cast<ITypeIdentifierNode *>(id) == nullptr)
-		return storage->findOperatorMemory(id->value(), searchScope);
+	if (dynamic_cast<ITypeIdentifierNode *>(value_.get()) == nullptr && dynamic_cast<ITypeIdentifierNode *>(base.get()) == nullptr)
+		return storage->findOperatorMemory(value_->str(), searchScope);
 
-	return storage->findTypenameOperatorMemory(id->value(), searchScope);
+	auto resolver = dynamic_cast<ITypeResolver *>(value_.get());
+	auto type = (resolver == nullptr) ? nullptr : resolver->resolveType(storage);
+
+	return (type == nullptr) ? nullptr : storage->findTypenameOperatorMemory(type, searchScope);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addMemory(IStorage *storage){
+	if (storage == nullptr)
+		return nullptr;
+
+	auto base = Query::Node::getBaseId(value_);
+	if (dynamic_cast<IIdentifierNode *>(base.get()) == nullptr)
+		return nullptr;
+
+	if (dynamic_cast<ITypeIdentifierNode *>(value_.get()) == nullptr && dynamic_cast<ITypeIdentifierNode *>(base.get()) == nullptr)
+		return storage->addOperatorMemory(value_->str());
+
+	auto resolver = dynamic_cast<ITypeResolver *>(value_.get());
+	auto type = (resolver == nullptr) ? nullptr : resolver->resolveType(storage);
+
+	return (type == nullptr) ? nullptr : storage->addTypenameOperatorMemory(type);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addNonOperatorMemory(IStorage *storage){
+	return nullptr;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierNode::clone(){
@@ -110,6 +142,14 @@ StructuredScript::IStorage *StructuredScript::Nodes::PrimitiveTypeIdentifierNode
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierNode::resolveMemory(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addMemory(IStorage *storage){
+	return nullptr;
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return nullptr;
 }
 

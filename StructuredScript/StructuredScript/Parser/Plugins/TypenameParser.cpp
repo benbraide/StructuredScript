@@ -2,7 +2,15 @@
 
 StructuredScript::INode::Ptr StructuredScript::Parser::TypenameParser::parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
 	auto value = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
-		return (next.type() == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER || next.value() == "::");
+		switch (next.type()){
+		case Scanner::TokenType::TOKEN_TYPE_IDENTIFIER:
+		case Scanner::Plugins::TypenameTokenType::type:
+			return true;
+		default:
+			break;
+		}
+		
+		return (next.value() == "::");
 	});
 
 	if (Query::ExceptionManager::has(exception))

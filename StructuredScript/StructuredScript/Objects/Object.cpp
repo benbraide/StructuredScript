@@ -88,11 +88,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findOperatorMe
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Object::addTypenameOperatorMemory(const std::string &name){
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::Object::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 

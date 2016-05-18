@@ -9,6 +9,7 @@
 
 #include "../Storage/FunctionMemory.h"
 #include "../Objects/Function.h"
+#include "../Interfaces/Nodes/IMemoryAdder.h"
 
 namespace StructuredScript{
 	namespace Nodes{

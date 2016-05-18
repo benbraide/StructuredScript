@@ -68,6 +68,8 @@ namespace StructuredScript{
 
 			static bool isPlainBlock(INode::Ptr node);
 
+			static INode::Ptr getBaseId(INode::Ptr node);
+
 			static void split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary = false);
 
 			static IStorage *resolveAsStorage(INode::Ptr node, IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT);

@@ -47,12 +47,12 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::SharedStorage::findOpe
 	return (value == nullptr) ? then_->findOperatorMemory(name, searchScope) : value;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Storage::SharedStorage::addTypenameOperatorMemory(const std::string &name){
+StructuredScript::IMemory::Ptr *StructuredScript::Storage::SharedStorage::addTypenameOperatorMemory(IType::Ptr name){
 	auto object = then_->findTypenameOperatorMemory(name, SEARCH_LOCAL);
 	return (object == nullptr || dynamic_cast<IFunctionMemory *>(object.get()) != nullptr) ? first_->addTypenameOperatorMemory(name) : nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::SharedStorage::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IMemory::Ptr StructuredScript::Storage::SharedStorage::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto value = first_->findTypenameOperatorMemory(name, SEARCH_LOCAL);
 	return (value == nullptr) ? then_->findTypenameOperatorMemory(name, searchScope) : value;
 }

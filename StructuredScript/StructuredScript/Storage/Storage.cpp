@@ -5,10 +5,13 @@ StructuredScript::IStorage *StructuredScript::Storage::Storage::parent(){
 }
 
 StructuredScript::Storage::Storage::Ptr *StructuredScript::Storage::Storage::addStorage(const std::string &name){
+	if (findType(name, IStorage::SEARCH_LOCAL) != nullptr || findMemory(name, IStorage::SEARCH_LOCAL) != nullptr)
+		return nullptr;
+
 	return &storages_[name];
 }
 
-StructuredScript::IStorage * StructuredScript::Storage::Storage::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IStorage *StructuredScript::Storage::Storage::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto storage = storages_.find(name);
 	if (storage != storages_.end())
 		return storage->second.get();
@@ -21,7 +24,10 @@ StructuredScript::IStorage * StructuredScript::Storage::Storage::findStorage(con
 }
 
 StructuredScript::IType::Ptr *StructuredScript::Storage::Storage::addType(const std::string &name){
-	return (findType(name, IStorage::SEARCH_LOCAL) == nullptr) ? &types_[name] : nullptr;
+	if (findStorage(name, IStorage::SEARCH_LOCAL) != nullptr || findType(name, IStorage::SEARCH_LOCAL) != nullptr || findMemory(name, IStorage::SEARCH_LOCAL) != nullptr)
+		return nullptr;
+
+	return &types_[name];
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::Storage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -33,6 +39,9 @@ StructuredScript::IType::Ptr StructuredScript::Storage::Storage::findType(const 
 }
 
 StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addMemory(const std::string &name){
+	if (findStorage(name, IStorage::SEARCH_LOCAL) != nullptr || findType(name, IStorage::SEARCH_LOCAL) != nullptr)
+		return nullptr;
+
 	auto object = objects_.find(name);
 	if (object != objects_.end())//Check if it is a function memory
 		return (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr) ? nullptr : &object->second;
@@ -89,11 +98,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findOperatorM
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addTypenameOperatorMemory(const std::string &name){
+StructuredScript::IMemory::Ptr *StructuredScript::Storage::Storage::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 
@@ -122,4 +131,15 @@ bool StructuredScript::Storage::Storage::remove(IMemory::Ptr target){
 	}
 
 	return false;
+}
+
+bool StructuredScript::Storage::Storage::use(IStorage *storage){
+	if (storage != this && std::find(usedStorages_.begin(), usedStorages_.end(), storage) == usedStorages_.end())
+		usedStorages_.push_back(storage);
+
+	return true;
+}
+
+bool StructuredScript::Storage::Storage::use(const std::string &name, IMemory::Ptr value){
+	return true;
 }

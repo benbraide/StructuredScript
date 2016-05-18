@@ -17,7 +17,7 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Memory> findMemberOperatorMemory(const std::string &name, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> findMemberTypenameOperatorMemory(const std::string &name, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
+			virtual std::shared_ptr<Memory> findMemberTypenameOperatorMemory(Type::Ptr name, unsigned short searchScope = Storage::SEARCH_DEFAULT) = 0;
 		};
 	}
 

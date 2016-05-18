@@ -44,12 +44,13 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr
 	}
 
 	auto name = declaration->value();
-	if (name == nullptr || !Query::Node::isIdentifier(name) || Query::Node::isTypeIdentifier(name) || Query::Node::isOperatorIdentifier(name)){
+	auto adder = dynamic_cast<IMemoryAdder *>(name.get());
+	if (adder == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Expected identifier after typename!", expr)));
 	}
 
-	auto memory = storage->addMemory(dynamic_cast<IIdentifierNode *>(name.get())->value());
+	auto memory = adder->addMemory(storage);
 	if (memory == nullptr){//Failed to add memory
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));

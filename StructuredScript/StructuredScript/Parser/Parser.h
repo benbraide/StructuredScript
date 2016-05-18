@@ -8,6 +8,7 @@
 #include "../Interfaces/IParser.h"
 
 #include "Plugins/TypenameParser.h"
+#include "Plugins/OperatorParser.h"
 #include "Plugins/DeclarationParser.h"
 #include "Plugins/InitializationParser.h"
 #include "Plugins/DependentDeclarationParser.h"

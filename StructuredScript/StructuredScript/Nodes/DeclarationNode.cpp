@@ -44,14 +44,15 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 	if (value == nullptr)//Unnamed declaration
 		return createMemory_(storage, type);
 
-	if (!Query::Node::isIdentifier(value) || Query::Node::isTypeIdentifier(value) || Query::Node::isOperatorIdentifier(value)){
+	auto adder = dynamic_cast<IMemoryAdder *>(value.get());
+	if (adder == nullptr){
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Expected identifier after typename!", expr)));
 
 		return nullptr;
 	}
 
-	auto memory = storage->addMemory(dynamic_cast<IIdentifierNode *>(value.get())->value());
+	auto memory = adder->addNonOperatorMemory(storage);
 	if (memory == nullptr || dynamic_cast<IFunctionMemory *>(memory->get()) != nullptr){//Failed to add memory
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));
