@@ -22,7 +22,9 @@ namespace StructuredScript{
 
 			virtual bool init(bool isRightUnary, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual bool isDefined() override;
+			virtual bool isDefined() const override;
+
+			virtual bool isStatic() const override;
 
 			virtual bool equals(Any::Ptr target) override;
 
@@ -41,6 +43,8 @@ namespace StructuredScript{
 
 			IType::Ptr type_;
 			IType::Ptr owner_;
+
+			bool isStatic_;
 			bool rightUnary_;
 
 			INode::Ptr parameters_;

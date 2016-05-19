@@ -30,6 +30,8 @@ namespace StructuredScript{
 
 			virtual IMemoryAttributes::Ptr attributes() override;
 
+			virtual Ptr declaration() override;
+
 		private:
 			Ptr declaration_;
 			Ptr value_;

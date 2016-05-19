@@ -8,7 +8,7 @@ StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &compon
 			for (auto memory : functionMemory->list_)
 				list_.push_back(memory);
 		}
-		else
+		else if (dynamic_cast<IFunction *>(component->object().get()) != nullptr)
 			list_.push_back(component);
 	}
 }

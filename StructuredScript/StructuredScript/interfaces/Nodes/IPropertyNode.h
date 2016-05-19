@@ -10,6 +10,8 @@ namespace StructuredScript{
 		class PropertyNode{
 		public:
 			virtual ~PropertyNode(){}
+
+			virtual Node::Ptr declaration() = 0;
 		};
 	}
 

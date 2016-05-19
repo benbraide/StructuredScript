@@ -50,6 +50,10 @@ void StructuredScript::Nodes::PropertyNode::attributes(IMemoryAttributes::Ptr at
 	attributes_ = attributes;
 }
 
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PropertyNode::declaration(){
+	return declaration_;
+}
+
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::PropertyNode::attributes(){
 	return attributes_;
 }

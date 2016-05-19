@@ -84,7 +84,15 @@ bool StructuredScript::Query::Node::isBlock(INode::Ptr node){
 }
 
 bool StructuredScript::Query::Node::isPlainBlock(INode::Ptr node){
-	return false;
+	return (dynamic_cast<IPlainBlockNode *>(node.get()) != nullptr); return false;
+}
+
+bool StructuredScript::Query::Node::isProperty(INode::Ptr node){
+	return (dynamic_cast<IPropertyNode *>(node.get()) != nullptr);
+}
+
+bool StructuredScript::Query::Node::isClass(INode::Ptr node){
+	return (dynamic_cast<IClassNode *>(node.get()) != nullptr);
 }
 
 StructuredScript::INode::Ptr StructuredScript::Query::Node::getBaseId(INode::Ptr node){

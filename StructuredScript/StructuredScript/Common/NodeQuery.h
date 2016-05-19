@@ -21,6 +21,7 @@
 #include "../Interfaces/Nodes/IExceptionHandler.h"
 #include "../Interfaces/Nodes/IMemoryAdder.h"
 #include "../Interfaces/Nodes/IUseAdder.h"
+#include "../Interfaces/Nodes/IClassNode.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 
@@ -69,6 +70,10 @@ namespace StructuredScript{
 			static bool isBlock(INode::Ptr node);
 
 			static bool isPlainBlock(INode::Ptr node);
+
+			static bool isProperty(INode::Ptr node);
+
+			static bool isClass(INode::Ptr node);
 
 			static INode::Ptr getBaseId(INode::Ptr node);
 

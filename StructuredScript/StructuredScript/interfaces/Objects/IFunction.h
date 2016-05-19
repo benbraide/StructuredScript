@@ -18,7 +18,9 @@ namespace StructuredScript{
 
 			virtual bool init(bool isRightUnary, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual bool isDefined() = 0;
+			virtual bool isDefined() const = 0;
+
+			virtual bool isStatic() const = 0;
 
 			virtual bool equals(Any::Ptr target) = 0;
 

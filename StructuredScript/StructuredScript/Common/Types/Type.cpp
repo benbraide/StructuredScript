@@ -108,66 +108,28 @@ StructuredScript::IMemory::Ptr *StructuredScript::Type::addMemory(const std::str
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	ListType list;
+
 	auto object = objects_.find(name);
 	if (object != objects_.end()){
 		if (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr)
 			return object->second;
 
-		std::list<IMemory::Ptr> list({ object->second });
-		if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-			for (auto parent : parents_){
-				auto base = parent->base();
-				auto storageParent = dynamic_cast<IStorage *>(base.get());
-
-				auto memory = (storageParent == nullptr) ? nullptr : storageParent->findFunctionMemory(name, SEARCH_FAMILY);
-				if (memory != nullptr)
-					list.push_back(memory);
-			}
-		}
-
-		if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
-			auto memory = storage_->findFunctionMemory(name, SEARCH_DEFAULT);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
-
-		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
+		list.push_back(object->second);
 	}
 
-	if (searchScope != SEARCH_LOCAL){
-		for (auto parent : parents_){
-			auto alike = dynamic_cast<Type *>(parent.get());
-			auto object = (alike == nullptr) ? nullptr : alike->findMemory(name, searchScope);
-			if (object != nullptr)
-				return object;
-		}
-	}
-
-	return (searchScope == SEARCH_DEFAULT && storage_ != nullptr) ? storage_->findMemory(name, SEARCH_DEFAULT) : nullptr;
+	extendList_(list, name, searchScope);
+	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	StructuredScript::Storage::FunctionMemory::ListType list;
+	ListType list;
 
 	auto object = objects_.find(name);
-	if (object != objects_.end())
+	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
 		list.push_back(object->second);
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		for (auto parent : parents_){
-			auto storageParent = dynamic_cast<IStorage *>(parent.get());
-			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findFunctionMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
-	}
-
-	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
-		auto memory = storage_->findFunctionMemory(name, SEARCH_DEFAULT);
-		if (memory != nullptr)
-			list.push_back(memory);
-	}
-
+	extendList_(list, name, searchScope);
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
@@ -176,27 +138,13 @@ StructuredScript::IMemory::Ptr *StructuredScript::Type::addOperatorMemory(const 
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	StructuredScript::Storage::FunctionMemory::ListType list;
+	ListType list;
 
 	auto object = operators_.find(name);
 	if (object != operators_.end())
 		list.push_back(object->second);
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		for (auto parent : parents_){
-			auto storageParent = dynamic_cast<IStorage *>(parent.get());
-			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findOperatorMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
-	}
-
-	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
-		auto memory = storage_->findOperatorMemory(name, SEARCH_DEFAULT);
-		if (memory != nullptr)
-			list.push_back(memory);
-	}
-
+	extendOperatorList_(list, name, searchScope);
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
@@ -205,27 +153,13 @@ StructuredScript::IMemory::Ptr *StructuredScript::Type::addTypenameOperatorMemor
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	StructuredScript::Storage::FunctionMemory::ListType list;
+	ListType list;
 
-	auto object = findTypeOperator_(name);
+	auto object = typeOperators_.find(name);
 	if (object != typeOperators_.end())
 		list.push_back(object->second);
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		for (auto parent : parents_){
-			auto storageParent = dynamic_cast<IStorage *>(parent.get());
-			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findTypenameOperatorMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
-	}
-
-	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
-		auto memory = storage_->findTypenameOperatorMemory(name, SEARCH_DEFAULT);
-		if (memory != nullptr)
-			list.push_back(memory);
-	}
-
+	extendTypeOperatorList_(list, name, searchScope);
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
@@ -270,4 +204,61 @@ StructuredScript::Type::TypenameOperatorMemoryListType::iterator StructuredScrip
 	}
 
 	return typeOperators_.end();
+}
+
+void StructuredScript::Type::extendList_(ListType &list, const std::string &name, unsigned short searchScope){
+	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
+		for (auto parent : parents_){
+			auto base = parent->base();
+			auto storageParent = dynamic_cast<IStorage *>(base.get());
+
+			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findFunctionMemory(name, SEARCH_FAMILY);
+			if (memory != nullptr)
+				list.push_back(memory);
+		}
+	}
+
+	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
+		auto memory = storage_->findFunctionMemory(name, SEARCH_DEFAULT);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+}
+
+void StructuredScript::Type::extendOperatorList_(ListType &list, const std::string &name, unsigned short searchScope){
+	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
+		for (auto parent : parents_){
+			auto base = parent->base();
+			auto storageParent = dynamic_cast<IStorage *>(base.get());
+
+			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findOperatorMemory(name, SEARCH_FAMILY);
+			if (memory != nullptr)
+				list.push_back(memory);
+		}
+	}
+
+	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
+		auto memory = storage_->findOperatorMemory(name, SEARCH_DEFAULT);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
+}
+
+void StructuredScript::Type::extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope){
+	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
+		for (auto parent : parents_){
+			auto base = parent->base();
+			auto storageParent = dynamic_cast<IStorage *>(base.get());
+
+			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findTypenameOperatorMemory(name, SEARCH_FAMILY);
+			if (memory != nullptr)
+				list.push_back(memory);
+		}
+	}
+
+	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
+		auto memory = storage_->findTypenameOperatorMemory(name, SEARCH_DEFAULT);
+		if (memory != nullptr)
+			list.push_back(memory);
+	}
 }

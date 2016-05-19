@@ -53,6 +53,36 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const st
 	return set_->call(false, IFunction::ArgListType{ right }, exception, expr);
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto target = base();
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Operands mismatch!", expr)));
+	}
+
+	return target->evaluateLeftUnary(value, storage, exception, expr);
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto target = base();
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Operands mismatch!", expr)));
+	}
+
+	return target->evaluateRightUnary(value, storage, exception, expr);
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto target = base();
+	if (target == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Operands mismatch!", expr)));
+	}
+
+	return target->evaluateBinary(value, right, storage, exception, expr);
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Property::type(){
 	auto target = base();
 	return (target == nullptr) ? nullptr : target->type();

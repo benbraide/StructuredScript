@@ -60,6 +60,12 @@ bool StructuredScript::Objects::Function::init(bool isRightUnary, IStorage *stor
 
 	rightUnary_ = isRightUnary;
 
+	auto declType = dynamic_cast<IDeclaredType *>(type_.get());
+	if (declType != nullptr){//Check for static declaration
+		if (Storage::MemoryState(declType->states()).isStatic())
+			return true;//Non-member function
+	}
+
 	auto storageType = dynamic_cast<IType *>(storage);
 	if (storageType != nullptr)//Member function
 		owner_ = storageType->ptr();
@@ -67,8 +73,12 @@ bool StructuredScript::Objects::Function::init(bool isRightUnary, IStorage *stor
 	return true;
 }
 
-bool StructuredScript::Objects::Function::isDefined(){
+bool StructuredScript::Objects::Function::isDefined() const{
 	return (definition_ != nullptr);
+}
+
+bool StructuredScript::Objects::Function::isStatic() const{
+	return isStatic_;
 }
 
 bool StructuredScript::Objects::Function::equals(Any::Ptr target){

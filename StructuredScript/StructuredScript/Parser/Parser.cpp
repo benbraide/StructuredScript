@@ -261,6 +261,7 @@ void StructuredScript::Parser::Parser::init(){
 
 	plugins_["namespace"] = std::make_shared<NamespaceParser>();
 	plugins_["enum"] = std::make_shared<EnumParser>();
+	plugins_["class"] = std::make_shared<ClassParser>();
 
 	plugins_["if"] = std::make_shared<SelectionParser>("if");
 	plugins_["unless"] = std::make_shared<SelectionParser>("unless");

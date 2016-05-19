@@ -23,8 +23,13 @@ namespace StructuredScript{
 		typedef std::map<std::string, IMemory::Ptr>				OperatorMemoryListType;
 		typedef std::map<IType::Ptr, IMemory::Ptr>				TypenameOperatorMemoryListType;
 
+		typedef StructuredScript::Storage::FunctionMemory::ListType ListType;
+
 		Type(IStorage *storage, const std::string &name)
-			: storage_(storage), name_(name){}
+			: name_(name), storage_(storage){}
+
+		Type(IStorage *storage, const ParentListType &parents, const std::string &name)
+			: name_(name), storage_(storage), parents_(parents){}
 
 		virtual Ptr ptr() override;
 
@@ -80,8 +85,14 @@ namespace StructuredScript{
 
 		void addExternalCall(const std::string &name, ExternalCallType value);
 
-	private:
+	protected:
 		TypenameOperatorMemoryListType::iterator findTypeOperator_(IType::Ptr name);
+
+		void extendList_(ListType &list, const std::string &name, unsigned short searchScope);
+
+		void extendOperatorList_(ListType &list, const std::string &name, unsigned short searchScope);
+
+		void extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope);
 
 		std::string name_;
 		IStorage *storage_;
