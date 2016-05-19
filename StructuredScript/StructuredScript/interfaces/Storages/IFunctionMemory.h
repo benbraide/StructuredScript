@@ -18,9 +18,11 @@ namespace StructuredScript{
 
 			virtual bool remove(Memory::Ptr function) = 0;
 
-			virtual Memory::Ptr find(const Function::ArgListType &args) = 0;
+			virtual Any::Ptr call(bool rightUnary, const Function::ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual Memory::Ptr find(const Function::TypeListType &args) = 0;
+			virtual Memory::Ptr find(bool rightUnary, Any::Ptr object, const Function::ArgListType &args) = 0;
+
+			virtual Memory::Ptr find(bool rightUnary, Any::Ptr object, const Function::TypeListType &args) = 0;
 
 			virtual Memory::Ptr first() = 0;
 

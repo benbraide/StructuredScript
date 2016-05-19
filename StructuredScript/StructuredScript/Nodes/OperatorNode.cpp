@@ -28,31 +28,8 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 		}
 
 		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
-		if (functionMemory != nullptr){//Call function
-			IFunction::ArgListType args;
-
-			auto targetStorage = memory->storage();
-			if (targetStorage != nullptr){//Function a member -- add object to argument list
-				auto object = dynamic_cast<IAny *>(targetStorage);
-				if (object != nullptr)
-					args.push_front(object->ptr());
-			}
-
-			auto match = functionMemory->find(args);//Find matching function
-			if (match == nullptr){
-				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-					Query::ExceptionManager::combine("'" + str() + "': No function found taking the specified arguments!", expr)));
-			}
-
-			auto matchBase = match->object()->base();
-			auto function = dynamic_cast<IFunction *>(matchBase.get());
-			if (function == nullptr){
-				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
-			}
-
-			return function->call(args, (targetStorage == nullptr) ? match->storage() : targetStorage, exception, expr);
-		}
+		if (functionMemory != nullptr)//Call function
+			return functionMemory->call(false, {}, exception, expr);
 	}
 
 	auto value = operand_->evaluate(storage, exception, expr);
@@ -166,27 +143,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;
 
-			auto targetStorage = memory->storage();
-			if (targetStorage != nullptr){//Function a member -- add object to argument list
-				auto object = dynamic_cast<IAny *>(targetStorage);
-				if (object != nullptr)
-					args.push_front(object->ptr());
-			}
-
-			auto match = functionMemory->find(args);//Find matching function
-			if (match == nullptr){
-				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-					Query::ExceptionManager::combine("'" + str() + "': No function found taking the specified arguments!", expr)));
-			}
-
-			auto matchBase = match->object()->base();
-			auto function = dynamic_cast<IFunction *>(matchBase.get());
-			if (function == nullptr){
-				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-					Query::ExceptionManager::combine("'" + str() + "': Target is not a function!", expr)));
-			}
-
-			return function->call(args, (targetStorage == nullptr) ? match->storage() : targetStorage, exception, expr);
+			return functionMemory->call(false, args, exception, expr);
 		}
 	}
 
@@ -331,17 +288,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::reso
 		if (storageObject == nullptr)
 			return nullptr;
 
-		memory = rightResolver->resolveMemory(storageObject, IStorage::SEARCH_FAMILY);
-		if (memory == nullptr)
-			return nullptr;
-
-		//TODO: Validate access
-
-		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
-		if (functionMemory != nullptr)//Set object as storage
-			functionMemory->setStorage(storageObject);
-
-		return memory;
+		return rightResolver->resolveMemory(storageObject, IStorage::SEARCH_FAMILY);
 	}
 
 	if (value_ == "::"){//Local search

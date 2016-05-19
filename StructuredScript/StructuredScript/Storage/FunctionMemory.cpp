@@ -82,13 +82,26 @@ bool StructuredScript::Storage::FunctionMemory::remove(Memory::Ptr function){
 	return false;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::ArgListType &args){
+StructuredScript::IAny::Ptr StructuredScript::Storage::FunctionMemory::call(bool rightUnary, const IFunction::ArgListType &args, IExceptionManager *exception, INode *expr){
+	auto objectStorage = dynamic_cast<IAny *>(storage_);
+	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
+
+	auto match = find(rightUnary, object, args);
+	if (match == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("No function found taking the specified arguments!", expr)));
+	}
+
+	return dynamic_cast<IFunction *>(match->object().get())->call(rightUnary, object, args, exception, expr);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, IAny::Ptr object, const IFunction::ArgListType &args){
 	auto max = 0;
 	Ptr selected;
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
 		auto functionBase = (*function)->object()->base();
-		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
+		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(rightUnary, object, args);
 		if (score > 0 && score >= max){
 			max = score;
 			selected = *function;
@@ -98,13 +111,13 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(c
 	return selected;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(const IFunction::TypeListType &args){
+StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, IAny::Ptr object, const IFunction::TypeListType &args){
 	auto max = 0;
 	Ptr selected;
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
 		auto functionBase = (*function)->object()->base();
-		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(args);
+		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(rightUnary, object, args);
 		if (score > 0 && score >= max){
 			max = score;
 			selected = *function;

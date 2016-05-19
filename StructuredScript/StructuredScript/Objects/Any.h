@@ -7,7 +7,7 @@
 #include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
 
-#include "../Interfaces/Types/ICompoundType.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
 
 namespace StructuredScript{
 	namespace Objects{

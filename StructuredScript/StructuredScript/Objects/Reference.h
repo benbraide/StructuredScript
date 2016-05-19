@@ -7,8 +7,6 @@
 #include "../Common/ObjectQuery.h"
 #include "../Common/Factory.h"
 
-#include "../Interfaces/Types/ICompoundType.h"
-
 namespace StructuredScript{
 	namespace Objects{
 		class Reference : public IAny{

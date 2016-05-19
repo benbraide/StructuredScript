@@ -58,20 +58,11 @@ bool StructuredScript::Objects::Function::init(bool isRightUnary, IStorage *stor
 	else//Empty parameter list
 		limits_ = { 0, 0 };
 
-	if (isRightUnary){
-		rightUnary_ = IGlobalStorage::globalStorage->getRightUnaryPlaceholderType();
-		++limits_.first;
-		if (limits_.second != -1)
-			++limits_.second;
-	}
+	rightUnary_ = isRightUnary;
 
 	auto storageType = dynamic_cast<IType *>(storage);
-	if (storageType != nullptr){
+	if (storageType != nullptr)//Member function
 		owner_ = storageType->ptr();
-		++limits_.first;
-		if (limits_.second != -1)
-			++limits_.second;
-	}
 
 	return true;
 }
@@ -101,35 +92,31 @@ bool StructuredScript::Objects::Function::accepts(int count){
 	return (limits_.second == -1 || count <= limits_.second);
 }
 
-int StructuredScript::Objects::Function::score(const ArgListType &args){
+int StructuredScript::Objects::Function::score(bool rightUnary, IAny::Ptr object, const ArgListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
-	auto arg = args.begin();
-	if (rightUnary_ != nullptr){//Compare first argument with right unary type
-		auto type = (*arg)->type();
-		if (type == nullptr || !rightUnary_->isEqual(type))//Exact type expected
-			return 0;
+	if (rightUnary_ != rightUnary)
+		return -2;
 
-		++arg;
-	}
-
-	if (owner_ != nullptr){//Compare first argument with owner type
-		auto type = (*arg)->type();
+	if (owner_ != nullptr){//Compare object types
+		auto type = (object == nullptr) ? nullptr : object->type();
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
-			return 0;
-
-		++arg;
+			return -1;
 	}
 
+	auto arg = args.begin();
 	if (arg == args.end())
+		return 1;
+
+	if (args.empty())//Matched
 		return 1;
 
 	auto total = 0;
 	unsigned int index = 0;
-	
-	for (; arg != args.end(); ++arg){
-		auto type = (*arg)->type();
+
+	for (auto arg : args){
+		auto type = arg->type();
 		if (type == nullptr)//Type expected
 			return 0;
 
@@ -143,35 +130,27 @@ int StructuredScript::Objects::Function::score(const ArgListType &args){
 	return total;
 }
 
-int StructuredScript::Objects::Function::score(const TypeListType &args){
+int StructuredScript::Objects::Function::score(bool rightUnary, IAny::Ptr object, const TypeListType &args){
 	if (!accepts(static_cast<int>(args.size())))
 		return 0;
 
-	auto arg = args.begin();
-	if (rightUnary_ != nullptr){//Compare first argument with right unary type
-		auto type = *arg;
-		if (type == nullptr || !rightUnary_->isEqual(type))//Exact type expected
-			return 0;
+	if (rightUnary_ != rightUnary)
+		return -2;
 
-		++arg;
-	}
-
-	if (owner_ != nullptr){//Compare first argument with owner type
-		auto type = *arg;
+	if (owner_ != nullptr){//Compare object types
+		auto type = (object == nullptr) ? nullptr : object->type();
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
-			return 0;
-
-		++arg;
+			return -1;
 	}
 
-	if (arg == args.end())
+	if (args.empty())//Matched
 		return 1;
 
 	auto total = 0;
 	unsigned int index = 0;
 
-	for (; arg != args.end(); ++arg){
-		auto score = score_(*arg, index++);
+	for (auto arg : args){
+		auto score = score_(arg, index++);
 		if (score < 1)
 			return 0;
 
@@ -181,7 +160,9 @@ int StructuredScript::Objects::Function::score(const TypeListType &args){
 	return total;
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(bool rightUnary, IAny::Ptr object, const ArgListType &args,
+	IExceptionManager *exception, INode *expr){
+	auto storage = (object == nullptr) ? memory_->storage() : dynamic_cast<IStorage *>(object.get());
 	if (storage == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("Bad function call!", expr)));
@@ -210,14 +191,6 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	auto param = list_.begin();
 	auto arg = args.begin();
-	if (owner_ != nullptr){//Assume first argument is object
-		if (args.empty()){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("Bad call to a member function!", expr)));
-		}
-
-		++arg;//Ignore
-	}
 
 	IMemory::Ptr expansionMemory;
 	IExpansion *expansion = nullptr;

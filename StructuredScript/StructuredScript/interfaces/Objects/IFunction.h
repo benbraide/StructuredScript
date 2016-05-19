@@ -24,11 +24,11 @@ namespace StructuredScript{
 
 			virtual bool accepts(int count) = 0;
 
-			virtual int score(const ArgListType &args) = 0;
+			virtual int score(bool rightUnary, Any::Ptr object, const ArgListType &args) = 0;
 
-			virtual int score(const TypeListType &args) = 0;
+			virtual int score(bool rightUnary, Any::Ptr object, const TypeListType &args) = 0;
 
-			virtual Any::Ptr call(const ArgListType &args, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual Any::Ptr call(bool rightUnary, Any::Ptr object, const ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}
 

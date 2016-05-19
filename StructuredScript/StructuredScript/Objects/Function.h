@@ -26,18 +26,18 @@ namespace StructuredScript{
 
 			virtual bool accepts(int count) override;
 
-			virtual int score(const ArgListType &args) override;
+			virtual int score(bool rightUnary, IAny::Ptr object, const ArgListType &args) override;
 
-			virtual int score(const TypeListType &args) override;
+			virtual int score(bool rightUnary, IAny::Ptr object, const TypeListType &args) override;
 
-			virtual Ptr call(const ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr call(bool rightUnary, IAny::Ptr object, const ArgListType &args, IExceptionManager *exception, INode *expr) override;
 
 		protected:
 			int score_(IType::Ptr type, unsigned int index);
 
 			IType::Ptr type_;
 			IType::Ptr owner_;
-			IType::Ptr rightUnary_;
+			bool rightUnary_;
 
 			INode::Ptr parameters_;
 			INode::Ptr definition_;

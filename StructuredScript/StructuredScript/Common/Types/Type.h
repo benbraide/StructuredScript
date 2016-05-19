@@ -12,13 +12,16 @@
 #include "../../Interfaces/Storages/INamespace.h"
 
 namespace StructuredScript{
-	class Type : public IType, public IStorage, public ICompoundType{
+	class Type : public IType, public IStorage{
 	public:
 		typedef std::list<Ptr>									ParentListType;
 		typedef std::map<std::string, IType::Ptr>				TypeListType;
-		typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
 		typedef std::map<std::string, IMemoryAttribute::Ptr>	MemoryAttributeListType;
 		typedef std::map<std::string, ExternalCallType>			ExternalCallListType;
+
+		typedef std::map<std::string, IMemory::Ptr>				MemoryListType;
+		typedef std::map<std::string, IMemory::Ptr>				OperatorMemoryListType;
+		typedef std::map<IType::Ptr, IMemory::Ptr>				TypenameOperatorMemoryListType;
 
 		Type(IStorage *storage, const std::string &name)
 			: storage_(storage), name_(name){}
@@ -75,25 +78,22 @@ namespace StructuredScript{
 
 		virtual bool remove(IMemory::Ptr target) override;
 
-		virtual IMemory::Ptr findMemberMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
-
-		virtual IMemory::Ptr findMemberFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
-
-		virtual IMemory::Ptr findMemberOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
-
-		virtual IMemory::Ptr findMemberTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
-
 		void addExternalCall(const std::string &name, ExternalCallType value);
 
 	private:
+		TypenameOperatorMemoryListType::iterator findTypeOperator_(IType::Ptr name);
+
 		std::string name_;
 		IStorage *storage_;
+		ParentListType parents_;
 
 		TypeListType types_;
-		MemoryListType objects_;
 		MemoryAttributeListType attributes_;
-		ParentListType parents_;
 		ExternalCallListType externalCalls_;
+
+		MemoryListType objects_;
+		OperatorMemoryListType operators_;
+		TypenameOperatorMemoryListType typeOperators_;
 	};
 }
 

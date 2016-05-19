@@ -7,7 +7,6 @@
 #include "../Interfaces/Types/ICompositeType.h"
 #include "../Interfaces/Types/IPrimitiveType.h"
 #include "../Interfaces/Types/IStackedType.h"
-#include "../Interfaces/Types/ICompoundType.h"
 
 #include "../Storage/MemoryState.h"
 
