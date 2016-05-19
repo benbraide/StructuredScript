@@ -20,9 +20,9 @@ namespace StructuredScript{
 
 			virtual Any::Ptr call(bool rightUnary, const Function::ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
 
-			virtual Memory::Ptr find(bool rightUnary, Any::Ptr object, const Function::ArgListType &args) = 0;
+			virtual Memory::Ptr find(bool rightUnary, const Function::ArgListType &args) = 0;
 
-			virtual Memory::Ptr find(bool rightUnary, Any::Ptr object, const Function::TypeListType &args) = 0;
+			virtual Memory::Ptr find(bool rightUnary, const Function::TypeListType &args) = 0;
 
 			virtual Memory::Ptr first() = 0;
 

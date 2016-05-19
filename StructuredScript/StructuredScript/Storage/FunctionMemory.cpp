@@ -91,21 +91,24 @@ bool StructuredScript::Storage::FunctionMemory::remove(Memory::Ptr function){
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Storage::FunctionMemory::call(bool rightUnary, const IFunction::ArgListType &args, IExceptionManager *exception, INode *expr){
-	auto objectStorage = dynamic_cast<IAny *>(storage_);
-	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
-
-	auto match = find(rightUnary, object, args);
+	auto match = find(rightUnary, args);
 	if (match == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("No function found taking the specified arguments!", expr)));
 	}
 
+	auto objectStorage = dynamic_cast<IAny *>(storage_);
+	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
+
 	return dynamic_cast<IFunction *>(match->object().get())->call(rightUnary, object, args, exception, expr);
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, IAny::Ptr object, const IFunction::ArgListType &args){
+StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, const IFunction::ArgListType &args){
 	auto max = 0;
 	Ptr selected;
+
+	auto objectStorage = dynamic_cast<IAny *>(storage_);
+	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
 		auto functionBase = (*function)->object()->base();
@@ -119,9 +122,12 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(b
 	return selected;
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, IAny::Ptr object, const IFunction::TypeListType &args){
+StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(bool rightUnary, const IFunction::TypeListType &args){
 	auto max = 0;
 	Ptr selected;
+
+	auto objectStorage = dynamic_cast<IAny *>(storage_);
+	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
 		auto functionBase = (*function)->object()->base();

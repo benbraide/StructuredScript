@@ -45,8 +45,9 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 	Ptr value;//Return value
 	if (Query::ExceptionManager::hasReturn(exception)){
 		value = exception->get();
-		if (value == nullptr)
+		if (value == nullptr && type_ != nullptr)
 			value = PrimitiveFactory::createVoid();
+
 		exception->clear();
 	}
 	else if (Query::ExceptionManager::hasBreak(exception)){
@@ -57,15 +58,16 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'continue' found outside loop!", expr)));
 	}
-	else if (!Query::ExceptionManager::has(exception))
-		value = PrimitiveFactory::createVoid();
+	else if (!Query::ExceptionManager::has(exception)){
+		if (type_ != nullptr)
+			value = PrimitiveFactory::createVoid();
+	}
 	else
 		return nullptr;
 
-	value = value->base();
-	if (value == nullptr){
+	if (type_ == nullptr && value != nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("Bad function return value!", expr)));
+			Query::ExceptionManager::combine("Invalid 'return' statement found in a constructor/destrcutor!", expr)));
 	}
 
 	Storage::Memory converter(nullptr, type_, value, nullptr);//For converting return value

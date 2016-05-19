@@ -19,6 +19,17 @@ namespace StructuredScript{
 		protected:
 			INode::Ptr definition_;
 		};
+
+		class Constructor : public Function{
+		public:
+			typedef std::map<std::string, INode::Ptr> InitializerListType;
+
+			Constructor(INode::Ptr parameters, INode::Ptr definition, const InitializerListType &initializers)
+				: Function(nullptr, parameters, definition), initializers_(initializers){}
+
+		private:
+			InitializerListType initializers_;
+		};
 	}
 }
 

@@ -44,9 +44,9 @@ namespace StructuredScript{
 
 			virtual IAny::Ptr call(bool rightUnary, const IFunction::ArgListType &args, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr find(bool rightUnary, IAny::Ptr object, const IFunction::ArgListType &args) override;
+			virtual Ptr find(bool rightUnary, const IFunction::ArgListType &args) override;
 
-			virtual Ptr find(bool rightUnary, IAny::Ptr object, const IFunction::TypeListType &args) override;
+			virtual Ptr find(bool rightUnary, const IFunction::TypeListType &args) override;
 
 			virtual Ptr first() override;
 
