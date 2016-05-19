@@ -48,7 +48,9 @@ namespace StructuredScript{
 
 			virtual Ptr find(bool rightUnary, IAny::Ptr object, const IFunction::TypeListType &args) override;
 
-			virtual Memory::Ptr first() override;
+			virtual Ptr first() override;
+
+			virtual Ptr filterNonMembers() override;
 
 			virtual void resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
@@ -57,6 +59,8 @@ namespace StructuredScript{
 			void getStaticMemories(ListType &list);
 
 		private:
+			void init_(const ListType &components);
+
 			ListType::iterator find_(IAny::Ptr function);
 
 			IStorage *storage_;

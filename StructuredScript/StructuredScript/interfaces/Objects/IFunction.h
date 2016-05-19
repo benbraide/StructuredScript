@@ -5,6 +5,7 @@
 
 #include <list>
 
+#include "../INode.h"
 #include "../IExceptionManager.h"
 
 namespace StructuredScript{
@@ -22,6 +23,8 @@ namespace StructuredScript{
 
 			virtual bool isStatic() const = 0;
 
+			virtual bool isMember() const = 0;
+
 			virtual bool equals(Any::Ptr target) = 0;
 
 			virtual bool accepts(int count) = 0;
@@ -31,6 +34,8 @@ namespace StructuredScript{
 			virtual int score(bool rightUnary, Any::Ptr object, const TypeListType &args) = 0;
 
 			virtual Any::Ptr call(bool rightUnary, Any::Ptr object, const ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual Type::Ptr declaredType() = 0;
 		};
 	}
 

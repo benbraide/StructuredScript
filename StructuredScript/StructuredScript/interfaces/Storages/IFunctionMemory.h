@@ -26,6 +26,8 @@ namespace StructuredScript{
 
 			virtual Memory::Ptr first() = 0;
 
+			virtual Memory::Ptr filterNonMembers() = 0;
+
 			virtual void resolveArgs(Node::Ptr args, Function::ArgListType &resolved, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}

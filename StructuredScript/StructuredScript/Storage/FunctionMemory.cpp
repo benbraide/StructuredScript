@@ -2,15 +2,7 @@
 
 StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &components)
 	: storage_(nullptr){//Combine multiple function memories into one
-	for (auto component : components){
-		auto functionMemory = dynamic_cast<FunctionMemory *>(component.get());
-		if (functionMemory != nullptr){
-			for (auto memory : functionMemory->list_)
-				list_.push_back(memory);
-		}
-		else if (dynamic_cast<IFunction *>(component->object().get()) != nullptr)
-			list_.push_back(component);
-	}
+	init_(components);
 }
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::ptr(){
@@ -50,13 +42,29 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IA
 
 	auto existing = find_(function);
 	if (existing != list_.end()){//Replace existing only if existing is declaration and new is not
-		auto existingBase = (*existing)->object()->base();
-		if (dynamic_cast<IFunction *>(existingBase.get())->isDefined() || !functionObject->isDefined())
+		auto existingFunction = dynamic_cast<IFunction *>((*existing)->object().get());
+		if (existingFunction->isDefined() || !functionObject->isDefined())
 			return nullptr;
 
 		auto attributes = (*existing)->attributes();
 		if (attributes != nullptr && (attributes->hasAttribute("Locked") || attributes->hasAttribute("Call")))//Restricted | Defined
 			return nullptr;
+
+		auto existingType = existingFunction->declaredType();
+		auto newType = functionObject->declaredType();
+
+		auto existingDeclaredType = dynamic_cast<IDeclaredType *>(existingType.get());
+		auto newDeclaredType = dynamic_cast<IDeclaredType *>(newType.get());
+
+		if (existingDeclaredType != nullptr){
+			if (newDeclaredType == nullptr || existingDeclaredType->states() != newDeclaredType->states())
+				return nullptr;//States must match previous declaration
+		}
+		else if (newDeclaredType != nullptr)
+			return nullptr;//Declared status must match
+
+		if (existingType->isAny() != newType->isAny() || !existingType->isEqual(newType))
+			return nullptr;//Types must be 'explicitly' equal
 
 		(*existing)->assign(function, nullptr, nullptr, nullptr);
 		return *existing;
@@ -127,8 +135,23 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(b
 	return selected;
 }
 
-StructuredScript::Storage::Memory::Ptr StructuredScript::Storage::FunctionMemory::first(){
+StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::first(){
 	return list_.empty() ? nullptr : *list_.begin();
+}
+
+StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::filterNonMembers(){
+	ListType members, nonMembers;
+	for (auto function : list_){
+		if (dynamic_cast<IFunction *>(function->object().get())->isMember())
+			members.push_back(function);
+		else
+			nonMembers.push_back(function);
+	}
+
+	//Replace list with members only
+	list_ = std::move(members);
+
+	return nonMembers.empty() ? nullptr : std::make_shared<FunctionMemory>(nonMembers);
 }
 
 void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -167,6 +190,16 @@ void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list
 		auto states = (declaredType == nullptr) ? StructuredScript::Storage::MemoryState::STATE_NONE : declaredType->states();
 		if (StructuredScript::Storage::MemoryState(states).isStatic())
 			list.push_back(memory);
+	}
+}
+
+void StructuredScript::Storage::FunctionMemory::init_(const ListType &components){
+	for (auto component : components){
+		auto functionMemory = dynamic_cast<FunctionMemory *>(component.get());
+		if (functionMemory == nullptr)
+			list_.push_back(component);
+		else
+			init_(functionMemory->list_);
 	}
 }
 
