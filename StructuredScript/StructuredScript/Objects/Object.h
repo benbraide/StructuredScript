@@ -13,7 +13,7 @@ namespace StructuredScript{
 	namespace Objects{
 		class Object : public Any{
 		public:
-			typedef std::list<IMemory::Ptr>				ParentListType;
+			typedef std::map<std::string, IMemory::Ptr>	ParentListType;
 			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
 
 			typedef StructuredScript::Storage::FunctionMemory::ListType ListType;
@@ -49,7 +49,7 @@ namespace StructuredScript{
 
 			void self(Any *self);
 
-			void addParent(IMemory::Ptr parent);
+			bool addParent(const std::string &name, IMemory::Ptr parent);
 
 		protected:
 			void extendList_(ListType &list, const std::string &name, unsigned short searchScope);

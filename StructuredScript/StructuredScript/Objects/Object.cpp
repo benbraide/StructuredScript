@@ -21,8 +21,8 @@ StructuredScript::IStorage *StructuredScript::Objects::Object::findStorage(const
 		return this;
 
 	if (searchScope != SEARCH_LOCAL){
-		for (auto parent : parents_){
-			auto storage = dynamic_cast<IStorage *>(parent->object().get())->findStorage(name, SEARCH_FAMILY);
+		for (auto &parent : parents_){
+			auto storage = dynamic_cast<IStorage *>(parent.second->object().get())->findStorage(name, SEARCH_FAMILY);
 			if (storage != nullptr)
 				return storage;
 		}
@@ -88,8 +88,13 @@ void StructuredScript::Objects::Object::self(Any *self){
 	self_ = self;
 }
 
-void StructuredScript::Objects::Object::addParent(IMemory::Ptr parent){
-	parents_.push_back(parent);
+bool StructuredScript::Objects::Object::addParent(const std::string &name, IMemory::Ptr parent){
+	if (parents_.find(name) == parents_.end()){
+		parents_[name] = parent;
+		return true;
+	}
+
+	return false;
 }
 
 void StructuredScript::Objects::Object::extendList_(ListType &list, const std::string &name, unsigned short searchScope){
@@ -104,8 +109,8 @@ void StructuredScript::Objects::Object::extendList_(ListType &list, const std::s
 		if (memory != nullptr)
 			list.push_back(memory);
 
-		for (auto parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
+		for (auto &parent : parents_){
+			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}
@@ -137,8 +142,8 @@ void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, cons
 		if (memory != nullptr)
 			list.push_back(memory);
 
-		for (auto parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
+		for (auto &parent : parents_){
+			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}
@@ -170,8 +175,8 @@ void StructuredScript::Objects::Object::extendTypeOperatorList_(ListType &list, 
 		if (memory != nullptr)
 			list.push_back(memory);
 
-		for (auto parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
+		for (auto &parent : parents_){
+			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}

@@ -6,6 +6,9 @@
 #include "../../Interfaces/IParserPlugin.h"
 #include "../../Nodes/ClassNode.h"
 #include "../../Nodes/BlockPairNode.h"
+#include "../../Nodes/IdentifierNode.h"
+
+#include "FunctionParser.h"
 
 namespace StructuredScript{
 	namespace Parser{

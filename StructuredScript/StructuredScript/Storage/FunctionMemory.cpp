@@ -161,6 +161,25 @@ StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMem
 }
 
 void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return resolveArgList(args, resolved, storage, exception, expr);
+}
+
+unsigned int StructuredScript::Storage::FunctionMemory::count() const{
+	return list_.size();
+}
+
+void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list){
+	for (auto memory : list_){
+		auto type = memory->type();
+		auto declaredType = dynamic_cast<IDeclaredType *>(type.get());
+
+		auto states = (declaredType == nullptr) ? StructuredScript::Storage::MemoryState::STATE_NONE : declaredType->states();
+		if (StructuredScript::Storage::MemoryState(states).isStatic())
+			list.push_back(memory);
+	}
+}
+
+void StructuredScript::Storage::FunctionMemory::resolveArgList(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr){
 	Query::Node::ListType list;
 	Query::Node::split(",", args, list);
 
@@ -181,21 +200,6 @@ void StructuredScript::Storage::FunctionMemory::resolveArgs(INode::Ptr args, IFu
 			resolved.push_back(value);
 		else//Expand value
 			expanded->expand(resolved);
-	}
-}
-
-unsigned int StructuredScript::Storage::FunctionMemory::count() const{
-	return list_.size();
-}
-
-void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list){
-	for (auto memory : list_){
-		auto type = memory->type();
-		auto declaredType = dynamic_cast<IDeclaredType *>(type.get());
-
-		auto states = (declaredType == nullptr) ? StructuredScript::Storage::MemoryState::STATE_NONE : declaredType->states();
-		if (StructuredScript::Storage::MemoryState(states).isStatic())
-			list.push_back(memory);
 	}
 }
 

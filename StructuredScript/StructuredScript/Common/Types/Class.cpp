@@ -29,11 +29,12 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 	}
 
 	for (auto parent : parents_){//Create base objects
-		auto base = dynamic_cast<IClass *>(parent.get())->create(storage, exception, expr);
+		auto classParent = dynamic_cast<Class *>(parent.get());
+		auto base = classParent->create(storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		object->addParent(std::make_shared<StructuredScript::Storage::Memory>(storage, parent, base, nullptr));
+		object->addParent(classParent->name_, std::make_shared<StructuredScript::Storage::Memory>(storage, parent, base, nullptr));
 	}
 
 	return object;

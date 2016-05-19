@@ -1,6 +1,56 @@
 #include "FunctionParser.h"
 
 StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
+	auto parameters = parseParameters_(well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+	
+	auto definition = parseDefinition_(parameters, well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (definition == nullptr)//Declaration
+		return std::make_shared<Nodes::FunctionDeclarationNode>(declaration_, parameters);
+
+	return std::make_shared<Nodes::FunctionDefinitionNode>(declaration_, parameters, definition);
+}
+
+StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseConstructor(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
+	auto parameters = parseParameters_(well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	INode::Ptr initializers;
+	if (scanner.peek(well).value() == ":"){//Initializers
+		scanner.next(well);//Ignore
+
+		initializers = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
+			auto value = next.value();
+			return (value != "{" && value != ";");
+		});
+
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	auto definition = parseDefinition_(parameters, well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	Nodes::ConstructorNode::InitializerListType list;
+	if (initializers != nullptr){
+		Nodes::ConstructorNode::parseInitializers(initializers, list, exception, nullptr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	if (definition == nullptr)//Declaration
+		return std::make_shared<Nodes::ConstructorDeclarationNode>(declaration_, parameters, list);
+
+	return std::make_shared<Nodes::ConstructorDefinitionNode>(declaration_, parameters, list, definition);
+}
+
+StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseParameters_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
 	INode::Ptr parameters;
 	if (scanner.peek(well).value() != "()"){
 		if (!scanner.open(well, '(', ')')){//Extract parameters
@@ -48,8 +98,13 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parse(ICh
 		parameters = std::make_shared<Nodes::EmptyNode>();
 	}
 
+	return parameters;
+}
+
+StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseDefinition_(INode::Ptr parameters, ICharacterWell &well, IScanner &scanner,
+	IParser &parser, IExceptionManager *exception){
 	if (!scanner.open(well, '{', '}'))//Declaration
-		return std::make_shared<Nodes::FunctionDeclarationNode>(declaration_, parameters);
+		return nullptr;
 
 	auto definition = parser.parse(well, scanner, exception);
 	if (!scanner.close(well)){
@@ -62,5 +117,5 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parse(ICh
 	else if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	return std::make_shared<Nodes::FunctionDefinitionNode>(declaration_, parameters, definition);
+	return definition;
 }

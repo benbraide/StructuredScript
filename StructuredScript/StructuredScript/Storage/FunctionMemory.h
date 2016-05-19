@@ -58,6 +58,8 @@ namespace StructuredScript{
 
 			void getStaticMemories(ListType &list);
 
+			static void resolveArgList(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 		private:
 			void init_(const ListType &components);
 

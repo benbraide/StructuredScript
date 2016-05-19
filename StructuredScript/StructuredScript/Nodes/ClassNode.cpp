@@ -9,8 +9,8 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ClassNode::clon
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::ClassNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	create(storage, exception, expr);
-	return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createUndefined();
+	auto type = create(storage, exception, expr);
+	return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createTypeObject(type);
 }
 
 std::string StructuredScript::Nodes::ClassNode::str(){

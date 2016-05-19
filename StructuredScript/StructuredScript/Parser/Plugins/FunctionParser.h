@@ -18,7 +18,13 @@ namespace StructuredScript{
 
 			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception) override;
 
+			INode::Ptr parseConstructor(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception);
+
 		private:
+			INode::Ptr parseParameters_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception);
+
+			INode::Ptr parseDefinition_(INode::Ptr parameters, ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception);
+
 			INode::Ptr declaration_;
 		};
 	}

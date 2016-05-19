@@ -37,9 +37,17 @@ namespace StructuredScript{
 
 			virtual Type::Ptr declaredType() = 0;
 		};
+
+		class Constructor{
+		public:
+			virtual ~Constructor(){}
+
+			virtual void initialize(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+		};
 	}
 
-	typedef Interfaces::Function IFunction;
+	typedef Interfaces::Function	IFunction;
+	typedef Interfaces::Constructor	IConstructor;
 }
 
 #endif /* !STRUCTURED_SCRIPT_FUNCTION_INTERFACE_H */

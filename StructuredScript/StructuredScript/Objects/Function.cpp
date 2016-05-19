@@ -75,3 +75,64 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	return Query::ExceptionManager::has(exception) ? nullptr : converter.object();
 }
+
+void StructuredScript::Objects::Constructor::initialize(IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto object = dynamic_cast<IObject *>(storage);
+	if (object == nullptr){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("Cannot initialize a non-object!", expr)));
+
+		return;
+	}
+
+	std::map< std::string, std::pair<IMemory::Ptr, INode::Ptr> > fields;
+	for (auto &initializer : initializers_){
+		auto target = storage->findMemory(initializer.first, IStorage::SEARCH_LOCAL);
+		if (target != nullptr){
+			if (dynamic_cast<IFunctionMemory *>(target.get()) != nullptr){
+				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+					Query::ExceptionManager::combine("'" + initializer.first + "': Invalid initializer item!", expr)));
+
+				return;
+			}
+
+			fields[initializer.first] = std::make_pair(target, initializer.second);
+		}
+		else//Try base constructor
+			initializeParent_(initializer, object, storage, exception, expr);
+		
+		if (Query::ExceptionManager::has(exception))
+			return;
+	}
+
+	for (auto &field : fields){//Initialize fields after base constructors
+		if (field.second.first->object() != nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + field.first + "': Is already initialized!", expr)));
+
+			return;
+		}
+
+		auto value = field.second.second->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return;
+
+		field.second.first->assign(value, storage, exception, expr);
+	}
+}
+
+void StructuredScript::Objects::Constructor::initializeParent_(const std::pair<std::string, INode::Ptr> &info, IObject *object,
+	IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto parent = object->findDirectParent(info.first);
+	if (parent == nullptr){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + info.first + "': Invalid initializer item!", expr)));
+
+		return;
+	}
+
+	ArgListType args;
+	Storage::FunctionMemory::resolveArgList(info.second, args, storage, exception, expr);
+	if (!Query::ExceptionManager::has(exception))
+		parent->construct(args, storage, exception, expr);
+}

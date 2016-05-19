@@ -20,14 +20,18 @@ namespace StructuredScript{
 			INode::Ptr definition_;
 		};
 
-		class Constructor : public Function{
+		class Constructor : public Function, public IConstructor{
 		public:
 			typedef std::map<std::string, INode::Ptr> InitializerListType;
 
 			Constructor(INode::Ptr parameters, INode::Ptr definition, const InitializerListType &initializers)
 				: Function(nullptr, parameters, definition), initializers_(initializers){}
 
+			virtual void initialize(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
 		private:
+			void initializeParent_(const std::pair<std::string, INode::Ptr> &info, IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			InitializerListType initializers_;
 		};
 	}

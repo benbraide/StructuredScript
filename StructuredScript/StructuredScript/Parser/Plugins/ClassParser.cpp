@@ -39,6 +39,10 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 		}
 		else if (next == nameStr || (nameStr.empty() && next == "__constructor")){//Constructor
 			scanner.next(well);//Ignore
+
+			right = FunctionParser(std::make_shared<Nodes::IdentifierNode>(nameStr)).parseConstructor(well, scanner, parser, exception);
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
 		}
 		else{//Parse line
 			right = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
