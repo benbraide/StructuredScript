@@ -3,7 +3,7 @@
 #ifndef STRUCTURED_SCRIPT_PURE_STORAGE_INTERFACE_H
 #define STRUCTURED_SCRIPT_PURE_STORAGE_INTERFACE_H
 
-#include "../IType.h"
+#include "../IMemory.h"
 
 namespace StructuredScript{
 	namespace Interfaces{

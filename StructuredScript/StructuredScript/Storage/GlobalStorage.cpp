@@ -5,8 +5,6 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	Scanner::Scanner::init();
 
 	primitives_.clear();
-	rightUnaryPlaceholderType_ = std::make_shared<PrimitiveType>("", Typename::TYPE_NAME_NONE);
-	rightUnaryPlaceholder_ = std::make_shared<Objects::Undefined>(rightUnaryPlaceholderType_);
 
 	auto bit = std::make_shared<Type>(this, "bit");
 	primitives_[Typename::TYPE_NAME_BIT]		= bit;
@@ -139,14 +137,6 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(Typename type){
 	auto value = primitives_.find(type);
 	return (value == primitives_.end()) ? nullptr : value->second;
-}
-
-StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getRightUnaryPlaceholderType(){
-	return rightUnaryPlaceholderType_;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Storage::GlobalStorage::getRightUnaryPlaceholder(){
-	return rightUnaryPlaceholder_;
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){

@@ -3,7 +3,6 @@
 #ifndef STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H
 #define STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H
 
-#include "../IExceptionManager.h"
 #include "IFunction.h"
 
 namespace StructuredScript{
@@ -111,6 +110,13 @@ namespace StructuredScript{
 
 			virtual void expand(Function::ArgListType &args) = 0;
 		};
+
+		class Property{
+		public:
+			virtual ~Property(){}
+
+			virtual Type::Ptr propertyType() = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -131,6 +137,7 @@ namespace StructuredScript{
 	typedef Interfaces::Undefined		IUndefined;
 	typedef Interfaces::Expansion		IExpansion;
 	typedef Interfaces::Expanded		IExpanded;
+	typedef Interfaces::Property		IProperty;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

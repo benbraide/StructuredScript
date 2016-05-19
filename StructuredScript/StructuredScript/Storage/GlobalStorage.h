@@ -48,14 +48,7 @@ namespace StructuredScript{
 
 			virtual IType::Ptr getPrimitiveType(int rank) override;
 
-			virtual IType::Ptr getRightUnaryPlaceholderType() override;
-
-			virtual IAny::Ptr getRightUnaryPlaceholder() override;
-
 		private:
-			IType::Ptr rightUnaryPlaceholderType_;
-			IAny::Ptr rightUnaryPlaceholder_;
-
 			ListType primitives_;
 		};
 	}

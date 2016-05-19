@@ -100,7 +100,7 @@ int StructuredScript::Objects::Function::score(bool rightUnary, IAny::Ptr object
 		return -2;
 
 	if (owner_ != nullptr){//Compare object types
-		auto type = (object == nullptr) ? nullptr : object->type();
+		auto type = (object == nullptr) ? nullptr : getObjectType_(object);
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
 			return -1;
 	}
@@ -138,7 +138,7 @@ int StructuredScript::Objects::Function::score(bool rightUnary, IAny::Ptr object
 		return -2;
 
 	if (owner_ != nullptr){//Compare object types
-		auto type = (object == nullptr) ? nullptr : object->type();
+		auto type = (object == nullptr) ? nullptr : getObjectType_(object);
 		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
 			return -1;
 	}
@@ -194,7 +194,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 
 	IMemory::Ptr expansionMemory;
 	IExpansion *expansion = nullptr;
-	Storage::Storage parameterStorage(storage);
+	Storage::FunctionStorage parameterStorage(storage, object);
 
 	for (; arg != args.end() && param != list_.end(); ++arg, ++param){//Create parameter objects
 		if (expansion != nullptr){//Bad expression
@@ -223,16 +223,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 	if (param != list_.end()){//Parameters must be initialization declarations
 		for (; param != list_.end(); ++param){
 			auto declaration = dynamic_cast<IDeclarationNode *>(param->get());
-			if (!Query::Node::isInitialization(*param) && !Query::Node::isExpandedTypeIdentifier(declaration->type())){
-				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
-			}
+			if (Query::Node::isExpandedTypeIdentifier(declaration->type())){//Expansion -- allocate
+				auto memory = declaration->allocate(&parameterStorage, exception, expr);
+				if (Query::ExceptionManager::has(exception))//Failed to create object
+					return nullptr;
 
-			auto memory = declaration->allocate(&parameterStorage, exception, expr);
-			if (Query::ExceptionManager::has(exception))//Failed to create object
-				return nullptr;
-
-			if (memory->object() == nullptr){
 				auto backdoor = dynamic_cast<IMemoryBackdoor *>(memory.get());
 				if (backdoor == nullptr){
 					return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
@@ -240,6 +235,15 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 				}
 
 				backdoor->assign(PrimitiveFactory::createUndefined());
+			}
+			else if (Query::Node::isInitialization(*param)){//Initialization -- evaluate
+				auto memory = (*param)->evaluate(&parameterStorage, exception, expr);
+				if (Query::ExceptionManager::has(exception))//Failed to create object
+					return nullptr;
+			}
+			else{
+				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
 			}
 		}
 	}
@@ -321,4 +325,9 @@ int StructuredScript::Objects::Function::score_(IType::Ptr type, unsigned int in
 		return 1;
 
 	return 0;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Objects::Function::getObjectType_(IAny::Ptr object){
+	auto property = dynamic_cast<IProperty *>(object.get());
+	return (property == nullptr) ? object->type() : property->propertyType();
 }

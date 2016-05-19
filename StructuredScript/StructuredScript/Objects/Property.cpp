@@ -82,12 +82,46 @@ std::string StructuredScript::Objects::Property::str(IStorage *storage, IExcepti
 	return target->str(storage, exception, expr);
 }
 
-bool StructuredScript::Objects::Property::remove(IMemory::Ptr target){
-	return false;
+StructuredScript::IStorage *StructuredScript::Objects::Property::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return (searchScope == SEARCH_DEFAULT) ? memory_->storage()->findStorage(name) : nullptr;
+}
+
+StructuredScript::IType::Ptr StructuredScript::Objects::Property::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return (searchScope == SEARCH_DEFAULT) ? memory_->storage()->findType(name) : nullptr;
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return memory_->storage()->findMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return memory_->storage()->findFunctionMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return memory_->storage()->findOperatorMemory(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr StructuredScript::Objects::Property::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return memory_->storage()->findTypenameOperatorMemory(name, searchScope);
+}
+
+StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Property::findMemoryAttribute(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	return memory_->storage()->findMemoryAttribute(name, searchScope);
+}
+
+StructuredScript::Objects::Property::ExternalCallType StructuredScript::Objects::Property::findExternalCall(const std::string &name){
+	return memory_->storage()->findExternalCall(name);
+}
+
+StructuredScript::IType::Ptr StructuredScript::Objects::Property::propertyType(){
+	return type_;
 }
 
 void StructuredScript::Objects::Property::getMemory_(const std::string &name, IStorage *storage, FunctionMemoryType &target){
 	auto memory = storage->findFunctionMemory(name, SEARCH_LOCAL);
-	if (memory != nullptr)
+	if (memory != nullptr){
 		target = std::dynamic_pointer_cast<IFunctionMemory>(memory);
+		target->setStorage(this);
+	}
 }

@@ -14,10 +14,6 @@ namespace StructuredScript{
 
 			virtual Type::Ptr getPrimitiveType(int rank) = 0;
 
-			virtual Type::Ptr getRightUnaryPlaceholderType() = 0;
-
-			virtual Any::Ptr getRightUnaryPlaceholder() = 0;
-
 			static GlobalStorage *globalStorage;
 		};
 	}

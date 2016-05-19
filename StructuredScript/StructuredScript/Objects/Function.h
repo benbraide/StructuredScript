@@ -5,6 +5,8 @@
 
 #include "../Common/NodeQuery.h"
 #include "../Common/TypeQuery.h"
+
+#include "../Storage/FunctionStorage.h"
 #include "../Storage/SpecializedStorage.h"
 
 #include "Primitive.h"
@@ -34,6 +36,8 @@ namespace StructuredScript{
 
 		protected:
 			int score_(IType::Ptr type, unsigned int index);
+
+			IType::Ptr getObjectType_(IAny::Ptr object);
 
 			IType::Ptr type_;
 			IType::Ptr owner_;

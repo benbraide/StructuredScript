@@ -10,7 +10,7 @@
 
 namespace StructuredScript{
 	namespace Objects{
-		class Property : public Any{
+		class Property : public Any, public IProperty{
 		public:
 			typedef std::shared_ptr<IFunctionMemory> FunctionMemoryType;
 
@@ -32,7 +32,23 @@ namespace StructuredScript{
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual bool remove(IMemory::Ptr target) override;
+			virtual IStorage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IType::Ptr findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemoryAttribute::Ptr findMemoryAttribute(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual ExternalCallType findExternalCall(const std::string &name) override;
+
+			virtual IType::Ptr propertyType() override;
 
 		protected:
 			void getMemory_(const std::string &name, IStorage *storage, FunctionMemoryType &target);

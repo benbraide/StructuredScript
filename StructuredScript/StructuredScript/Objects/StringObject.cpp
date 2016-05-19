@@ -150,8 +150,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	lengthNode_ = parser.parse(well, scanner, nullptr);
 
 	type->addExternalCall("at", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -167,8 +169,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("append", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -186,8 +190,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("insert", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -211,8 +217,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("erase", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -229,8 +237,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("clear", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -241,8 +251,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("substr", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -258,8 +270,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("find", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -282,8 +296,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("find_last", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -306,8 +322,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("empty", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = dynamic_cast<String *>(object.get());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
@@ -317,8 +335,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 	});
 
 	type->addExternalCall("length.get", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto string = dynamic_cast<String *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : functionStorage->object();
+
+		auto string = (object == nullptr) ? nullptr : dynamic_cast<String *>(object->memory()->storage());
 		if (string == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
