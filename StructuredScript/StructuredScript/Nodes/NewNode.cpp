@@ -35,13 +35,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::NewNode::evaluate(IStorage 
 			target = value_;
 	}
 
-	auto type = Query::Node::resolveAsType(target, storage);
-	if (type == nullptr){
-		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + target->str() + "'!", expr)));
-
+	auto type = resolveType_(target, storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
 		return nullptr;
-	}
 
 	auto classType = dynamic_cast<IClass *>(type.get());
 	if (classType == nullptr){
@@ -71,6 +67,23 @@ std::string StructuredScript::Nodes::NewNode::str(){
 }
 
 void StructuredScript::Nodes::NewNode::attributes(IMemoryAttributes::Ptr attributes){}
+
+StructuredScript::IType::Ptr StructuredScript::Nodes::NewNode::resolveType_(Ptr target, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto classNode = dynamic_cast<IClassNode *>(target.get());
+	if (classNode == nullptr){//Resolve
+		auto type = Query::Node::resolveAsType(target, storage);
+		if (type == nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + target->str() + "'!", expr)));
+
+			return nullptr;
+		}
+
+		return type;
+	}
+
+	return classNode->create(storage, exception, expr);
+}
 
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::NewNode::attributes(){
 	return nullptr;

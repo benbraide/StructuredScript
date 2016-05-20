@@ -66,6 +66,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::FunctionNode::p
 	return parameters_;
 }
 
+std::string StructuredScript::Nodes::FunctionNode::declName(){
+	auto value = name();
+	return (value == nullptr) ? "" : value->str();
+}
+
 StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr definition, IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto declaration = dynamic_cast<IDeclarationNode *>(declaration_.get());
 	if (declaration == nullptr){
@@ -73,17 +78,33 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::FunctionNode::evaluate_(Ptr
 			Query::ExceptionManager::combine("'" + str() + "': Bad function definition!", expr)));
 	}
 
-	auto type = Query::Node::resolveAsType(declaration->type(), storage);
-	if (type == nullptr){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Could not resolve return type!", expr)));
-	}
+	auto type = resolveType_(declaration, storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
 
 	return CallableNode::evaluate_(declaration->value(), type, definition, storage, exception, expr);
 }
 
 std::shared_ptr<StructuredScript::Objects::Function> StructuredScript::Nodes::FunctionNode::create_(IType::Ptr type, INode::Ptr definition){
 	return std::make_shared<Objects::Function>(type, parameters_, definition);
+}
+
+StructuredScript::IType::Ptr StructuredScript::Nodes::FunctionNode::resolveType_(IDeclarationNode *declaration, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto typeNode = declaration->type();
+	auto classNode = dynamic_cast<IClassNode *>(typeNode.get());
+	if (classNode == nullptr){//Resolve
+		auto type = Query::Node::resolveAsType(typeNode, storage);
+		if (type == nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve return type!", expr)));
+
+			return nullptr;
+		}
+
+		return type;
+	}
+
+	return classNode->create(storage, exception, expr);
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::FunctionDeclarationNode::clone(){
@@ -173,5 +194,45 @@ std::string StructuredScript::Nodes::ConstructorDefinitionNode::str(){
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ConstructorDefinitionNode::definition(){
+	return definition_;
+}
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DestructorNode::type(){
+	return nullptr;
+}
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DestructorNode::name(){
+	return declaration_;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Nodes::DestructorNode::evaluate_(Ptr definition, IStorage *storage, IExceptionManager *exception, INode *expr){
+	return CallableNode::evaluate_(declaration_, nullptr, definition, storage, exception, expr);
+}
+
+std::shared_ptr<StructuredScript::Objects::Function> StructuredScript::Nodes::DestructorNode::create_(IType::Ptr type, INode::Ptr definition){
+	return std::make_shared<Objects::Destructor>(parameters_, definition);
+}
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DestructorDeclarationNode::clone(){
+	return std::make_shared<DestructorDeclarationNode>(declaration_->clone(), parameters_->clone());
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Nodes::DestructorDeclarationNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
+	return evaluate_(nullptr, storage, exception, expr);
+}
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DestructorDefinitionNode::clone(){
+	return std::make_shared<DestructorDefinitionNode>(declaration_->clone(), parameters_->clone(), definition_->clone());
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Nodes::DestructorDefinitionNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
+	return evaluate_(definition_, storage, exception, expr);
+}
+
+std::string StructuredScript::Nodes::DestructorDefinitionNode::str(){
+	return (declaration_->str() + "(" + parameters_->str() + "){...}");
+}
+
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DestructorDefinitionNode::definition(){
 	return definition_;
 }

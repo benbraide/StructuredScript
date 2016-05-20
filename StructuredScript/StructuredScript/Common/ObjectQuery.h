@@ -26,7 +26,7 @@ namespace StructuredScript{
 			template <typename TargetType, int TargetRank>
 			static bool getIndex(IAny::Ptr object, unsigned int &value);
 
-			static IAny::Ptr getObjectInStorage(IStorage *storage);
+			static IAny *getObjectInStorage(IStorage *storage);
 		};
 
 		template <typename TargetType, int TargetRank>

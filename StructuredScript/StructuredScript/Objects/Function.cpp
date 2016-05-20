@@ -6,7 +6,12 @@ bool StructuredScript::Objects::Function::isDefined() const{
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call(bool rightUnary, IAny::Ptr object, const ArgListType &args,
 	IExceptionManager *exception, INode *expr){
-	auto storage = (object == nullptr) ? memory_->storage() : dynamic_cast<IStorage *>(object.get());
+	return rawCall(rightUnary, object.get(), args, exception, expr);
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::rawCall(bool rightUnary, IAny *object, const ArgListType &args,
+	IExceptionManager *exception, INode *expr){
+	auto storage = (object == nullptr) ? memory_->storage() : dynamic_cast<IStorage *>(object);
 	if (storage == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("Bad function call!", expr)));
@@ -18,10 +23,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 			Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
 	}
 
-	Storage::FunctionStorage parameterStorage(storage, object);
+	Storage::RawFunctionStorage parameterStorage(storage, object);
 	auto expansionMemory = prep_(args, &parameterStorage, exception, expr);
 
-	initialize(dynamic_cast<IObject *>(object.get()), &parameterStorage, exception, expr);
+	initialize(dynamic_cast<IObject *>(object), &parameterStorage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
@@ -40,12 +45,12 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Invalid 'return' statement found in a constructor/destrcutor!", expr)));
 		}
-		
+
 		return PrimitiveFactory::createUndefined();
 	}
 
 	Storage::Memory converter(nullptr, type_, nullptr, nullptr);//For converting return value
-	converter.assign((value == nullptr) ? PrimitiveFactory::createUndefined() : value, storage, exception, expr);
+	converter.assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
 
 	return Query::ExceptionManager::has(exception) ? nullptr : converter.object();
 }
@@ -118,7 +123,7 @@ void StructuredScript::Objects::Constructor::initialize(IObject *object, IStorag
 		
 		if (Query::ExceptionManager::has(exception))
 			return;
-	}
+	}//class{__constructor():v_(27){}__constructor(int v):v_(v){}__destructor(){echo"destroyed"}int v_;any vp{int get(){return v_}}}
 
 	for (auto &field : fields){//Initialize fields after base constructors
 		auto value = field.second.first->object();
@@ -126,7 +131,7 @@ void StructuredScript::Objects::Constructor::initialize(IObject *object, IStorag
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + field.first + "': Is already initialized!", expr)));
 
-			return;
+			return;//class a{a():v_(27){}a(int v):v_(v){}~a(){echo"destroyed"}int v_;any vp{int get(){return v_}}}
 		}//class a{a():v_(27){}a(int v):v_(v){}int v_}
 
 		value = field.second.second->evaluate(storage, exception, expr);

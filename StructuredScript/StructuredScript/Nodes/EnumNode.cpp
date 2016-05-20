@@ -57,6 +57,10 @@ std::string StructuredScript::Nodes::EnumNode::str(){
 
 void StructuredScript::Nodes::EnumNode::attributes(IMemoryAttributes::Ptr attributes){}
 
+std::string StructuredScript::Nodes::EnumNode::declName(){
+	return name_->str();
+}
+
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::EnumNode::attributes(){
 	return nullptr;
 }

@@ -14,8 +14,7 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;
 		}
-
-		if (!Query::Node::isInitialization(field)){//Allocate
+		else if (!Query::Node::isInitialization(field)){//Allocate
 			auto memory = declaration->allocate(object.get(), exception, expr);
 			if (Query::ExceptionManager::has(exception))
 				return nullptr;

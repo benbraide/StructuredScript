@@ -13,12 +13,25 @@ namespace StructuredScript{
 			FunctionStorage(IStorage *parent, IAny::Ptr object)
 				: Storage(parent), object_(object){}
 
-			virtual IAny::Ptr object() override{
-				return object_;
+			virtual IAny *object() override{
+				return object_.get();
 			}
 
 		private:
 			IAny::Ptr object_;
+		};
+
+		class RawFunctionStorage : public Storage, public IFunctionStorage{
+		public:
+			RawFunctionStorage(IStorage *parent, IAny *object)
+				: Storage(parent), object_(object){}
+
+			virtual IAny *object() override{
+				return object_;
+			}
+
+		private:
+			IAny *object_;
 		};
 	}
 }

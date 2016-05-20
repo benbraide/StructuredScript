@@ -29,7 +29,7 @@ namespace StructuredScript{
 			IMemoryAttributes::Ptr attributes_;
 		};
 
-		class FunctionNode : public INode, public IFunctionNode, public CallableNode{
+		class FunctionNode : public INode, public IFunctionNode, public CallableNode, public IClassEntry{
 		public:
 			FunctionNode(Ptr declaration, Ptr parameters)
 				: CallableNode(parameters), declaration_(declaration){}
@@ -48,10 +48,14 @@ namespace StructuredScript{
 
 			virtual Node::Ptr parameters() override;
 
+			virtual std::string declName() override;
+
 		protected:
 			IAny::Ptr evaluate_(Ptr definition, IStorage *storage, IExceptionManager *exception, INode *expr);
 
 			virtual std::shared_ptr<Objects::Function> create_(IType::Ptr type, INode::Ptr definition) override;
+
+			IType::Ptr resolveType_(IDeclarationNode *declaration, IStorage *storage, IExceptionManager *exception, INode *expr);
 
 			Ptr declaration_;
 		};
@@ -83,7 +87,7 @@ namespace StructuredScript{
 			Ptr definition_;
 		};
 
-		class ConstructorNode : public FunctionNode{
+		class ConstructorNode : public FunctionNode, public IConstructorNode{
 		public:
 			typedef Objects::Constructor::InitializerListType InitializerListType;
 
@@ -118,6 +122,48 @@ namespace StructuredScript{
 		public:
 			ConstructorDefinitionNode(Ptr declaration, Ptr parameters, const InitializerListType &initializers, Ptr definition)
 				: ConstructorNode(declaration, parameters, initializers), definition_(definition){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual std::string str() override;
+
+			virtual Node::Ptr definition() override;
+
+		private:
+			Ptr definition_;
+		};
+
+		class DestructorNode : public FunctionNode, public IDestructorNode{
+		public:
+			DestructorNode(Ptr declaration, Ptr parameters)
+				: FunctionNode(declaration, parameters){}
+
+			virtual Node::Ptr type() override;
+
+			virtual Node::Ptr name() override;
+
+		protected:
+			IAny::Ptr evaluate_(Ptr definition, IStorage *storage, IExceptionManager *exception, INode *expr);
+
+			virtual std::shared_ptr<Objects::Function> create_(IType::Ptr type, INode::Ptr definition) override;
+		};
+
+		class DestructorDeclarationNode : public DestructorNode, public IFunctionDeclarationNode{
+		public:
+			DestructorDeclarationNode(Ptr declaration, Ptr parameters)
+				: DestructorNode(declaration, parameters){}
+
+			virtual Ptr clone() override;
+
+			virtual IAny::Ptr evaluate(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+		};
+
+		class DestructorDefinitionNode : public DestructorNode, public IFunctionDefinitionNode, public IBlockNode{
+		public:
+			DestructorDefinitionNode(Ptr declaration, Ptr parameters, Ptr definition)
+				: DestructorNode(declaration, parameters), definition_(definition){}
 
 			virtual Ptr clone() override;
 

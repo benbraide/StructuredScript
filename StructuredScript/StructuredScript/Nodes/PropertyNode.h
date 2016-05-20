@@ -13,7 +13,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class PropertyNode : public INode, public IPropertyNode, public IBlockNode{
+		class PropertyNode : public INode, public IPropertyNode, public IClassEntry, public IBlockNode{
 		public:
 			PropertyNode(Ptr declaration, Ptr value)
 				: declaration_(declaration), value_(value){}
@@ -31,6 +31,8 @@ namespace StructuredScript{
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual Ptr declaration() override;
+
+			virtual std::string declName() override;
 
 		private:
 			Ptr declaration_;

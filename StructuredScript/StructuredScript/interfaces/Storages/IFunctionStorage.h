@@ -11,7 +11,7 @@ namespace StructuredScript{
 		public:
 			virtual ~FunctionStorage(){}
 
-			virtual Any::Ptr object() = 0;
+			virtual Any *object() = 0;
 		};
 	}
 

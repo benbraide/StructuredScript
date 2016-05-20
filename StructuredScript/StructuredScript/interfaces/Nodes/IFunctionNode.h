@@ -29,11 +29,23 @@ namespace StructuredScript{
 
 			virtual Node::Ptr definition() = 0;
 		};
+
+		class ConstructorNode{
+		public:
+			virtual ~ConstructorNode(){}
+		};
+
+		class DestructorNode{
+		public:
+			virtual ~DestructorNode(){}
+		};
 	}
 
 	typedef Interfaces::FunctionNode			IFunctionNode;
 	typedef Interfaces::FunctionDeclarationNode	IFunctionDeclarationNode;
 	typedef Interfaces::FunctionDefinitionNode	IFunctionDefinitionNode;
+	typedef Interfaces::ConstructorNode			IConstructorNode;
+	typedef Interfaces::DestructorNode			IDestructorNode;
 }
 
 #endif /* !STRUCTURED_SCRIPT_FUNCTION_NODE_INTERFACE_H */

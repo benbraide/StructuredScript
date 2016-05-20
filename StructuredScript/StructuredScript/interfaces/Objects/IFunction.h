@@ -37,6 +37,8 @@ namespace StructuredScript{
 
 			virtual Any::Ptr call(bool rightUnary, Any::Ptr object, const ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
 
+			virtual Any::Ptr rawCall(bool rightUnary, Any *object, const ArgListType &args, ExceptionManager *exception, Node *expr) = 0;
+
 			virtual Type::Ptr declaredType() = 0;
 		};
 
@@ -46,10 +48,16 @@ namespace StructuredScript{
 
 			virtual void initialize(Object *object, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
+
+		class Destructor{
+		public:
+			virtual ~Destructor(){}
+		};
 	}
 
 	typedef Interfaces::Function	IFunction;
 	typedef Interfaces::Constructor	IConstructor;
+	typedef Interfaces::Destructor	IDestructor;
 }
 
 #endif /* !STRUCTURED_SCRIPT_FUNCTION_INTERFACE_H */

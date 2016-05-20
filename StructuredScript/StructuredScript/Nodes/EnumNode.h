@@ -13,7 +13,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class EnumNode : public INode, public IBlockNode{
+		class EnumNode : public INode, public IClassEntry, public IBlockNode{
 		public:
 			EnumNode(Ptr name, Ptr value)
 				: name_(name), value_(value){}
@@ -29,6 +29,8 @@ namespace StructuredScript{
 			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
 
 			virtual IMemoryAttributes::Ptr attributes() override;
+
+			virtual std::string declName() override;
 
 		private:
 			Ptr name_;

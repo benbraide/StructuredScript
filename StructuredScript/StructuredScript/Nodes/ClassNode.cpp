@@ -85,6 +85,10 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ClassNode::create(IStorage
 	return classType;
 }
 
+std::string StructuredScript::Nodes::ClassNode::declName(){
+	return name_->str();
+}
+
 void StructuredScript::Nodes::ClassNode::getParents_(Class::ParentListType &parents, IStorage *storage, IExceptionManager *exception, INode *expr){}
 
 bool StructuredScript::Nodes::ClassNode::isStatic_(IDeclarationNode *declaration){

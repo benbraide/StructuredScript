@@ -198,7 +198,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 	operatorInfo.find(value, OperatorType(OperatorType::BINARY | OperatorType::RIGHT_UNARY), list);
 
 	if (list.empty()){//Check declaration
-		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER && Query::Node::isIdentifier(node) && !Query::Node::isOperatorIdentifier(node)){//Declaration
+		if (type == Scanner::TokenType::TOKEN_TYPE_IDENTIFIER && (Query::Node::isClass(node) || (Query::Node::isIdentifier(node) &&
+			!Query::Node::isOperatorIdentifier(node)))){//Declaration
+
 			scanner.save(next);
 			node = DeclarationParser(node).parse(well, scanner, *this, exception);
 			if (Query::ExceptionManager::has(exception))

@@ -52,7 +52,7 @@ bool StructuredScript::Query::Node::isControl(INode::Ptr node){
 }
 
 bool StructuredScript::Query::Node::isFunction(INode::Ptr node){
-	return (dynamic_cast<IFunctionDeclarationNode *>(node.get()) != nullptr || dynamic_cast<IFunctionDefinitionNode *>(node.get()) != nullptr);
+	return (dynamic_cast<IFunctionNode *>(node.get()) != nullptr);
 }
 
 bool StructuredScript::Query::Node::isFunctionDeclaration(INode::Ptr node){
@@ -61,6 +61,14 @@ bool StructuredScript::Query::Node::isFunctionDeclaration(INode::Ptr node){
 
 bool StructuredScript::Query::Node::isFunctionDefinition(INode::Ptr node){
 	return dynamic_cast<IFunctionDefinitionNode *>(node.get()) != nullptr;
+}
+
+bool StructuredScript::Query::Node::isConstructor(INode::Ptr node){
+	return dynamic_cast<IConstructorNode *>(node.get()) != nullptr;
+}
+
+bool StructuredScript::Query::Node::isDestructor(INode::Ptr node){
+	return dynamic_cast<IDestructorNode *>(node.get()) != nullptr;
 }
 
 bool StructuredScript::Query::Node::isLoop(INode::Ptr node){

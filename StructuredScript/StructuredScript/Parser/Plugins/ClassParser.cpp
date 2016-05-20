@@ -1,7 +1,11 @@
 #include "ClassParser.h"
 
 StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
-	auto name = parser.term(well, scanner, exception);
+	auto name = parser.term(well, scanner, exception, [](const Scanner::Token &next) -> bool{
+		auto value = next.value();
+		return (value != ";" && value != "{");
+	});
+
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
@@ -36,6 +40,10 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 						"'~" + next + "...': Bad expression in class definition!"));
 				}
 			}
+
+			right = FunctionParser(std::make_shared<Nodes::IdentifierNode>("~" + nameStr)).parseDestructor(well, scanner, parser, exception);
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
 		}
 		else if (next == nameStr || (nameStr.empty() && next == "__constructor")){//Constructor
 			scanner.next(well);//Ignore
@@ -55,6 +63,19 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
+
+		auto classEntry = dynamic_cast<IClassEntry *>(right.get());
+		if (classEntry == nullptr){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + right->str() + "': Bad expression in class definition!"));
+		}
+
+		auto entryName = classEntry->declName();
+		if ((entryName.empty() || entryName == nameStr) && !Query::Node::isClass(right) && !Query::Node::isConstructor(right) &&
+			!Query::Node::isDestructor(right)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + right->str() + "': Bad expression in class definition!"));
+		}
 
 		if (value == nullptr)
 			value = right;

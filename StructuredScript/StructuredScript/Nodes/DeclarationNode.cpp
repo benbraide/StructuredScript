@@ -32,13 +32,9 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::SharedDeclaration::evaluate
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::allocate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto type = Query::Node::resolveAsType(this->type(), storage);
-	if (type == nullptr){
-		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + this->type()->str() + "'!", expr)));
-
+	auto type = resolveType_(storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
 		return nullptr;
-	}
 
 	auto value = this->value();
 	if (value == nullptr)//Unnamed declaration
@@ -61,6 +57,24 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 	}
 
 	return (*memory = createMemory_(storage, type));
+}
+
+StructuredScript::IType::Ptr StructuredScript::Nodes::SharedDeclaration::resolveType_(IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto typeNode = this->type();
+	auto classNode = dynamic_cast<IClassNode *>(typeNode.get());
+	if (classNode == nullptr){//Resolve
+		auto type = Query::Node::resolveAsType(typeNode, storage);
+		if (type == nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not resolve typename '" + typeNode->str() + "'!", expr)));
+
+			return nullptr;
+		}
+
+		return type;
+	}
+
+	return classNode->create(storage, exception, expr);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::createMemory_(IStorage *storage, IType::Ptr type){
@@ -120,6 +134,10 @@ StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::Dec
 	return attributes_;
 }
 
+std::string StructuredScript::Nodes::DeclarationNode::declName(){
+	return (value_ == nullptr) ? "" : value_->str();
+}
+
 void StructuredScript::Nodes::DeclarationNode::attributes(IMemoryAttributes::Ptr value){
 	attributes_ = value;
 }
@@ -143,6 +161,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::CommonDeclarati
 
 void StructuredScript::Nodes::CommonDeclaration::attributes(IMemoryAttributes::Ptr value){
 	declaration_->attributes(value);
+}
+
+std::string StructuredScript::Nodes::CommonDeclaration::declName(){
+	auto value = this->value();
+	return (value == nullptr) ? "" : value->str();
 }
 
 StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Nodes::CommonDeclaration::attributes(){

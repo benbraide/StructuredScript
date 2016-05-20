@@ -296,7 +296,7 @@ bool StructuredScript::Scanner::Scanner::hasMore_(ICharacterWell &well, bool che
 			return false;
 	}
 
-	return true;
+	return (well.peek() != '\0');
 }
 
 StructuredScript::Scanner::Scanner::Token StructuredScript::Scanner::Scanner::skip_(ICharacterWell &well) const{

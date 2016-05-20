@@ -1,5 +1,21 @@
 #include "Object.h"
 
+StructuredScript::Objects::Object::~Object(){
+	if (self_ != nullptr){//Only call destructors on fully constructed objects
+		auto destructorMemory = dynamic_cast<IClass *>(type_.get())->destructor();
+		if (destructorMemory != nullptr){
+			auto functionMemory = dynamic_cast<IFunctionMemory *>(destructorMemory.get());
+			if (functionMemory != nullptr){
+				auto destructor = functionMemory->first();
+				if (destructor != nullptr)
+					dynamic_cast<IFunction *>(destructor->object().get())->rawCall(false, this, {}, nullptr, nullptr);
+			}
+		}
+
+		self_ = nullptr;
+	}
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return nullptr;
 }

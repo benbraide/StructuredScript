@@ -21,7 +21,7 @@ namespace StructuredScript{
 			explicit Object(IType::Ptr type)
 				: Any(type){}
 
-			virtual ~Object(){}
+			virtual ~Object();
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 

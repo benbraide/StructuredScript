@@ -35,7 +35,7 @@ unsigned int StructuredScript::Query::Object::getIndex(IAny::Ptr object){
 	return 0;
 }
 
-StructuredScript::IAny::Ptr StructuredScript::Query::Object::getObjectInStorage(IStorage *storage){
+StructuredScript::IAny *StructuredScript::Query::Object::getObjectInStorage(IStorage *storage){
 	while (storage != nullptr){
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		if (functionStorage != nullptr)

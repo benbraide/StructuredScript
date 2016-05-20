@@ -50,6 +50,26 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseCons
 	return std::make_shared<Nodes::ConstructorDefinitionNode>(declaration_, parameters, list, definition);
 }
 
+StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseDestructor(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
+	auto parameters = parseParameters_(well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (!Query::Node::isEmpty(parameters)){
+		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+			"'" + declaration_->str() + "(" + parameters->str() + "){...': Destructor cannot have parameters!"));
+	}
+
+	auto definition = parseDefinition_(parameters, well, scanner, parser, exception);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (definition == nullptr)//Declaration
+		return std::make_shared<Nodes::DestructorDeclarationNode>(declaration_, parameters);
+
+	return std::make_shared<Nodes::DestructorDefinitionNode>(declaration_, parameters, definition);
+}
+
 StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseParameters_(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception){
 	INode::Ptr parameters;
 	if (scanner.peek(well).value() != "()"){

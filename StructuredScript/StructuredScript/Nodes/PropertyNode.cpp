@@ -54,6 +54,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::PropertyNode::d
 	return declaration_;
 }
 
+std::string StructuredScript::Nodes::PropertyNode::declName(){
+	auto value = dynamic_cast<IDeclarationNode *>(declaration_.get())->value();
+	return (value == nullptr) ? "" : value->str();
+}
+
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::PropertyNode::attributes(){
 	return attributes_;
 }

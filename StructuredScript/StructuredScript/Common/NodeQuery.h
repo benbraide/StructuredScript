@@ -22,6 +22,7 @@
 #include "../Interfaces/Nodes/IMemoryAdder.h"
 #include "../Interfaces/Nodes/IUseAdder.h"
 #include "../Interfaces/Nodes/IClassNode.h"
+#include "../Interfaces/Nodes/IClassEntry.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
 
@@ -58,6 +59,10 @@ namespace StructuredScript{
 			static bool isFunctionDeclaration(INode::Ptr node);
 
 			static bool isFunctionDefinition(INode::Ptr node);
+
+			static bool isConstructor(INode::Ptr node);
+
+			static bool isDestructor(INode::Ptr node);
 
 			static bool isLoop(INode::Ptr node);
 
