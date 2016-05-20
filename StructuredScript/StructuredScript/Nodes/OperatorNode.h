@@ -34,6 +34,8 @@ namespace StructuredScript{
 
 			virtual Ptr operand() override;
 
+			virtual bool isLeft() const override;
+
 			virtual IStorage *resolveStorage(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 			virtual IType::Ptr resolveType(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;

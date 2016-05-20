@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::clone(
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	return type_->isEqual(type) ? shared_from_this() : nullptr;
 }
 
 bool StructuredScript::Objects::Object::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -32,6 +32,11 @@ StructuredScript::IStorage *StructuredScript::Objects::Object::findStorage(const
 		return (searchScope == SEARCH_DEFAULT) ? dynamic_cast<IStorage *>(type_.get())->findStorage(name) : nullptr;
 
 	return self_->findStorage(name, searchScope);
+}
+
+StructuredScript::IMemory::Ptr *StructuredScript::Objects::Object::addMemory(const std::string &name){
+	auto object = objects_.find(name);
+	return (object == objects_.end()) ? &objects_[name] : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -82,6 +87,42 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Object::findM
 
 bool StructuredScript::Objects::Object::remove(IMemory::Ptr target){
 	return false;
+}
+
+void StructuredScript::Objects::Object::construct(const IFunction::ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (self_ != nullptr){//Already constructed
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Cannot construct a fully constructed object!", expr)));
+
+		return;
+	}
+
+	auto constructorMemory = dynamic_cast<IClass *>(type_.get())->constructor();
+	if (constructorMemory == nullptr){//Nothing to construct
+		if (!args.empty()){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+				"No constructor found taking the specified arguments!", expr)));
+		}
+
+		return;
+	}
+
+	auto functionMemory = dynamic_cast<IFunctionMemory *>(constructorMemory.get());
+	if (functionMemory != nullptr){
+		functionMemory->setStorage(this);
+		functionMemory->call(false, args, exception, expr);
+		if (!Query::ExceptionManager::has(exception))//Fully constructed
+			self_ = this;
+	}
+	else{
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"No constructor found taking the specified arguments!", expr)));
+	}
+}
+
+StructuredScript::IObject *StructuredScript::Objects::Object::findDirectParent(const std::string &name){
+	auto parent = parents_.find(name);
+	return (parent == parents_.end()) ? nullptr : dynamic_cast<IObject *>(parent->second->object().get());
 }
 
 void StructuredScript::Objects::Object::self(Any *self){

@@ -19,6 +19,8 @@ namespace StructuredScript{
 			virtual ~UnaryOperatorNode(){}
 
 			virtual std::shared_ptr<Node> operand() = 0;
+
+			virtual bool isLeft() const = 0;
 		};
 
 		class BinaryOperatorNode : public OperatorNode{

@@ -78,7 +78,7 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 			else//Reference
 				object = PrimitiveFactory::createReference(memory->ptr());
 		}
-		else{//Cast object to compatible type
+		else if (!compatibleType->isAny()){//Cast object to compatible type
 			object = object->cast(compatibleType->base(), storage, exception, expr);
 			if (Query::ExceptionManager::has(exception))
 				return;

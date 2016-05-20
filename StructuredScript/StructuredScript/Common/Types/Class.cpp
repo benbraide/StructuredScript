@@ -5,8 +5,14 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 	for (auto field : fields_){//Allocate memories for fields
 		auto declaration = dynamic_cast<IDeclarationNode *>(field.get());
 		if (declaration == nullptr){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("'" + field->str() + "': Expected a declaration!", expr)));
+			if (!Query::Node::isProperty(field)){
+				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+					Query::ExceptionManager::combine("'" + field->str() + "': Expected a declaration!", expr)));
+			}
+			
+			field->evaluate(object.get(), exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
 		}
 
 		if (!Query::Node::isInitialization(field)){//Allocate
@@ -41,11 +47,11 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Class::constructor(){
-	return nullptr;
+	return findFunctionMemory(name_, SEARCH_LOCAL);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Class::destructor(){
-	return nullptr;
+	return findFunctionMemory("~" + name_, SEARCH_LOCAL);
 }
 
 void StructuredScript::Class::setFieldList(const FieldListType &fields){

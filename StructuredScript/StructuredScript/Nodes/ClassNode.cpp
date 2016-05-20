@@ -81,6 +81,7 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ClassNode::create(IStorage
 		*added = classType;
 	}
 
+	classType->setFieldList(fields);
 	return classType;
 }
 

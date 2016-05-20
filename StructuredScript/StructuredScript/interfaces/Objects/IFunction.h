@@ -10,6 +10,8 @@
 
 namespace StructuredScript{
 	namespace Interfaces{
+		class Object;
+
 		class Function{
 		public:
 			typedef std::list<Any::Ptr>		ArgListType;
@@ -42,7 +44,7 @@ namespace StructuredScript{
 		public:
 			virtual ~Constructor(){}
 
-			virtual void initialize(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+			virtual void initialize(Object *object, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 		};
 	}
 

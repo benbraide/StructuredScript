@@ -11,7 +11,7 @@
 
 namespace StructuredScript{
 	namespace Objects{
-		class Object : public Any{
+		class Object : public Any, public IObject{
 		public:
 			typedef std::map<std::string, IMemory::Ptr>	ParentListType;
 			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
@@ -19,7 +19,7 @@ namespace StructuredScript{
 			typedef StructuredScript::Storage::FunctionMemory::ListType ListType;
 
 			explicit Object(IType::Ptr type)
-				: Any(type), self_(this){}
+				: Any(type){}
 
 			virtual ~Object(){}
 
@@ -32,6 +32,8 @@ namespace StructuredScript{
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual IStorage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
+
+			virtual IMemory::Ptr *addMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
@@ -47,6 +49,10 @@ namespace StructuredScript{
 
 			virtual bool remove(IMemory::Ptr target) override;
 
+			virtual void construct(const IFunction::ArgListType &args, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual IObject *findDirectParent(const std::string &name) override;
+
 			void self(Any *self);
 
 			bool addParent(const std::string &name, IMemory::Ptr parent);
@@ -58,7 +64,7 @@ namespace StructuredScript{
 
 			void extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope);
 
-			Any *self_;
+			Any *self_ = nullptr;
 			MemoryListType objects_;
 			ParentListType parents_;
 		};

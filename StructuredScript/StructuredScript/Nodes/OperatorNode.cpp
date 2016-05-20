@@ -72,6 +72,10 @@ std::shared_ptr<StructuredScript::Interfaces::Node> StructuredScript::Nodes::Una
 	return operand_;
 }
 
+bool StructuredScript::Nodes::UnaryOperatorNode::isLeft() const{
+	return left_;
+}
+
 StructuredScript::IStorage *StructuredScript::Nodes::UnaryOperatorNode::resolveStorage(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
 	if (value_ == "::"){
 		auto resolver = dynamic_cast<IStorageResolver *>(operand_.get());

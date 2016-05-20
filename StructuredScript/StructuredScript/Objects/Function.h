@@ -17,6 +17,12 @@ namespace StructuredScript{
 			virtual Ptr call(bool rightUnary, IAny::Ptr object, const ArgListType &args, IExceptionManager *exception, INode *expr) override;
 
 		protected:
+			IStorage::ExternalCallType getExternalCall_(IStorage *storage, IExceptionManager *exception, INode *expr);
+
+			Ptr getReturnValue_(IExceptionManager *exception, INode *expr);
+
+			virtual void initialize(IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			INode::Ptr definition_;
 		};
 
@@ -27,7 +33,9 @@ namespace StructuredScript{
 			Constructor(INode::Ptr parameters, INode::Ptr definition, const InitializerListType &initializers)
 				: Function(nullptr, parameters, definition), initializers_(initializers){}
 
-			virtual void initialize(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+			virtual Ptr call(bool rightUnary, IAny::Ptr object, const ArgListType &args, IExceptionManager *exception, INode *expr) override;
+
+			virtual void initialize(IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 		private:
 			void initializeParent_(const std::pair<std::string, INode::Ptr> &info, IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr);

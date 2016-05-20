@@ -95,6 +95,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 	if (value == "throw")
 		return std::make_shared<Nodes::ThrowNode>(operand);
 
+	if (value == "new")
+		return std::make_shared<Nodes::NewNode>(operand);
+
 	if (Query::Node::isEmpty(operand))
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Missing operand!"));
 

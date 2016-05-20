@@ -36,6 +36,7 @@
 #include "../Nodes/InterruptNode.h"
 #include "../Nodes/EchoNode.h"
 #include "../Nodes/ThrowNode.h"
+#include "../Nodes/NewNode.h"
 
 #include "../Storage/MemoryAttributes.h"
 
