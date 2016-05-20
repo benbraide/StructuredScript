@@ -39,7 +39,7 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		object->addParent(classParent->name_, std::make_shared<StructuredScript::Storage::Memory>(storage, parent, base, nullptr));
+		object->addParent(classParent->name_, std::make_shared<StructuredScript::Storage::Memory>(object.get(), parent, base, nullptr));
 	}
 
 	return object;

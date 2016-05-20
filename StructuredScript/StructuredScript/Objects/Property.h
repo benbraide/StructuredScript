@@ -54,6 +54,8 @@ namespace StructuredScript{
 
 			virtual ExternalCallType findExternalCall(const std::string &name) override;
 
+			virtual Ptr propertyClone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
 			virtual IType::Ptr propertyType() override;
 
 		protected:

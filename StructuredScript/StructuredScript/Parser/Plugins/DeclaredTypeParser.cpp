@@ -19,13 +19,12 @@ StructuredScript::INode::Ptr StructuredScript::Parser::DeclaredTypeParser::parse
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	auto type = dynamic_cast<ITypeIdentifierNode *>(value.get());
-	if (type == nullptr){//Type identifier required
+	if (!Query::Node::isIdentifier(value) || Query::Node::isOperatorIdentifier(value)){//Type identifier required
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
 			"'" + state_.str() + " " + value->str() + "': Expected type after state modifier!"));
 	}
 
-	auto modifiedType = dynamic_cast<IModifiedTypeIdentifierNode *>(type);
+	auto modifiedType = dynamic_cast<IModifiedTypeIdentifierNode *>(value.get());
 	if (modifiedType != nullptr){//Add states
 		if ((modifiedType->states() & state_.states()) != 0u){//Bad declaration
 			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(

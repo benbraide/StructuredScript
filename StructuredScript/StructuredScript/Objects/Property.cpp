@@ -28,8 +28,13 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::cast
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::base(){
+	if (get_ == nullptr)
+		return nullptr;
+
+	get_->setStorage(this);
+
 	ExceptionManager xManager;
-	return (get_ == nullptr) ? nullptr : get_->call(false, {}, &xManager, nullptr);
+	return get_->call(false, {}, &xManager, nullptr);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -50,7 +55,10 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const st
 			return nullptr;
 	}
 
-	return set_->call(false, IFunction::ArgListType{ right }, exception, expr);
+	set_->setStorage(this);
+	set_->call(false, IFunction::ArgListType{ right }, exception, expr);
+
+	return Query::ExceptionManager::has(exception) ? nullptr : shared_from_this();
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -144,14 +152,21 @@ StructuredScript::Objects::Property::ExternalCallType StructuredScript::Objects:
 	return memory_->storage()->findExternalCall(name);
 }
 
+StructuredScript::IAny::Ptr StructuredScript::Objects::Property::propertyClone(IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto property = std::make_shared<Property>(type_);
+
+	property->get_ = get_;
+	property->set_ = set_;
+
+	return property;
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Property::propertyType(){
 	return type_;
 }
 
 void StructuredScript::Objects::Property::getMemory_(const std::string &name, IStorage *storage, FunctionMemoryType &target){
 	auto memory = storage->findFunctionMemory(name, SEARCH_LOCAL);
-	if (memory != nullptr){
+	if (memory != nullptr)
 		target = std::dynamic_pointer_cast<IFunctionMemory>(memory);
-		target->setStorage(this);
-	}
 }

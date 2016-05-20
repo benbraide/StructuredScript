@@ -86,6 +86,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parsePara
 				return (next.value() != ",");
 			});
 
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+
 			if (!Query::Node::isDeclaration(node)){//Check unnamed parameter
 				if (!Query::Node::isIdentifier(node) || Query::Node::isOperatorIdentifier(node)){
 					return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
@@ -109,6 +112,9 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parsePara
 		} while (scanner.peek(well).value() == ",");
 
 		if (!scanner.close(well)){
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+
 			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
 				"'" + declaration_->str() + "(" + parameters->str() + "...': Bad expression!"));
 		}

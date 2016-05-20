@@ -17,11 +17,113 @@ StructuredScript::Objects::Object::~Object(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
+	auto function = findFunctionMemory("clone");
+	auto value = callFunction_(function, nullptr, false, "", true, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (value != nullptr)
+		return value;
+
+	//Default clone
+	auto object = std::make_shared<Object>(type_);
+	for (auto &parent : parents_){
+		auto parentClone = parent.second->object()->clone(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		object->addParent(parent.first, std::make_shared<StructuredScript::Storage::Memory>(object.get(), parent.second->type(), parentClone,
+			parent.second->attributes()));//Add similar memory
+	}
+
+	for (auto &entry : objects_){
+		auto target = entry.second->object();
+		auto property = dynamic_cast<IProperty *>(target.get());
+
+		Ptr objectClone;
+		if (property == nullptr)
+			objectClone = entry.second->object()->clone(storage, exception, expr);
+		else//Clone property object
+			objectClone = property->propertyClone(storage, exception, expr);
+
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		object->objects_[entry.first] = std::make_shared<StructuredScript::Storage::Memory>(object.get(), entry.second->type(), objectClone,
+			entry.second->attributes());//Add similar memory
+	}
+
+	object->self_ = object.get();//Signal full construction
+	return object;
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto function = findTypenameOperatorMemory(type);
+	auto value = callFunction_(function, nullptr, false, "", true, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (value != nullptr)
+		return value;
+
 	return type_->isEqual(type) ? shared_from_this() : nullptr;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Object::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto function = findOperatorMemory(value);
+	auto returnValue = callFunction_(function, nullptr, false, "", true, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (returnValue != nullptr)
+		return returnValue;
+
+	//Default assignent
+	if (memory_ == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Assignment requires an lvalue object!", expr)));
+	}
+
+	if (value.size() > 1u){//Compound assignment
+		right = evaluateBinary(value.substr(0, value.size() - 1), right, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	auto memory = memory_;
+	memory->assign(right, storage, exception, expr);
+
+	return Query::ExceptionManager::has(exception) ? nullptr : memory->object();
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto function = findOperatorMemory(value);
+	return callFunction_(function, nullptr, false, value, false, exception, expr);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto function = findOperatorMemory(value);
+	return callFunction_(function, nullptr, true, value, false, exception, expr);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto rightBase = right->base();
+	if (rightBase == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}
+
+	auto function = findOperatorMemory(value);
+	auto rightObject = dynamic_cast<IStorage *>(rightBase.get());
+	if (rightObject != nullptr){//Get operators from 'right'
+		auto rightFunction = rightObject->findOperatorMemory(value);
+		if (function != nullptr && rightFunction != nullptr)
+			function = std::make_shared<StructuredScript::Storage::FunctionMemory>(StructuredScript::Storage::FunctionMemory::ListType{ function, rightFunction });
+		else if (rightFunction != nullptr)
+			function = rightFunction;
+	}
+
+	return callFunction_(function, rightBase, false, value, false, exception, expr);
 }
 
 bool StructuredScript::Objects::Object::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -251,4 +353,39 @@ void StructuredScript::Objects::Object::extendTypeOperatorList_(ListType &list, 
 				list.push_back(memory);
 		}
 	}
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::callFunction_(IMemory::Ptr function, Ptr right, bool isRight,
+	const std::string &value, bool silent, IExceptionManager *exception, INode *expr){
+	auto functionMemory = dynamic_cast<IFunctionMemory *>(function.get());
+	if (functionMemory == nullptr){
+		if (silent)
+			return nullptr;
+
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}//class a{void operator+(){echo"plused"}int operator-(){return -v_}int v_=9}
+
+	auto nonMembers = functionMemory->filterNonMembers();
+	IFunction::ArgListType args;
+	if (right != nullptr)
+		args.push_back(right);
+
+	functionMemory->setStorage(this);
+	auto memberMatch = functionMemory->find(isRight, args);
+	if (memberMatch != nullptr)//Call member operator
+		return dynamic_cast<IFunction *>(memberMatch->object().get())->call(isRight, shared_from_this(), args, exception, expr);
+
+	if (nonMembers != nullptr){//Try non-members using object as argument
+		args.push_front(shared_from_this());
+		auto nonMemberMatch = dynamic_cast<IFunctionMemory *>(nonMembers.get())->find(isRight, args);
+		if (nonMemberMatch != nullptr)//Call non-member operator
+			return dynamic_cast<IFunction *>(nonMemberMatch->object().get())->call(isRight, nullptr, args, exception, expr);
+	}
+
+	if (silent)
+		return nullptr;
+
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+		"'" + value + "': Operands mismatch!", expr)));
 }

@@ -17,22 +17,6 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Any::base(){
 	return shared_from_this();
 }
 
-StructuredScript::IAny::Ptr StructuredScript::Objects::Any::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Objects::Any::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Objects::Any::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
-}
-
-StructuredScript::IAny::Ptr StructuredScript::Objects::Any::evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return nullptr;
-}
-
 StructuredScript::IType::Ptr StructuredScript::Objects::Any::type(){
 	return type_;
 }

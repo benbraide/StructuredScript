@@ -115,6 +115,8 @@ namespace StructuredScript{
 		public:
 			virtual ~Property(){}
 
+			virtual Any::Ptr propertyClone(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
 			virtual Type::Ptr propertyType() = 0;
 		};
 	}

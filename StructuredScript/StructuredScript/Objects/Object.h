@@ -27,6 +27,14 @@ namespace StructuredScript{
 
 			virtual Ptr cast(IType::Ptr type, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
+			virtual Ptr assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
+			virtual Ptr evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
 			virtual bool truth(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
@@ -63,6 +71,8 @@ namespace StructuredScript{
 			void extendOperatorList_(ListType &list, const std::string &name, unsigned short searchScope);
 
 			void extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope);
+
+			Ptr callFunction_(IMemory::Ptr function, Ptr right, bool isRight, const std::string &value, bool silent, IExceptionManager *exception, INode *expr);
 
 			Any *self_ = nullptr;
 			MemoryListType objects_;
