@@ -139,6 +139,16 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimit
 	return (value == primitives_.end()) ? nullptr : value->second;
 }
 
+StructuredScript::INode::Ptr StructuredScript::Storage::GlobalStorage::parse(const std::string &value){
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+
+	ExceptionManager xManager;
+	Scanner::StringCharacterWell well(value);
+
+	return parser.parse(well, scanner, &xManager);
+}
+
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){
 	switch (rank){
 	case Objects::Primitive::CHAR_RANK:

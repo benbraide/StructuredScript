@@ -61,6 +61,13 @@ StructuredScript::INode::Ptr StructuredScript::Parser::GroupParser::parse_(IChar
 		return std::make_shared<Nodes::BlockNode>(value);
 	}
 
+	auto indexNode = dynamic_cast<IIndexNode *>(node_.get());
+	if (indexNode != nullptr && (symbol[0] == '(' || symbol[0] == '{')){//Lambda
+		if (unary)//Save symbol
+			scanner.save(Scanner::Token(Scanner::TokenType::TOKEN_TYPE_SYMBOL, symbol));
+		return LambdaParser(indexNode->value()).parse(well, scanner, parser, exception);
+	}
+
 	if (Query::Node::isDeclaration(node_)){
 		if (Query::Node::isInitialization(node_)){
 			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(

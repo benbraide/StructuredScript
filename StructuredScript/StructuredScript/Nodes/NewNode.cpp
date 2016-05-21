@@ -68,6 +68,10 @@ std::string StructuredScript::Nodes::NewNode::str(){
 
 void StructuredScript::Nodes::NewNode::attributes(IMemoryAttributes::Ptr attributes){}
 
+StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::NewNode::value(){
+	return value_;
+}
+
 StructuredScript::IType::Ptr StructuredScript::Nodes::NewNode::resolveType_(Ptr target, IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto classNode = dynamic_cast<IClassNode *>(target.get());
 	if (classNode == nullptr){//Resolve

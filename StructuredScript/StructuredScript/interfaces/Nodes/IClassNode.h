@@ -12,6 +12,10 @@ namespace StructuredScript{
 			virtual ~ClassNode(){}
 
 			virtual Type::Ptr create(Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual void value(Node::Ptr value) = 0;
+
+			virtual Node::Ptr value() = 0;
 		};
 	}
 

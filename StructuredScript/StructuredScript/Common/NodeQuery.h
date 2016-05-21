@@ -80,6 +80,8 @@ namespace StructuredScript{
 
 			static bool isClass(INode::Ptr node);
 
+			static INode::Ptr getBase(INode::Ptr node);
+
 			static INode::Ptr getBaseId(INode::Ptr node);
 
 			static void split(const std::string &value, INode::Ptr node, ListType &list, bool forceBinary = false);

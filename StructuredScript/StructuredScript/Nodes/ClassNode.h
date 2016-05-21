@@ -31,6 +31,10 @@ namespace StructuredScript{
 
 			virtual IType::Ptr create(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
+			virtual void value(INode::Ptr value) override;
+
+			virtual INode::Ptr value() override;
+
 			virtual std::string declName() override;
 
 		protected:

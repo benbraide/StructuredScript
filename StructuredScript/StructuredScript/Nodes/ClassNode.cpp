@@ -85,6 +85,14 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ClassNode::create(IStorage
 	return classType;
 }
 
+void StructuredScript::Nodes::ClassNode::value(INode::Ptr value){
+	value_ = value;
+}
+
+StructuredScript::INode::Ptr StructuredScript::Nodes::ClassNode::value(){
+	return value_;
+}
+
 std::string StructuredScript::Nodes::ClassNode::declName(){
 	return name_->str();
 }

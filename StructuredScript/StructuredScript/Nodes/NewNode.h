@@ -30,6 +30,8 @@ namespace StructuredScript{
 
 			virtual IMemoryAttributes::Ptr attributes() override;
 
+			Ptr value();
+
 		private:
 			IType::Ptr resolveType_(Ptr target, IStorage *storage, IExceptionManager *exception, INode *expr);
 

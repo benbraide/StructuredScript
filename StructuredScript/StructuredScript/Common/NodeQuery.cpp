@@ -103,6 +103,11 @@ bool StructuredScript::Query::Node::isClass(INode::Ptr node){
 	return (dynamic_cast<IClassNode *>(node.get()) != nullptr);
 }
 
+StructuredScript::INode::Ptr StructuredScript::Query::Node::getBase(INode::Ptr node){
+	auto group = dynamic_cast<IGroupNode *>(node.get());
+	return (group == nullptr) ? node : getBase(group->value());
+}
+
 StructuredScript::INode::Ptr StructuredScript::Query::Node::getBaseId(INode::Ptr node){
 	auto operatorNode = dynamic_cast<IOperatorNode *>(node.get());
 	if (operatorNode == nullptr || operatorNode->value() != "::")

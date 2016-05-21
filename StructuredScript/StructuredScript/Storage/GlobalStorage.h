@@ -48,6 +48,8 @@ namespace StructuredScript{
 
 			virtual IType::Ptr getPrimitiveType(int rank) override;
 
+			virtual INode::Ptr parse(const std::string &value) override;
+
 		private:
 			ListType primitives_;
 		};

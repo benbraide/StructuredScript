@@ -13,7 +13,7 @@ namespace StructuredScript{
 	namespace Parser{
 		class FunctionParser : public IParserPlugin{
 		public:
-			FunctionParser(INode::Ptr declaration)
+			explicit FunctionParser(INode::Ptr declaration)
 				: declaration_(declaration){}
 
 			virtual INode::Ptr parse(ICharacterWell &well, IScanner &scanner, IParser &parser, IExceptionManager *exception) override;

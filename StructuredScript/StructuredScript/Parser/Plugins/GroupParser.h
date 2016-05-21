@@ -13,6 +13,7 @@
 #include "../../Nodes/DeclarationNode.h"
 
 #include "FunctionParser.h"
+#include "LambdaParser.h"
 
 namespace StructuredScript{
 	namespace Parser{
