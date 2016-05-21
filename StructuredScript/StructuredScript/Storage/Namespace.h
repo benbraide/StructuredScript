@@ -11,11 +11,9 @@ namespace StructuredScript{
 		class Namespace : public Storage, public INamespace{
 		public:
 			Namespace(IStorage *parent, const std::string &name)
-				: Storage(parent){}
+				: Storage(parent), name_(name){}
 
-			virtual std::string name() const override{
-				return name_;
-			}
+			virtual std::string name() const override;
 
 		private:
 			std::string name_;

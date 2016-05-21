@@ -11,7 +11,11 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::UnaryOperatorNo
 StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (left_ && value_ == "::"){
 		auto memory = resolveMemory(storage);
-		if (memory == nullptr){
+		if (memory == nullptr){//Try type
+			auto type = resolveType(storage);
+			if (type != nullptr)
+				return PrimitiveFactory::createTypeObject(type);
+
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 		}
@@ -156,7 +160,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 			memory = resolveMemory(storage);
 
 		if (value_[0] == ':'){//Scope
-			if (memory == nullptr){
+			if (memory == nullptr){//Try type
+				auto type = resolveType(storage);
+				if (type != nullptr)
+					return PrimitiveFactory::createTypeObject(type);
+
 				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 			}

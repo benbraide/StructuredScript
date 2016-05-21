@@ -14,7 +14,7 @@
 #include "Type.h"
 
 namespace StructuredScript{
-	class Class : public Type, public IClass{
+	class Class : public Type, public IClass, public INamespace{
 	public:
 		typedef std::list<INode::Ptr> FieldListType;
 
@@ -26,6 +26,8 @@ namespace StructuredScript{
 		virtual IMemory::Ptr constructor() override;
 
 		virtual IMemory::Ptr destructor() override;
+
+		virtual std::string name() const override;
 
 		void setFieldList(const FieldListType &fields);
 

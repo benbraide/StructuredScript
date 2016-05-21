@@ -53,6 +53,10 @@ StructuredScript::IMemory::Ptr StructuredScript::Class::destructor(){
 	return findFunctionMemory("~" + name_, SEARCH_LOCAL);
 }
 
+std::string StructuredScript::Class::name() const {
+	return Type::name();
+}
+
 void StructuredScript::Class::setFieldList(const FieldListType &fields){
 	fields_ = fields;
 }

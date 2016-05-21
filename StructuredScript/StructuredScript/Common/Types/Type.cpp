@@ -89,8 +89,7 @@ StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string 
 
 	if (searchScope != SEARCH_LOCAL){
 		for (auto parent : parents_){
-			auto alike = dynamic_cast<Type *>(parent.get());
-			auto type = (alike == nullptr) ? nullptr : alike->findType(name, SEARCH_FAMILY);
+			auto type = dynamic_cast<Type *>(parent.get())->findType(name, SEARCH_FAMILY);
 			if (type != nullptr)
 				return type;
 		}
@@ -116,6 +115,19 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 			return object->second;
 
 		list.push_back(object->second);
+	}
+
+	if (list.empty()){//Search parents and storage
+		if (searchScope == SEARCH_LOCAL)
+			return nullptr;
+
+		for (auto parent : parents_){
+			auto object = dynamic_cast<Type *>(parent.get())->findMemory(name, SEARCH_FAMILY);
+			if (object != nullptr)
+				return object;
+		}
+
+		return (searchScope == SEARCH_DEFAULT && storage_ != nullptr) ? storage_->findMemory(name, SEARCH_DEFAULT) : nullptr;
 	}
 
 	extendList_(list, name, searchScope);

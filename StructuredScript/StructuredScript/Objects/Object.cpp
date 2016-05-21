@@ -168,11 +168,27 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(con
 		list.push_back(object->second);
 	}
 
-	extendList_(list, name, searchScope);
-	if (!list.empty())
-		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
+	if (list.empty()){//Search parents and storage
+		if (searchScope == SEARCH_LOCAL)
+			return nullptr;
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
+		for (auto parent : parents_){
+			auto object = dynamic_cast<IStorage *>(parent.second->object().get())->findMemory(name, SEARCH_FAMILY);
+			if (object != nullptr)
+				return object;
+		}
+
+		if (self_ != nullptr && self_ != this){
+			auto object = self_->findMemory(name, SEARCH_FAMILY);
+			if (object != nullptr)
+				return object;
+		}
+		
+		return (searchScope == SEARCH_DEFAULT) ? dynamic_cast<IStorage *>(type_.get())->findMemory(name) : nullptr;
+	}
+
+	extendList_(list, name, searchScope);
+	return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
