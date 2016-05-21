@@ -29,7 +29,11 @@
 #include "../Common/Factory.h"
 
 #include "../Objects/StringObject.h"
+#include "../Objects/FunctionObject.h"
 #include "../Objects/Undefined.h"
+
+#include "../Scanner/Scanner.h"
+#include "../Parser/Parser.h"
 
 namespace StructuredScript{
 	namespace Storage{

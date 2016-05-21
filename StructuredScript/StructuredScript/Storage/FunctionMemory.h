@@ -26,6 +26,8 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() override;
 
+			virtual Ptr clone() override;
+
 			virtual void assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual IAny::Ptr object() override;
@@ -54,7 +56,7 @@ namespace StructuredScript{
 
 			virtual void resolveArgs(INode::Ptr args, IFunction::ArgListType &resolved, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			unsigned int count() const;
+			virtual unsigned int count() const override;
 
 			void getStaticMemories(ListType &list);
 

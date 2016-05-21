@@ -10,6 +10,10 @@ StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::Memory::ptr
 	return shared_from_this();
 }
 
+StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::Memory::clone(){
+	return std::make_shared<Memory>(storage_, type_, value_, attributes_, false);
+}
+
 void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (attributes_ != nullptr){//Validate access
 		if (value_ != nullptr && !Query::Object::isUndefined(value_) && (attributes_->hasAttribute(""))){
@@ -118,6 +122,10 @@ StructuredScript::Interfaces::MemoryAttributes::Ptr StructuredScript::Storage::M
 
 StructuredScript::IStorage *StructuredScript::Storage::Memory::storage(){
 	return storage_;
+}
+
+void StructuredScript::Storage::Memory::setStorage(IStorage *storage){
+	storage_ = storage;
 }
 
 void StructuredScript::Storage::Memory::assign(IAny::Ptr object){

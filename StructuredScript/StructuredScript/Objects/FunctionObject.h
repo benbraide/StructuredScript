@@ -4,14 +4,18 @@
 #define STRUCTURED_SCRIPT_FUNCTION_OBJECT_H
 
 #include "Primitive.h"
-#include "../Interfaces/Storages/IGlobalStorage.h"
+#include "PrimitiveObject.h"
+
+#include "../Storage/FunctionMemory.h"
+#include "../Common/ExceptionManager.h"
 
 namespace StructuredScript{
 	namespace Objects{
-		class FunctionObject : public Primitive, public ITypeObject{
+		class FunctionObject : public Primitive, public PrimitiveObject{
 		public:
-			explicit FunctionObject(IType::Ptr value)
-				: Primitive(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_TYPE)), value_(value){}
+			typedef StructuredScript::Storage::FunctionMemory::ListType ListType;
+
+			explicit FunctionObject(IMemory::Ptr value);
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
@@ -19,10 +23,14 @@ namespace StructuredScript{
 
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual IType::Ptr value() override;
+			static void init();
 
 		protected:
-			IType::Ptr value_;
+			Ptr bound_;
+			IMemory::Ptr value_;
+
+			static IType::Ptr class_;
+			static INode::Ptr lengthNode_;
 		};
 	}
 }

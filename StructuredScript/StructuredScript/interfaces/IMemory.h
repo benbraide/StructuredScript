@@ -16,6 +16,8 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() = 0;
 
+			virtual Ptr clone() = 0;
+
 			virtual void assign(Any::Ptr object, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual Any::Ptr object() = 0;
@@ -25,6 +27,8 @@ namespace StructuredScript{
 			virtual MemoryAttributes::Ptr attributes() = 0;
 
 			virtual Storage *storage() = 0;
+
+			virtual void setStorage(Storage *storage) = 0;
 		};
 	}
 

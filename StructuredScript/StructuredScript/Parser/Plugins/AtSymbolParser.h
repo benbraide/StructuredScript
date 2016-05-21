@@ -8,6 +8,9 @@
 
 #include "../../Interfaces/IParserPlugin.h"
 #include "../../Storage/MemoryAttributes.h"
+#include "../../Scanner/Plugins/Identifier/TypenameIdentifier.h"
+
+#include "../../Nodes/IdentifierNode.h"
 
 namespace StructuredScript{
 	namespace Parser{

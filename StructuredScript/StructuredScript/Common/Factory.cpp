@@ -12,6 +12,7 @@
 #include "../Objects/Real.h"
 #include "../Objects/StringObject.h"
 #include "../Objects/TypeObject.h"
+#include "../Objects/FunctionObject.h"
 #include "../Objects/IndexObject.h"
 #include "../Objects/Expanded.h"
 
@@ -109,6 +110,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createString(con
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createTypeObject(IType::Ptr value){
 	return std::make_shared<Objects::TypeObject>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createFunctionObject(IMemory::Ptr value){
+	return std::make_shared<Objects::FunctionObject>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){

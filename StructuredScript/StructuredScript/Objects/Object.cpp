@@ -170,7 +170,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(con
 
 	if (list.empty()){//Search parents and storage
 		if (searchScope == SEARCH_LOCAL)
-			return nullptr;
+			return dynamic_cast<IStorage *>(type_.get())->findMemory(name, SEARCH_LOCAL);
 
 		for (auto parent : parents_){
 			auto object = dynamic_cast<IStorage *>(parent.second->object().get())->findMemory(name, SEARCH_FAMILY);
@@ -184,7 +184,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(con
 				return object;
 		}
 		
-		return (searchScope == SEARCH_DEFAULT) ? dynamic_cast<IStorage *>(type_.get())->findMemory(name) : nullptr;
+		return dynamic_cast<IStorage *>(type_.get())->findMemory(name, searchScope);
 	}
 
 	extendList_(list, name, searchScope);
@@ -294,16 +294,17 @@ void StructuredScript::Objects::Object::extendList_(ListType &list, const std::s
 			list.push_back(memory);
 	}
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		auto memory = dynamic_cast<IStorage *>(type_.get())->findFunctionMemory(name, SEARCH_LOCAL);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findFunctionMemory(name, SEARCH_LOCAL);
+	if (memory != nullptr)
+		list.push_back(memory);
+
+	if (searchScope == SEARCH_LOCAL)
+		return;
+
+	for (auto &parent : parents_){//Get all functions with same name
+		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
-
-		for (auto &parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Get list from storage
@@ -327,16 +328,17 @@ void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, cons
 			list.push_back(memory);
 	}
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		auto memory = dynamic_cast<IStorage *>(type_.get())->findOperatorMemory(name, SEARCH_LOCAL);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findOperatorMemory(name, SEARCH_LOCAL);
+	if (memory != nullptr)
+		list.push_back(memory);
+
+	if (searchScope == SEARCH_LOCAL)
+		return;
+
+	for (auto &parent : parents_){//Get all functions with same name
+		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
-
-		for (auto &parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Get list from storage
@@ -360,16 +362,17 @@ void StructuredScript::Objects::Object::extendTypeOperatorList_(ListType &list, 
 			list.push_back(memory);
 	}
 
-	if (searchScope != SEARCH_LOCAL){//Get all functions with same name
-		auto memory = dynamic_cast<IStorage *>(type_.get())->findTypenameOperatorMemory(name, SEARCH_LOCAL);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findTypenameOperatorMemory(name, SEARCH_LOCAL);
+	if (memory != nullptr)
+		list.push_back(memory);
+
+	if (searchScope == SEARCH_LOCAL)
+		return;
+
+	for (auto &parent : parents_){//Get all functions with same name
+		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
-
-		for (auto &parent : parents_){
-			memory = dynamic_cast<IStorage *>(parent.second->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
-			if (memory != nullptr)
-				list.push_back(memory);
-		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Get list from storage

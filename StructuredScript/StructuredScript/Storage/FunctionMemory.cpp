@@ -9,6 +9,10 @@ StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMem
 	return shared_from_this();
 }
 
+StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::clone(){
+	return std::make_shared<FunctionMemory>(list_, storage_);
+}
+
 void StructuredScript::Storage::FunctionMemory::assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr){
 	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 		Query::ExceptionManager::combine("Invalid assignment!", expr)));

@@ -20,7 +20,10 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 		}
 
-		return memory->object();
+		if (dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
+			return memory->object();
+
+		return PrimitiveFactory::createFunctionObject(memory);
 	}
 
 	if (!left_ && value_ == "()"){//Call
@@ -169,7 +172,10 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 					Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 			}
 
-			return memory->object();
+			if (dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
+				return memory->object();
+
+			return PrimitiveFactory::createFunctionObject(memory);
 		}
 
 		if (memory != nullptr){

@@ -21,6 +21,8 @@ namespace StructuredScript{
 
 			virtual Ptr ptr() override;
 
+			virtual Ptr clone() override;
+
 			virtual void assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual IAny::Ptr object() override;
@@ -30,6 +32,8 @@ namespace StructuredScript{
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 			virtual IStorage *storage() override;
+
+			virtual void setStorage(IStorage *storage) override;
 
 			virtual void assign(IAny::Ptr object) override;
 

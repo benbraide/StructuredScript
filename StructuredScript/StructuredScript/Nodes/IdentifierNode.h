@@ -12,6 +12,7 @@
 #include "../Common/Types/StackedType.h"
 
 #include "../Storage/MemoryState.h"
+#include "../Interfaces/Storages/IFunctionMemory.h"
 
 namespace StructuredScript{
 	namespace Nodes{

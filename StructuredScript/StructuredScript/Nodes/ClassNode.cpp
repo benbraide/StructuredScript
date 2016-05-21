@@ -48,6 +48,18 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ClassNode::create(IStorage
 	Class::FieldListType fields;
 	auto classType = std::make_shared<Class>(storage, parents, name);
 
+	if (!name.empty()){//Add named class to storage
+		auto added = storage->addType(name);
+		if (added == nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Failed to create class!", expr)));
+
+			return nullptr;
+		}
+
+		*added = classType;
+	}
+
 	for (auto line : lines){//Evaluate | Add to field list
 		if (Query::Node::isProperty(line)){//Check for static declarations
 			auto property = dynamic_cast<IPropertyNode *>(line.get());
@@ -67,18 +79,6 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::ClassNode::create(IStorage
 
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
-	}
-
-	if (!name.empty()){//Add named class to storage
-		auto added = storage->addType(name);
-		if (added == nullptr){
-			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("Failed to create class!", expr)));
-
-			return nullptr;
-		}
-
-		*added = classType;
 	}
 
 	classType->setFieldList(fields);

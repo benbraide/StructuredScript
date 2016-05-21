@@ -27,9 +27,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	primitives_[Typename::TYPE_NAME_FLOAT]		= std::make_shared<PrimitiveType>("float", Typename::TYPE_NAME_FLOAT);
 	primitives_[Typename::TYPE_NAME_DOUBLE]		= std::make_shared<PrimitiveType>("double", Typename::TYPE_NAME_DOUBLE);
 	primitives_[Typename::TYPE_NAME_LDOUBLE]	= std::make_shared<PrimitiveType>("long double", Typename::TYPE_NAME_LDOUBLE);
-	primitives_[Typename::TYPE_NAME_STRING]		= std::make_shared<PrimitiveType>("string", Typename::TYPE_NAME_STRING);
 	primitives_[Typename::TYPE_NAME_TYPE]		= std::make_shared<PrimitiveType>("type", Typename::TYPE_NAME_TYPE);
-	primitives_[Typename::TYPE_NAME_FUNCTION]	= std::make_shared<PrimitiveType>("function_type", Typename::TYPE_NAME_FUNCTION);
 
 	attributes_["Locked"]						= std::make_shared<LockedAttribute>();
 	attributes_["Concurrent"]					= std::make_shared<ConcurentAttribute>();
@@ -79,7 +77,10 @@ void StructuredScript::Storage::GlobalStorage::init(){
 		primitives_[Typename::TYPE_NAME_LDOUBLE]
 	}, "numeric_type");
 
-	types_["primitive_type"]					= std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
+	Objects::FunctionObject::init();
+	Objects::String::init();
+
+	types_["primitive_type"] = std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
 		primitives_[Typename::TYPE_NAME_VOID],
 		primitives_[Typename::TYPE_NAME_BOOLEAN],
 		primitives_[Typename::TYPE_NAME_BIT],
@@ -98,8 +99,9 @@ void StructuredScript::Storage::GlobalStorage::init(){
 		primitives_[Typename::TYPE_NAME_FLOAT],
 		primitives_[Typename::TYPE_NAME_DOUBLE],
 		primitives_[Typename::TYPE_NAME_LDOUBLE],
-		primitives_[Typename::TYPE_NAME_STRING],
-		primitives_[Typename::TYPE_NAME_TYPE]
+		primitives_[Typename::TYPE_NAME_TYPE],
+		findType("function_type"),
+		findType("string")
 	}, "primitive_type");
 
 	//Create a constant bit type & a locked attribute
@@ -108,13 +110,6 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
-
-	Parser::Parser parser;
-	Scanner::Scanner scanner;
-
-	auto string = std::make_shared<StringType>(this);
-	primitives_[Typename::TYPE_NAME_STRING] = string;
-	Objects::String::init(string, scanner, parser);
 
 	Objects::Expansion::init();
 }
@@ -135,6 +130,12 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(Typename type){
+	if (type == Typename::TYPE_NAME_STRING)
+		return findType("string", SEARCH_LOCAL);
+
+	if (type == Typename::TYPE_NAME_FUNCTION)
+		return findType("function_type", SEARCH_LOCAL);
+
 	auto value = primitives_.find(type);
 	return (value == primitives_.end()) ? nullptr : value->second;
 }
@@ -178,7 +179,7 @@ StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimit
 	case Objects::Primitive::LDOUBLE_RANK:
 		return getPrimitiveType(Typename::TYPE_NAME_LDOUBLE);
 	case Objects::Primitive::STRING_RANK:
-		return getPrimitiveType(Typename::TYPE_NAME_STRING);
+		return findType("string", SEARCH_LOCAL);
 	default:
 		break;
 	}

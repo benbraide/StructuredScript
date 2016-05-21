@@ -23,7 +23,10 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::IdentifierNode::evaluate(IS
 		return PrimitiveFactory::createTypeObject(type);
 	}
 
-	return memory->object();
+	if (dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
+		return memory->object();
+
+	return PrimitiveFactory::createFunctionObject(memory);
 }
 
 std::string StructuredScript::Nodes::IdentifierNode::str(){

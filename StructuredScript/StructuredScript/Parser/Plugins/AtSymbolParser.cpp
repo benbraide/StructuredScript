@@ -33,5 +33,12 @@ StructuredScript::INode::Ptr StructuredScript::Parser::AtSymbolParser::parse(ICh
 		return target;
 	}
 
-	return nullptr;
+	auto next = scanner.next(well);
+	auto type = next.type();
+	if (type != Scanner::TokenType::TOKEN_TYPE_IDENTIFIER && type != Scanner::Plugins::TypenameTokenType::type){
+		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+			"'@" + next.value() + "': Bad expression!"));
+	}
+
+	return std::make_shared<Nodes::IdentifierNode>(next.value());
 }
