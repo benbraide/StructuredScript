@@ -113,8 +113,8 @@ void StructuredScript::Objects::Expansion::init(){
 	lengthNode_ = parser.parse(well, scanner, nullptr);
 
 	lengthCallback_ = [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
-		auto storageBase = Query::Object::getObjectInStorage(storage)->base();
-		auto exspansion = dynamic_cast<Expansion *>(storageBase.get());
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto exspansion = (functionStorage == nullptr) ? nullptr : dynamic_cast<Expansion *>(functionStorage->object()->memory()->storage());
 		if (exspansion == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Bad member function call!", expr)));

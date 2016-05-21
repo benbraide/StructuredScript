@@ -63,12 +63,6 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::LambdaNode::evaluate(IStora
 
 	auto parametersNode = (parameters_ == nullptr) ? std::make_shared<EmptyNode>() : parameters_;
 	auto function = std::make_shared<FunctionDefinitionNode>(declaration, parametersNode, value_);
-	if (parameters_ == nullptr || Query::Node::isEmpty(parameters_)){//Right unary
-		Storage::MemoryAttributes::ListType attributes;
-
-		attributes["RightUnary"] = dynamic_cast<IStorage *>(IGlobalStorage::globalStorage)->findMemoryAttribute("RightUnary");
-		function->attributes(std::make_shared<Storage::MemoryAttributes>(attributes));
-	}
 
 	classNode->value(std::make_shared<BlockPairNode>(classNode->value(), function));//Insert operator function
 
@@ -82,7 +76,21 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::LambdaNode::evaluate(IStora
 		transformedNode = std::make_shared<BinaryOperatorNode>("()", transformedNode, args);
 	}
 
-	return std::make_shared<NewNode>(transformedNode)->evaluate(storage, exception, expr);//Create new unnamed instance
+	auto object = std::make_shared<NewNode>(transformedNode)->evaluate(storage, exception, expr);//Create new unnamed instance
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	if (self){
+		auto target = dynamic_cast<Objects::Any *>(Query::Object::getObjectInStorage(storage));
+		if (target == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'self': Found in lambda capture list outside of object!", expr)));
+		}
+
+		dynamic_cast<Objects::Object *>(object.get())->self(target);
+	}
+
+	return object;
 }
 
 std::string StructuredScript::Nodes::LambdaNode::str(){

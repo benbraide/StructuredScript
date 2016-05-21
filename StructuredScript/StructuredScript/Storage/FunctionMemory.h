@@ -22,7 +22,7 @@ namespace StructuredScript{
 			FunctionMemory(IStorage *storage)
 				: storage_(storage){}
 
-			FunctionMemory(const ListType &components);
+			FunctionMemory(const ListType &components, IStorage *storage = nullptr);
 
 			virtual Ptr ptr() override;
 

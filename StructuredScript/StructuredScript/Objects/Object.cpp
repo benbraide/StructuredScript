@@ -169,7 +169,10 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(con
 	}
 
 	extendList_(list, name, searchScope);
-	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
+	if (!list.empty())
+		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
+
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -180,19 +183,30 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findFunctionMe
 		list.push_back(object->second);
 
 	extendList_(list, name, searchScope);
-	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
+	if (!list.empty())
+		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
+
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findFunctionMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
+
 	extendOperatorList_(list, name, searchScope);
-	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
+	if (!list.empty())
+		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
+
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findOperatorMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
+
 	extendTypeOperatorList_(list, name, searchScope);
-	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
+	if (!list.empty())
+		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
+
+	return (self_ == nullptr || self_ == this) ? nullptr : self_->findTypenameOperatorMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 }
 
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Object::addMemoryAttribute(const std::string &name){
@@ -222,6 +236,7 @@ void StructuredScript::Objects::Object::construct(const IFunction::ArgListType &
 				"No constructor found taking the specified arguments!", expr)));
 		}
 
+		self_ = this;//No constructor -- fully constructed
 		return;
 	}
 
@@ -364,14 +379,13 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::callFu
 
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 			"'" + value + "': Operands mismatch!", expr)));
-	}//class a{void operator+(){echo"plused"}int operator-(){return -v_}int v_=9}
+	}
 
 	auto nonMembers = functionMemory->filterNonMembers();
 	IFunction::ArgListType args;
 	if (right != nullptr)
 		args.push_back(right);
 
-	functionMemory->setStorage(this);
 	auto memberMatch = functionMemory->find(isRight, args);
 	if (memberMatch != nullptr)//Call member operator
 		return dynamic_cast<IFunction *>(memberMatch->object().get())->call(isRight, shared_from_this(), args, exception, expr);

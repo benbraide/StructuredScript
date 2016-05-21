@@ -43,6 +43,8 @@ namespace StructuredScript{
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		protected:
+			IAny::Ptr call_(IAny::Ptr object, IExceptionManager *exception, INode *expr);
+
 			bool left_;
 			std::string value_;
 			Ptr operand_;
@@ -78,6 +80,8 @@ namespace StructuredScript{
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
 		protected:
+			IAny::Ptr call_(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			std::string value_;
 			Ptr leftOperand_;
 			Ptr rightOperand_;

@@ -8,6 +8,7 @@
 #include "../Common/Factory.h"
 
 #include "../Storage/MemoryAttributes.h"
+#include "../Objects/Object.h"
 
 #include "EmptyNode.h"
 #include "FunctionNode.h"

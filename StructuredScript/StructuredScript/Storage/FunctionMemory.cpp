@@ -1,7 +1,7 @@
 #include "FunctionMemory.h"
 
-StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &components)
-	: storage_(nullptr){//Combine multiple function memories into one
+StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &components, IStorage *storage /*= nullptr*/)
+	: storage_(storage){//Combine multiple function memories into one
 	init_(components);
 }
 

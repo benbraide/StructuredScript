@@ -22,14 +22,19 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::evaluate
 	if (!left_ && value_ == "()"){//Call
 		auto resolver = dynamic_cast<IMemoryResolver *>(operand_.get());
 		auto memory = (resolver == nullptr) ? nullptr : resolver->resolveMemory(storage);
-		if (memory == nullptr){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+		if (memory != nullptr){
+			auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
+			if (functionMemory != nullptr)//Call function
+				return functionMemory->call(false, {}, exception, expr);
+
+			return call_(memory->object(), exception, expr);
 		}
 
-		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
-		if (functionMemory != nullptr)//Call function
-			return functionMemory->call(false, {}, exception, expr);
+		auto value = operand_->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		return call_(value, exception, expr);
 	}
 
 	auto value = operand_->evaluate(storage, exception, expr);
@@ -112,6 +117,25 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::UnaryOperatorNode::resol
 	return nullptr;
 }
 
+StructuredScript::IAny::Ptr StructuredScript::Nodes::UnaryOperatorNode::call_(IAny::Ptr object, IExceptionManager *exception, INode *expr){
+	object = object->base();
+
+	auto storage = dynamic_cast<IStorage *>(object.get());
+	if (storage == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Object is not callable!", expr)));
+	}
+
+	auto function = storage->findOperatorMemory("()");
+	auto functionMemory = dynamic_cast<IFunctionMemory *>(function.get());
+	if (functionMemory == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Object is not callable!", expr)));
+	}
+
+	return functionMemory->call(false, {}, exception, expr);
+}
+
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::BinaryOperatorNode::ptr(){
 	return shared_from_this();
 }
@@ -131,24 +155,35 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 		else//Resolve both operands as memory
 			memory = resolveMemory(storage);
 
-		if (memory == nullptr){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
-		}
+		if (value_[0] == ':'){//Scope
+			if (memory == nullptr){
+				return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+					Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
+			}
 
-		if (value_[0] == ':')//Scope
 			return memory->object();
-
-		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
-		if (functionMemory != nullptr){//Call function
-			IFunction::ArgListType args;
-
-			functionMemory->resolveArgs(rightOperand_, args, storage, exception, expr);
-			if (Query::ExceptionManager::has(exception))
-				return nullptr;
-
-			return functionMemory->call(false, args, exception, expr);
 		}
+
+		if (memory != nullptr){
+			auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
+			if (functionMemory != nullptr){//Call function
+				IFunction::ArgListType args;
+
+				functionMemory->resolveArgs(rightOperand_, args, storage, exception, expr);
+				if (Query::ExceptionManager::has(exception))
+					return nullptr;
+
+				return functionMemory->call(false, args, exception, expr);
+			}
+
+			return call_(memory->object(), storage, exception, expr);
+		}
+
+		auto leftValue = leftOperand_->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		return call_(leftValue, storage, exception, expr);
 	}
 
 	auto leftValue = leftOperand_->evaluate(storage, exception, expr);
@@ -306,4 +341,29 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::BinaryOperatorNode::reso
 	}
 
 	return nullptr;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::call_(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr){
+	object = object->base();
+
+	auto objectStorage = dynamic_cast<IStorage *>(object.get());
+	if (objectStorage == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Object is not callable!", expr)));
+	}
+
+	auto function = objectStorage->findOperatorMemory("()");
+	auto functionMemory = dynamic_cast<IFunctionMemory *>(function.get());
+	if (functionMemory == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+			Query::ExceptionManager::combine("'" + str() + "': Object is not callable!", expr)));
+	}
+
+	IFunction::ArgListType args;
+
+	functionMemory->resolveArgs(rightOperand_, args, storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	return functionMemory->call(false, args, exception, expr);
 }

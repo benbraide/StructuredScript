@@ -190,17 +190,14 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::FunctionDeclaration::p
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Invalid function parameter list!", expr)));
 
-			return nullptr;;
+			return nullptr;
 		}
 
 		auto memory = dynamic_cast<IDeclarationNode *>(param->get())->allocate(storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))//Failed to allocate memory
-			return nullptr;;
+			return nullptr;
 
-		auto object = memory->object();
-		auto objectBase = (object == nullptr) ? nullptr : object->base();
-
-		expansion = (objectBase == nullptr) ? nullptr : dynamic_cast<IExpansion *>(objectBase.get());
+		expansion = dynamic_cast<IExpansion *>(memory->object().get());
 		if (expansion != nullptr){//Add entry
 			expansionMemory = memory;//Store memory reference for when memory is temporary
 			memory = expansion->add();
@@ -208,7 +205,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::FunctionDeclaration::p
 
 		memory->assign(*arg, storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))//Failed to create object
-			return nullptr;;
+			return nullptr;
 	}
 
 	if (param != list_.end()){//Parameters must be initialization declarations
@@ -217,28 +214,33 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::FunctionDeclaration::p
 			if (Query::Node::isExpandedTypeIdentifier(declaration->type())){//Expansion -- allocate
 				auto memory = declaration->allocate(storage, exception, expr);
 				if (Query::ExceptionManager::has(exception))//Failed to create object
-					return nullptr;;
+					return nullptr;
 
-				auto backdoor = dynamic_cast<IMemoryBackdoor *>(memory.get());
-				if (backdoor == nullptr){
-					Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-						Query::ExceptionManager::combine("Error during function call!", expr)));
+				expansion = dynamic_cast<IExpansion *>(memory->object().get());
+				if (expansion == nullptr){//Insert undefined
+					auto backdoor = dynamic_cast<IMemoryBackdoor *>(memory.get());
+					if (backdoor == nullptr){
+						Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+							Query::ExceptionManager::combine("Error during function call!", expr)));
 
-					return nullptr;;
+						return nullptr;
+					}
+
+					backdoor->assign(PrimitiveFactory::createUndefined());
 				}
-
-				backdoor->assign(PrimitiveFactory::createUndefined());
+				else//Expansion object created
+					expansionMemory = memory;//Store memory reference for when memory is temporary
 			}
 			else if (Query::Node::isInitialization(*param)){//Initialization -- evaluate
 				auto memory = (*param)->evaluate(storage, exception, expr);
 				if (Query::ExceptionManager::has(exception))//Failed to create object
-					return nullptr;;
+					return nullptr;
 			}
 			else{//Too few arguments
 				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 					Query::ExceptionManager::combine("'" + (*param)->str() + "': Missing argument for parameter!", expr)));
 
-				return nullptr;;
+				return nullptr;
 			}
 		}
 	}
@@ -247,13 +249,13 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::FunctionDeclaration::p
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("Too many arguments in function call!", expr)));
 
-			return nullptr;;
+			return nullptr;
 		}
 
 		for (; arg != args.end(); ++arg){
 			expansion->add()->assign(*arg, storage, exception, expr);
 			if (Query::ExceptionManager::has(exception))//Failed to create object
-				return nullptr;;
+				return nullptr;
 		}
 	}
 
