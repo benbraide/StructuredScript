@@ -87,7 +87,7 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Objects::Expansion::fi
 }
 
 StructuredScript::Objects::Expansion::ExternalCallType StructuredScript::Objects::Expansion::findExternalCall(const std::string &name){
-	return (name == "length.get") ? lengthCallback_ : nullptr;
+	return (name == "0") ? lengthCallback_ : nullptr;
 }
 
 bool StructuredScript::Objects::Expansion::remove(IMemory::Ptr target){
@@ -108,7 +108,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::add(){
 void StructuredScript::Objects::Expansion::init(){
 	Parser::Parser parser;
 	Scanner::Scanner scanner;
-	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+	Scanner::StringCharacterWell well("any length{ @[Call(0)]unsigned int get() }");
 
 	lengthNode_ = parser.parse(well, scanner, nullptr);
 

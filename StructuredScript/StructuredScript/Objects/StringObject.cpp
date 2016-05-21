@@ -129,15 +129,15 @@ bool StructuredScript::Objects::String::remove(IMemory::Ptr target){
 
 void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanner &scanner, IParser &parser){
 	std::list<std::string> lines({
-		"@[Call(at)]char at(integral_type index)",
-		"@[Call(append)]ref string append(const ref val string value)",
-		"@[Call(insert)]ref string insert(integral_type index, const ref val string value)",
-		"@[Call(erase)]ref string erase(integral_type index, integral_type count = npos)",
-		"@[Call(clear)]void clear()",
-		"@[Call(substr)]string substr(integral_type index, integral_type count = npos)",
-		"@[Call(find)]int find(const ref val string value, integral_type offset = 0)",
-		"@[Call(find_last)]int find_last(const ref val string value, integral_type offset = 0)",
-		"@[Call(empty)]bool empty()",
+		"@[Call(0)]char at(integral_type index)",
+		"@[Call(1)]ref string append(const ref val string value)",
+		"@[Call(2)]ref string insert(integral_type index, const ref val string value)",
+		"@[Call(3)]ref string erase(integral_type index, integral_type count = npos)",
+		"@[Call(4)]void clear()",
+		"@[Call(5)]string substr(integral_type index, integral_type count = npos)",
+		"@[Call(6)]int find(const ref val string value, integral_type offset = 0)",
+		"@[Call(7)]int find_last(const ref val string value, integral_type offset = 0)",
+		"@[Call(8)]bool empty()",
 		"static const unsigned int npos = -1u"
 	});
 
@@ -146,10 +146,10 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		parser.parse(well, scanner, nullptr)->evaluate(type.get(), nullptr, nullptr);
 	}
 
-	Scanner::StringCharacterWell well("any length{ @[Call(length.get)]unsigned int get() }");
+	Scanner::StringCharacterWell well("any length{ @[Call(9)]unsigned int get() }");
 	lengthNode_ = parser.parse(well, scanner, nullptr);
 
-	type->addExternalCall("at", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("0", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -166,7 +166,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createChar(string->value_[index]);
 	});
 
-	type->addExternalCall("append", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("1", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -185,7 +185,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return string->ptr();
 	});
 
-	type->addExternalCall("insert", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("2", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -210,7 +210,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return string->ptr();
 	});
 
-	type->addExternalCall("erase", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("3", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -228,7 +228,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return string->ptr();
 	});
 
-	type->addExternalCall("clear", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("4", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -240,7 +240,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createVoid();
 	});
 
-	type->addExternalCall("substr", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("5", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -257,7 +257,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return std::make_shared<String>(string->value_.substr(index, Query::Object::getIndex(storage->findMemory("count")->object())));
 	});
 
-	type->addExternalCall("find", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("6", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -281,7 +281,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createUInt(string->value_.find(value->value_, offset));
 	});
 
-	type->addExternalCall("find_last", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("7", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -305,7 +305,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createUInt(string->value_.find_last_of(value->value_, offset));
 	});
 
-	type->addExternalCall("empty", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("8", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object());
 		if (string == nullptr){
@@ -316,7 +316,7 @@ void StructuredScript::Objects::String::init(std::shared_ptr<Type> type, IScanne
 		return PrimitiveFactory::createBool(string->value_.empty());
 	});
 
-	type->addExternalCall("length.get", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+	type->addExternalCall("9", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto string = (functionStorage == nullptr) ? nullptr : dynamic_cast<String *>(functionStorage->object()->memory()->storage());
 		if (string == nullptr){
