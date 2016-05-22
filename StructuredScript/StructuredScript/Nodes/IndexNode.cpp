@@ -9,7 +9,22 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::IndexNode::clon
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::IndexNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return value_->evaluate(storage, exception, expr);
+	auto object = std::make_shared<Objects::ArrayObject>();
+
+	Query::Node::ListType entries;
+	Query::Node::split(",", value_, entries);
+
+	for (auto entry : entries){
+		auto value = entry->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		object->append(value, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+	}
+
+	return object;
 }
 
 std::string StructuredScript::Nodes::IndexNode::str(){

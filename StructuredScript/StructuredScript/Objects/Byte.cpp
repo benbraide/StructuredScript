@@ -70,7 +70,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluate
 			"'[]': Expected index to be an integral value!", expr)));
 	}
 
-	auto index = static_cast<unsigned char>(getIndex(right));
+	auto index = static_cast<unsigned char>(getIndex(rightBase));
 	if (memory_ == nullptr)
 		return PrimitiveFactory::createBit(((value_ >> (static_cast<unsigned char>(7) - index)) & static_cast<unsigned char>(1)) != static_cast<unsigned char>(0));
 

@@ -9,7 +9,7 @@ bool StructuredScript::Storage::AssumeTypeAttribute::appliesTo(IMemory::Ptr memo
 }
 
 bool StructuredScript::Storage::AssumeTypeAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return Query::Node::isDeclaration(node);
+	return (Query::Node::isDeclaration(node) || Query::Node::isFunction(node));
 }
 
 void StructuredScript::Storage::AssumeTypeAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}

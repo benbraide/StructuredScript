@@ -65,6 +65,8 @@ namespace StructuredScript{
 
 		static IAny::Ptr createExpanded(IAny::Ptr value);
 
+		static IAny::Ptr createArray();
+
 		static IAny::Ptr create(int rank);
 
 		static IAny::Ptr create(Typename type);

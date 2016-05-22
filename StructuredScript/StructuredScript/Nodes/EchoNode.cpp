@@ -13,47 +13,11 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::EchoNode::evaluate(IStorage
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	value = value->base();
-	if (value == nullptr || Query::Object::isUndefined(value) || Query::Object::isExpansion(value) || Query::Object::isExpanded(value)){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
-			"Cannot echo an invalid object!", expr)));
-	}
-
-	auto enumObject = dynamic_cast<IEnum *>(value.get());
-	if (enumObject != nullptr){
-		std::cout << enumObject->name() << "\n";
-		return PrimitiveFactory::createUndefined();
-	}
-
-	auto str = value->str(storage, exception, expr);
+	auto str = str_(value, storage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	if (dynamic_cast<IString *>(value.get()) != nullptr)
-		std::cout << "\"" << str << "\"\n";
-	else if (dynamic_cast<Objects::Char *>(value.get()) != nullptr)
-		std::cout << "\'" << str << "\'\n";
-	else if (dynamic_cast<Objects::UChar *>(value.get()) != nullptr)
-		std::cout << "\'" << str << "\'U\n";
-	else if (dynamic_cast<Objects::Short *>(value.get()) != nullptr)
-		std::cout << str << "H\n";
-	else if (dynamic_cast<Objects::UShort *>(value.get()) != nullptr)
-		std::cout << str << "UH\n";
-	else if (dynamic_cast<Objects::UInt *>(value.get()) != nullptr)
-		std::cout << str << "U\n";
-	else if (dynamic_cast<Objects::Long *>(value.get()) != nullptr || dynamic_cast<Objects::LDouble *>(value.get()) != nullptr)
-		std::cout << str << "L\n";
-	else if (dynamic_cast<Objects::ULong *>(value.get()) != nullptr)
-		std::cout << str << "UL\n";
-	else if (dynamic_cast<Objects::LLong *>(value.get()) != nullptr)
-		std::cout << str << "LL\n";
-	else if (dynamic_cast<Objects::ULLong *>(value.get()) != nullptr)
-		std::cout << str << "ULL\n";
-	else if (dynamic_cast<Objects::Float *>(value.get()) != nullptr)
-		std::cout << str << "F\n";
-	else
-		std::cout << str << "\n";
-
+	std::cout << str << "\n";
 	return PrimitiveFactory::createUndefined();
 }
 
@@ -65,4 +29,64 @@ void StructuredScript::Nodes::EchoNode::attributes(IMemoryAttributes::Ptr attrib
 
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::EchoNode::attributes(){
 	return nullptr;
+}
+
+std::string StructuredScript::Nodes::EchoNode::str_(IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	value = value->base();
+	if (value == nullptr || Query::Object::isUndefined(value) || Query::Object::isExpansion(value) || Query::Object::isExpanded(value)){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"Cannot echo an invalid object!", expr)));
+
+		return "";
+	}
+
+	auto enumObject = dynamic_cast<IEnum *>(value.get());
+	if (enumObject != nullptr)
+		return enumObject->name();
+
+	auto arrayObject = dynamic_cast<IArrayObject *>(value.get());
+	if (arrayObject != nullptr){
+		std::string str;
+		for (auto entry : arrayObject->list()){
+			auto entryStr = str_(entry->object(), storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return "";
+
+			if (str.empty())
+				str = entryStr;
+			else
+				str += ", " + entryStr;
+		}
+
+		return ("[" + str + "]");
+	}
+
+	auto str = value->str(storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return "";
+
+	if (dynamic_cast<IString *>(value.get()) != nullptr)
+		return ("\"" + str + "\"");
+	if (dynamic_cast<Objects::Char *>(value.get()) != nullptr)
+		return ("\'" + str + "\'");
+	if (dynamic_cast<Objects::UChar *>(value.get()) != nullptr)
+		return ("\'" + str + "\'U");
+	if (dynamic_cast<Objects::Short *>(value.get()) != nullptr)
+		return (str + "H");
+	if (dynamic_cast<Objects::UShort *>(value.get()) != nullptr)
+		return (str + "UH");
+	if (dynamic_cast<Objects::UInt *>(value.get()) != nullptr)
+		return (str + "U");
+	if (dynamic_cast<Objects::Long *>(value.get()) != nullptr || dynamic_cast<Objects::LDouble *>(value.get()) != nullptr)
+		return (str + "L");
+	if (dynamic_cast<Objects::ULong *>(value.get()) != nullptr)
+		return (str + "UL");
+	if (dynamic_cast<Objects::LLong *>(value.get()) != nullptr)
+		return (str + "LL");
+	if (dynamic_cast<Objects::ULLong *>(value.get()) != nullptr)
+		return (str + "ULL");
+	if (dynamic_cast<Objects::Float *>(value.get()) != nullptr)
+		return (str + "F");
+
+	return str;
 }

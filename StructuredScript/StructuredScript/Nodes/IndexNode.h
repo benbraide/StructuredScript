@@ -7,6 +7,8 @@
 #include "../Common/NodeQuery.h"
 #include "../Common/Factory.h"
 
+#include "../Objects/Array.h"
+
 namespace StructuredScript{
 	namespace Nodes{
 		class IndexNode : public INode, public IIndexNode{

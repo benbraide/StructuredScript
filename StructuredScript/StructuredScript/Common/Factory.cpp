@@ -15,6 +15,7 @@
 #include "../Objects/FunctionObject.h"
 #include "../Objects/IndexObject.h"
 #include "../Objects/Expanded.h"
+#include "../Objects/Array.h"
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createUndefined(){
 	return std::make_shared<Objects::Undefined>();
@@ -122,6 +123,10 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObjec
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createExpanded(IAny::Ptr value){
 	return std::make_shared<Objects::Expanded>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createArray(){
+	return std::make_shared<Objects::ArrayObject>();
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::create(int rank){

@@ -9,9 +9,6 @@
 #include "../Storage/Memory.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
-#include "../Scanner/Scanner.h"
-#include "../Scanner/Wells/StringCharacterWell.h"
-#include "../Parser/Parser.h"
 
 namespace StructuredScript{
 	namespace Objects{

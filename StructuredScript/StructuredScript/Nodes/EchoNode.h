@@ -33,6 +33,8 @@ namespace StructuredScript{
 			virtual IMemoryAttributes::Ptr attributes() override;
 
 		private:
+			std::string str_(IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			Ptr value_;
 		};
 	}

@@ -21,7 +21,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Expansion::eva
 			"'[]': Expected index to be an integral value!", expr)));
 	}
 
-	auto index = Query::Object::getIndex(right);
+	auto index = Query::Object::getIndex(rightBase);
 	if (index >= entries_.size()){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("Index is out of bounds!", expr)));
@@ -106,11 +106,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::add(){
 }
 
 void StructuredScript::Objects::Expansion::init(){
-	Parser::Parser parser;
-	Scanner::Scanner scanner;
-	Scanner::StringCharacterWell well("any length{ @[Call(0)]unsigned int get() }");
-
-	lengthNode_ = parser.parse(well, scanner, nullptr);
+	lengthNode_ = IGlobalStorage::globalStorage->parse("any length{ @[Call(0)]unsigned int get() }");
 
 	lengthCallback_ = [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);

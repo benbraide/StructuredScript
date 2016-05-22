@@ -20,7 +20,6 @@
 #include "Attributes/AttributeSpawner.h"
 
 #include "../Interfaces/Storages/IGlobalStorage.h"
-#include "../Objects/Primitive.h"
 
 #include "../Common/Types/StringType.h"
 #include "../Common/Types/PrimitiveType.h"
@@ -31,6 +30,7 @@
 #include "../Objects/StringObject.h"
 #include "../Objects/FunctionObject.h"
 #include "../Objects/Undefined.h"
+#include "../Objects/Array.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Parser/Parser.h"

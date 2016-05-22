@@ -28,7 +28,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::evalua
 			"'[]': Expected index to be an integral value!", expr)));
 	}
 
-	auto index = Query::Object::getIndex(right);
+	auto index = Query::Object::getIndex(rightBase);
 	if (index >= value_.size()){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("Index is out of bounds!", expr)));

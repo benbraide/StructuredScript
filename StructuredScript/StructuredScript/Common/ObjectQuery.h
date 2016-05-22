@@ -7,6 +7,7 @@
 #include "../Interfaces/Objects/IPrimitiveObject.h"
 #include "../Interfaces/Objects/IFunction.h"
 #include "../Interfaces/Objects/IObject.h"
+#include "../Interfaces/Objects/IArray.h"
 #include "../Interfaces/Storages/IFunctionStorage.h"
 
 namespace StructuredScript{

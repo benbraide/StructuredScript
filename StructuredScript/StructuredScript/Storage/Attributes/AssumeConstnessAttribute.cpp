@@ -9,7 +9,7 @@ bool StructuredScript::Storage::AssumeConstnessAttribute::appliesTo(IMemory::Ptr
 }
 
 bool StructuredScript::Storage::AssumeConstnessAttribute::appliesTo(INode::Ptr node, IStorage *storage, IExceptionManager *exception, INode *expr){
-	return Query::Node::isDeclaration(node);
+	return (Query::Node::isDeclaration(node) || Query::Node::isFunction(node));
 }
 
 void StructuredScript::Storage::AssumeConstnessAttribute::apply(IMemory::Ptr memory, IStorage *storage, IExceptionManager *exception, INode *expr){}

@@ -112,6 +112,7 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
 
 	Objects::Expansion::init();
+	Objects::ArrayObject::init();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
