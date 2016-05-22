@@ -1,7 +1,14 @@
 #include "IndexObject.h"
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::base(){
+	auto objectBase = target_->object()->base();
+	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
+
+	return (target == nullptr) ? nullptr : target->getIndexValue(value_);
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -12,7 +19,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::c
 }
 
 bool StructuredScript::Objects::IndexObject::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -25,7 +32,7 @@ bool StructuredScript::Objects::IndexObject::truth(IStorage *storage, IException
 }
 
 std::string StructuredScript::Objects::IndexObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -38,7 +45,7 @@ std::string StructuredScript::Objects::IndexObject::str(IStorage *storage, IExce
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -50,7 +57,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -63,7 +70,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
 	IExceptionManager *exception, INode *expr){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -75,7 +82,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::IndexObject::e
 }
 
 int StructuredScript::Objects::IndexObject::rank(){
-	auto objectBase = memory_->object()->base();
+	auto objectBase = target_->object()->base();
 	auto target = dynamic_cast<IIndexTarget *>(objectBase.get());
 	if (target == nullptr)
 		return -1;

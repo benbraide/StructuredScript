@@ -197,7 +197,24 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		return call_(leftValue, storage, exception, expr);
+		auto typeObject = dynamic_cast<ITypeObject *>(leftValue.get());
+		if (typeObject == nullptr)
+			return call_(leftValue, storage, exception, expr);
+
+		auto rightValue = rightOperand_->evaluate(storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		auto castValue = rightValue->cast(typeObject->value(), storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		if (castValue == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + str() + "': Could not perform cast!", expr)));
+		}
+
+		return castValue;
 	}
 
 	auto leftValue = leftOperand_->evaluate(storage, exception, expr);

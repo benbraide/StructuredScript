@@ -98,6 +98,12 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::term(ICharacterWe
 	if (value == "new")
 		return std::make_shared<Nodes::NewNode>(operand);
 
+	if (value == "typeof")
+		return std::make_shared<Nodes::TypeOfNode>(operand);
+
+	if (value == "sizeof")
+		return std::make_shared<Nodes::SizeOfNode>(operand);
+
 	if (Query::Node::isEmpty(operand))
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString("'" + next.str() + "': Missing operand!"));
 

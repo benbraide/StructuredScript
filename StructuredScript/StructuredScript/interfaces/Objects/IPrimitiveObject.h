@@ -49,6 +49,8 @@ namespace StructuredScript{
 		class Number{
 		public:
 			virtual ~Number(){}
+
+			virtual unsigned int size() const = 0;
 		};
 
 		class Integer{

@@ -12,6 +12,8 @@ namespace StructuredScript{
 			IndexObject(IType::Ptr type, unsigned int value, IMemory *target)
 				: Primitive(type), value_(value), target_(target){}
 
+			virtual Ptr base() override;
+
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual bool truth(IStorage *storage, IExceptionManager *exception, INode *expr) override;

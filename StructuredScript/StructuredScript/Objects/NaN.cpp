@@ -33,6 +33,10 @@ int StructuredScript::Objects::NaN::rank(){
 	return Primitive::NAN_RANK;
 }
 
+unsigned int StructuredScript::Objects::NaN::size() const {
+	return 0;
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NaN::promote_(Primitive *target){
 	return target->ptr();
 }

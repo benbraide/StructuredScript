@@ -37,6 +37,8 @@
 #include "../Nodes/EchoNode.h"
 #include "../Nodes/ThrowNode.h"
 #include "../Nodes/NewNode.h"
+#include "../Nodes/TypeOfNode.h"
+#include "../Nodes/SizeOfNode.h"
 
 #include "../Storage/MemoryAttributes.h"
 

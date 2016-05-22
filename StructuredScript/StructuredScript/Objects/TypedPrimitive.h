@@ -48,7 +48,7 @@ namespace StructuredScript{
 			}
 
 			virtual Ptr getIndexValue(unsigned int index) override{
-				return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[index]);
+				return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[sizeof(value_) - index - 1]);
 			}
 
 			void setValue(const ValueType &value){

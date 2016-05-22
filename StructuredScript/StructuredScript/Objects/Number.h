@@ -65,6 +65,10 @@ namespace StructuredScript{
 				return nullptr;
 			}
 
+			virtual unsigned int size() const override{
+				return sizeof(value_);
+			}
+
 		protected:
 			virtual IAny::Ptr promote_(Primitive *target) override{
 				if (dynamic_cast<Number *>(target) != nullptr)//Same type

@@ -27,6 +27,8 @@ namespace StructuredScript{
 
 			virtual int rank() override;
 
+			virtual unsigned int size() const override;
+
 		protected:
 			virtual Ptr promote_(Primitive *target) override;
 
