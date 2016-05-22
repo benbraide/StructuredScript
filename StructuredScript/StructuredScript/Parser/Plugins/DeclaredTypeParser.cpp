@@ -8,7 +8,7 @@ StructuredScript::INode::Ptr StructuredScript::Parser::DeclaredTypeParser::parse
 		case Scanner::Plugins::TypenameTokenType::type://Stop at the first identifier token
 			return (idCount++ == 0);
 		case Scanner::TokenType::TOKEN_TYPE_SYMBOL:
-			return (next.value() == "<" || next.value() == "[" || next.value() == "::" || next.value() == "...");
+			return (next.value() == "<" || next.value() == "[" || next.value() == "::");
 		default:
 			break;
 		}

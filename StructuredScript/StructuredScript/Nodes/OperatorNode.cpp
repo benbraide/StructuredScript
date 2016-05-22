@@ -225,12 +225,19 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::BinaryOperatorNode::evaluat
 
 		auto resolver = dynamic_cast<IMemoryResolver *>(rightOperand_.get());
 		auto memory = (resolver == nullptr) ? nullptr : resolver->resolveMemory(objectStorage, IStorage::SEARCH_FAMILY);
-		if (memory == nullptr){
+		if (memory == nullptr){//Try type
+			auto type = resolveType(storage);
+			if (type != nullptr)
+				return PrimitiveFactory::createTypeObject(type);
+
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + str() + "': Could not resolve expression!", expr)));
 		}
 
-		return memory->object();
+		if (dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
+			return memory->object();
+
+		return PrimitiveFactory::createFunctionObject(memory);
 	}
 
 	auto rightValue = rightOperand_->evaluate(storage, exception, expr);

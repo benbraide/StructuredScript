@@ -32,16 +32,17 @@ void StructuredScript::Objects::FunctionObject::init(){
 	lines += "@[Call(0)]any call(@[AssumeConstness]ref val any... args);";
 	lines += "@[Call(1)]any call_right();";
 	lines += "@[Call(2)]function_type find(@[AssumeConstness]ref val any... args);";
-	lines += "@[Call(3)]function_type first();";
-	lines += "@[Call(4)]function_type filter();";
-	lines += "@[Call(5)]function_type bind(@[AssumeConstness]ref val any object);";
-	lines += "@[Call(6)]bool is_bound();";
-	lines += "@[Call(7)]bool is_collection()}";
+	lines += "@[Call(3)]function_type find_right();";
+	lines += "@[Call(4)]function_type first();";
+	lines += "@[Call(5)]function_type filter();";
+	lines += "@[Call(6)]function_type bind(@[AssumeConstness]ref val any object);";
+	lines += "@[Call(7)]bool is_bound();";
+	lines += "@[Call(8)]bool is_collection()}";
 
 	auto parsed = IGlobalStorage::globalStorage->parse(lines);
 
 	class_ = dynamic_cast<IClassNode *>(parsed.get())->create(dynamic_cast<IStorage *>(IGlobalStorage::globalStorage), nullptr, nullptr);
-	lengthNode_ = IGlobalStorage::globalStorage->parse("any length{ @[Call(8)]unsigned int get() }");
+	lengthNode_ = IGlobalStorage::globalStorage->parse("any length{ @[Call(9)]unsigned int get() }");
 
 	auto type = dynamic_cast<Type *>(class_.get());
 
@@ -53,7 +54,21 @@ void StructuredScript::Objects::FunctionObject::init(){
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
 		}
 
-		return nullptr;
+		IFunction::ArgListType args;
+		auto target = storage->findMemory("args")->object();
+		dynamic_cast<IExpansion *>(target.get())->expand(args);
+
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(object->value_.get());
+		if (functionMemory != nullptr)
+			return functionMemory->call(false, args, exception, expr);
+
+		auto function = (object->value_ == nullptr) ? nullptr : dynamic_cast<IFunction *>(object->value_->object().get());
+		if (function == nullptr || function->score(false, object->bound_, args) < 1){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("No function found taking the specified arguments!", expr)));
+		}
+
+		return function->call(false, object->bound_, args, exception, expr);
 	});
 
 	type->addExternalCall("1", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//call_right
@@ -64,7 +79,17 @@ void StructuredScript::Objects::FunctionObject::init(){
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
 		}
 
-		return nullptr;
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(object->value_.get());
+		if (functionMemory != nullptr)
+			return functionMemory->call(true, {}, exception, expr);
+
+		auto function = (object->value_ == nullptr) ? nullptr : dynamic_cast<IFunction *>(object->value_->object().get());
+		if (function == nullptr || function->score(true, object->bound_, IFunction::ArgListType{}) < 1){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("No function found taking the specified arguments!", expr)));
+		}
+
+		return function->call(true, object->bound_, {}, exception, expr);
 	});
 
 	type->addExternalCall("2", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//find
@@ -75,10 +100,22 @@ void StructuredScript::Objects::FunctionObject::init(){
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
 		}
 
-		return nullptr;
+		IFunction::ArgListType args;
+		auto target = storage->findMemory("args")->object();
+		dynamic_cast<IExpansion *>(target.get())->expand(args);
+
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(object->value_.get());
+		if (functionMemory != nullptr)
+			return std::make_shared<FunctionObject>(functionMemory->find(false, args));
+
+		auto function = (object->value_ == nullptr) ? nullptr : dynamic_cast<IFunction *>(object->value_->object().get());
+		if (function == nullptr || function->score(false, object->bound_, args) < 1)
+			return std::make_shared<FunctionObject>(nullptr);
+
+		return std::make_shared<FunctionObject>(object->value_);
 	});
 
-	type->addExternalCall("3", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//first
+	type->addExternalCall("3", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//find_right
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
 		if (object == nullptr){
@@ -86,10 +123,33 @@ void StructuredScript::Objects::FunctionObject::init(){
 				Query::ExceptionManager::combine("Bad member function call!", expr)));
 		}
 
-		return nullptr;
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(object->value_.get());
+		if (functionMemory != nullptr)
+			return std::make_shared<FunctionObject>(functionMemory->find(true, IFunction::ArgListType{}));
+
+		auto function = (object->value_ == nullptr) ? nullptr : dynamic_cast<IFunction *>(object->value_->object().get());
+		if (function == nullptr || function->score(true, object->bound_, IFunction::ArgListType{}) < 1)
+			return std::make_shared<FunctionObject>(nullptr);
+
+		return std::make_shared<FunctionObject>(object->value_);
 	});
 
-	type->addExternalCall("4", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//filter
+	type->addExternalCall("4", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//first
+		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
+		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
+		if (object == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("Bad member function call!", expr)));
+		}
+
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(object->value_.get());
+		if (functionMemory == nullptr)
+			return std::make_shared<FunctionObject>(nullptr);
+
+		return std::make_shared<FunctionObject>(functionMemory->first());
+	});
+
+	type->addExternalCall("5", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//filter
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
 		if (object == nullptr){
@@ -109,7 +169,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 		return std::make_shared<FunctionObject>(functionMemory->filterNonMembers());
 	});
 
-	type->addExternalCall("5", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//bind
+	type->addExternalCall("6", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//bind
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
 		if (object == nullptr){
@@ -122,7 +182,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 				Query::ExceptionManager::combine("Cannot bind to an empty function list!", expr)));
 		}
 
-		auto target = storage->findMemory("object")->object();
+		auto target = storage->findMemory("object")->object()->base();
 		auto objectStorage = dynamic_cast<IStorage *>(target.get());
 		if (objectStorage == nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
@@ -140,7 +200,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 		return std::make_shared<FunctionObject>(memory);
 	});
 
-	type->addExternalCall("6", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//is_bound
+	type->addExternalCall("7", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//is_bound
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
 		if (object == nullptr){
@@ -151,7 +211,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 		return PrimitiveFactory::createBool(object->bound_ != nullptr);
 	});
 
-	type->addExternalCall("7", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//is_collection
+	type->addExternalCall("8", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//is_collection
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object());
 		if (object == nullptr){
@@ -162,7 +222,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 		return PrimitiveFactory::createBool(dynamic_cast<IFunctionMemory *>(object->value_.get()) != nullptr);
 	});
 
-	type->addExternalCall("8", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//length.get
+	type->addExternalCall("9", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//length.get
 		auto functionStorage = dynamic_cast<IFunctionStorage *>(storage);
 		auto object = (functionStorage == nullptr) ? nullptr : dynamic_cast<FunctionObject *>(functionStorage->object()->memory()->storage());
 		if (object == nullptr){

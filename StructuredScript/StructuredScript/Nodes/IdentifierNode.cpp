@@ -231,7 +231,8 @@ StructuredScript::IStorage *StructuredScript::Nodes::TypenameIdentifierNode::res
 }
 
 StructuredScript::IType::Ptr StructuredScript::Nodes::TypenameIdentifierNode::resolveType(IStorage *storage, unsigned short searchScope /*= IStorage::SEARCH_DEFAULT*/){
-	return (storage == nullptr) ? nullptr : storage->findType(value(), searchScope);
+	auto resolver = dynamic_cast<ITypeResolver *>(value_.get());
+	return (resolver == nullptr) ? nullptr : resolver->resolveType(storage, searchScope);
 }
 
 bool StructuredScript::Nodes::TypenameIdentifierNode::use(IPureStorage *target, IStorage *storage){
