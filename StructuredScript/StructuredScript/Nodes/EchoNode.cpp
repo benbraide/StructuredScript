@@ -61,6 +61,10 @@ std::string StructuredScript::Nodes::EchoNode::str_(IAny::Ptr value, IStorage *s
 		return ("[" + str + "]");
 	}
 
+	auto rangeObject = dynamic_cast<IRange *>(value.get());
+	if (rangeObject != nullptr)
+		return rangeObject->str();
+
 	auto str = value->str(storage, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return "";

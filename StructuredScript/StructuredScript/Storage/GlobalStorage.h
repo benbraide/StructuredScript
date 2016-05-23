@@ -31,6 +31,7 @@
 #include "../Objects/FunctionObject.h"
 #include "../Objects/Undefined.h"
 #include "../Objects/Array.h"
+#include "../Objects/Range.h"
 
 #include "../Scanner/Scanner.h"
 #include "../Parser/Parser.h"

@@ -15,10 +15,6 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::FunctionObject
 	return std::make_shared<FunctionObject>(value_);
 }
 
-StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::FunctionObject::base(){
-	return shared_from_this();
-}
-
 std::string StructuredScript::Objects::FunctionObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
 	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 		Query::ExceptionManager::combine("Cannot get string value of object!", expr)));

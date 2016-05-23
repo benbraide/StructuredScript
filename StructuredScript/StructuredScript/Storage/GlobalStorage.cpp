@@ -80,6 +80,11 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	Objects::FunctionObject::init();
 	Objects::String::init();
 
+	Objects::Expansion::init();
+	Objects::ArrayObject::init();
+
+	Objects::RangeBase::init();
+
 	types_["primitive_type"] = std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
 		primitives_[Typename::TYPE_NAME_VOID],
 		primitives_[Typename::TYPE_NAME_BOOLEAN],
@@ -110,9 +115,6 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
-
-	Objects::Expansion::init();
-	Objects::ArrayObject::init();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){

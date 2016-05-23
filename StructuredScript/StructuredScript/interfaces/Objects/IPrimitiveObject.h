@@ -7,6 +7,8 @@
 
 namespace StructuredScript{
 	namespace Interfaces{
+		class ArrayObject;
+
 		class PrimitiveObject{
 		public:
 			virtual ~PrimitiveObject(){}
@@ -121,6 +123,15 @@ namespace StructuredScript{
 
 			virtual Type::Ptr propertyType() = 0;
 		};
+
+		class Range{
+		public:
+			virtual ~Range(){}
+
+			virtual void extend(ArrayObject &object, unsigned int index, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
+
+			virtual std::string str() = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -142,6 +153,7 @@ namespace StructuredScript{
 	typedef Interfaces::Expansion		IExpansion;
 	typedef Interfaces::Expanded		IExpanded;
 	typedef Interfaces::Property		IProperty;
+	typedef Interfaces::Range			IRange;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

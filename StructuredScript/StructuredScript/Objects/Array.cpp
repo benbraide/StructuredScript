@@ -51,16 +51,26 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::ArrayObject::at(unsigned 
 }
 
 void StructuredScript::Objects::ArrayObject::append(IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr){
-	add_(entries_.end(), value->type())->assign(value, storage, exception, expr);
-	if (Query::ExceptionManager::has(exception))
-		entries_.pop_back();//Undo
+	auto range = dynamic_cast<IRange *>(value.get());
+	if (range == nullptr){
+		add_(entries_.end(), value->type())->assign(value, storage, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			entries_.pop_back();//Undo
+	}
+	else
+		range->extend(*this, entries_.size(), storage, exception, expr);
 }
 
 void StructuredScript::Objects::ArrayObject::insert(unsigned int index, IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (index < entries_.size()){
-		add_(entries_.begin() + index, value->type())->assign(value, storage, exception, expr);
-		if (Query::ExceptionManager::has(exception))
-			entries_.erase(entries_.begin() + index);//Undo
+		auto range = dynamic_cast<IRange *>(value.get());
+		if (range == nullptr){
+			add_(entries_.begin() + index, value->type())->assign(value, storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				entries_.erase(entries_.begin() + index);//Undo
+		}
+		else
+			range->extend(*this, index, storage, exception, expr);
 	}
 	else{
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
@@ -70,9 +80,14 @@ void StructuredScript::Objects::ArrayObject::insert(unsigned int index, IAny::Pt
 
 void StructuredScript::Objects::ArrayObject::insert(MemoryListType::iterator index, IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr){
 	if (index != entries_.end()){
-		add_(index, value->type())->assign(value, storage, exception, expr);
-		if (Query::ExceptionManager::has(exception))
-			entries_.erase(index);//Undo
+		auto range = dynamic_cast<IRange *>(value.get());
+		if (range == nullptr){
+			add_(index, value->type())->assign(value, storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				entries_.erase(index);//Undo
+		}
+		else
+			range->extend(*this, std::distance(entries_.begin(), index), storage, exception, expr);
 	}
 	else{
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(

@@ -22,17 +22,7 @@ bool StructuredScript::Query::Object::isExpanded(IAny::Ptr object){
 }
 
 unsigned int StructuredScript::Query::Object::getIndex(IAny::Ptr object){
-	unsigned int value;
-
-	if (getIndex<char, Objects::Primitive::CHAR_RANK>(object, value) || getIndex<unsigned char, Objects::Primitive::UCHAR_RANK>(object, value) ||
-		getIndex<short, Objects::Primitive::SHORT_RANK>(object, value) || getIndex<unsigned short, Objects::Primitive::USHORT_RANK>(object, value) ||
-		getIndex<int, Objects::Primitive::INT_RANK>(object, value) || getIndex<unsigned int, Objects::Primitive::UINT_RANK>(object, value) ||
-		getIndex<long, Objects::Primitive::LONG_RANK>(object, value) || getIndex<unsigned long, Objects::Primitive::ULONG_RANK>(object, value) ||
-		getIndex<long long, Objects::Primitive::LLONG_RANK>(object, value) || getIndex<unsigned long long, Objects::Primitive::ULLONG_RANK>(object, value)){
-		return value;
-	}
-
-	return 0;
+	return getIndexValue<unsigned int>(object);
 }
 
 StructuredScript::IAny *StructuredScript::Query::Object::getObjectInStorage(IStorage *storage){

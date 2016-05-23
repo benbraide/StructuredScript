@@ -19,8 +19,6 @@ namespace StructuredScript{
 
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
-			virtual Ptr base() override;
-
 			virtual std::string str(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			static void init();

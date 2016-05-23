@@ -4,6 +4,7 @@
 #define STRUCTURED_SCRIPT_INTEGER_OBJECT_H
 
 #include "Number.h"
+#include "Range.h"
 
 namespace StructuredScript{
 	namespace Objects{
@@ -63,6 +64,9 @@ namespace StructuredScript{
 
 				if (value == ">>")
 					return std::make_shared<ObjectType>(left->value() >> right->value());
+
+				if (value == "...")
+					return std::make_shared< Range<ObjectType, std::remove_reference<ValueType>::type> >(left->value(), right->value());
 
 				return BaseType::evaluate_(value, left, right, exception, expr);
 			}

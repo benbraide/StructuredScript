@@ -24,18 +24,36 @@ namespace StructuredScript{
 
 			static unsigned int getIndex(IAny::Ptr object);
 
-			template <typename TargetType, int TargetRank>
-			static bool getIndex(IAny::Ptr object, unsigned int &value);
+			template <typename ValueType>
+			static ValueType getIndexValue(IAny::Ptr object);
+
+			template <typename TargetType, int TargetRank, typename ValueType>
+			static bool getIndex(IAny::Ptr object, ValueType &value);
 
 			static IAny *getObjectInStorage(IStorage *storage);
 		};
 
-		template <typename TargetType, int TargetRank>
-		bool StructuredScript::Query::Object::getIndex(IAny::Ptr object, unsigned int &value){
+		template <typename ValueType>
+		ValueType StructuredScript::Query::Object::getIndexValue(IAny::Ptr object){
+			ValueType value;
+
+			if (getIndex<char, Objects::Primitive::CHAR_RANK, ValueType>(object, value) || getIndex<unsigned char, Objects::Primitive::UCHAR_RANK, ValueType>(object, value) ||
+				getIndex<short, Objects::Primitive::SHORT_RANK, ValueType>(object, value) || getIndex<unsigned short, Objects::Primitive::USHORT_RANK, ValueType>(object, value) ||
+				getIndex<int, Objects::Primitive::INT_RANK, ValueType>(object, value) || getIndex<unsigned int, Objects::Primitive::UINT_RANK, ValueType>(object, value) ||
+				getIndex<long, Objects::Primitive::LONG_RANK, ValueType>(object, value) || getIndex<unsigned long, Objects::Primitive::ULONG_RANK, ValueType>(object, value) ||
+				getIndex<long long, Objects::Primitive::LLONG_RANK, ValueType>(object, value) || getIndex<unsigned long long, Objects::Primitive::ULLONG_RANK, ValueType>(object, value)){
+				return value;
+			}
+
+			return 0;
+		}
+
+		template <typename TargetType, int TargetRank, typename ValueType>
+		bool StructuredScript::Query::Object::getIndex(IAny::Ptr object, ValueType &value){
 			auto objectBase = (object == nullptr) ? nullptr : object->base();
 			auto target = dynamic_cast<Objects::TypedPrimitive<TargetType, TargetRank> *>(objectBase.get());
 			if (target != nullptr){
-				value = static_cast<unsigned int>(target->value());
+				value = static_cast<ValueType>(target->value());
 				return true;
 			}
 
