@@ -23,18 +23,35 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::rawC
 			Query::ExceptionManager::combine("Cannot call an undefined function!", expr)));
 	}
 
-	Storage::RawFunctionStorage parameterStorage(storage, object);
-	auto expansionMemory = prep_(args, &parameterStorage, exception, expr);
+	auto parameterStorage = std::make_shared<Storage::RawFunctionStorage>(storage, object);
+	auto expansionMemory = prep_(args, parameterStorage.get(), exception, expr);
 
-	initialize(dynamic_cast<IObject *>(object), &parameterStorage, exception, expr);
+	auto attributes = memory_->attributes();
+	auto attribute = (attributes == nullptr) ? nullptr : attributes->getAttribute("Concurrent");
+	if (attribute != nullptr){//Concurrent execution
+		auto objectPtr = (object == nullptr) ? nullptr : object->ptr();
+		auto t = std::thread([=](){
+			call_(call, parameterStorage, expansionMemory, dynamic_cast<IObject *>(objectPtr.get()), storage, exception, expr);
+		});
+
+		t.detach();
+		return PrimitiveFactory::createUndefined();
+	}
+
+	return call_(call, parameterStorage, expansionMemory, dynamic_cast<IObject *>(object), storage, exception, expr);
+}
+
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call_(IStorage::ExternalCallType call, std::shared_ptr<Storage::RawFunctionStorage> parameterStorage,
+	IMemory::Ptr expansionMemory, IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr){
+	initialize(object, parameterStorage.get(), exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
 	if (call != nullptr)//Forward call
-		return call(&parameterStorage, exception, expr);
+		return call(parameterStorage.get(), exception, expr);
 
 	if (!Query::Node::isEmpty(definition_))
-		definition_->evaluate(&parameterStorage, exception, expr);
+		definition_->evaluate(parameterStorage.get(), exception, expr);
 
 	auto value = getReturnValue_(exception, expr);
 	if (Query::ExceptionManager::has(exception))
@@ -49,7 +66,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::rawC
 		return PrimitiveFactory::createUndefined();
 	}
 
-	Storage::Memory converter(nullptr, type_, nullptr, nullptr);//For converting return value
+	Storage::Memory converter(nullptr, type_, nullptr, memory_->attributes());//For converting return value
 	converter.assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
 
 	return Query::ExceptionManager::has(exception) ? nullptr : converter.object();

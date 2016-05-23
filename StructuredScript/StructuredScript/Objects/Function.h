@@ -3,6 +3,8 @@
 #ifndef STRUCTURED_SCRIPT_FUNCTION_H
 #define STRUCTURED_SCRIPT_FUNCTION_H
 
+#include <thread>
+
 #include "FunctionDeclaration.h"
 
 namespace StructuredScript{
@@ -19,6 +21,9 @@ namespace StructuredScript{
 			virtual Ptr rawCall(bool rightUnary, IAny *object, const ArgListType &args, IExceptionManager *exception, INode *expr) override;
 
 		protected:
+			Ptr call_(IStorage::ExternalCallType call, std::shared_ptr<Storage::RawFunctionStorage> parameterStorage, IMemory::Ptr expansionMemory,
+				IObject *object, IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			IStorage::ExternalCallType getExternalCall_(IStorage *storage, IExceptionManager *exception, INode *expr);
 
 			Ptr getReturnValue_(IExceptionManager *exception, INode *expr);
