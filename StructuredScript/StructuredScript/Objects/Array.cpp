@@ -21,7 +21,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::e
 	if (value != "[]")
 		return Primitive::evaluateRightUnary(value, storage, exception, expr);
 
-	return nullptr;
+	grow_(storage, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	return (*entries_.rbegin())->object();
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
@@ -36,11 +40,21 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::e
 	}
 
 	auto index = static_cast<int>(Query::Object::getIndex(rightBase));
-	if (index < 0){
+	if (index < 0){//Append
+		do{//Grow
+			grow_(storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+		} while (++index < 0);
 
+		index = static_cast<int>(entries_.size()) - 1;
 	}
-	else if (static_cast<unsigned int>(index) >= entries_.size()){
-
+	else{
+		while (static_cast<unsigned int>(index) >= entries_.size()){//Grow
+			grow_(storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return nullptr;
+		}
 	}
 
 	return entries_[index]->object();
@@ -117,8 +131,16 @@ unsigned int StructuredScript::Objects::ArrayObject::size(){
 	return entries_.size();
 }
 
-void StructuredScript::Objects::ArrayObject::size(unsigned int value){
-
+void StructuredScript::Objects::ArrayObject::size(unsigned int value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (value > entries_.size()){//Grow
+		do{
+			grow_(storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return;
+		} while (value > entries_.size());
+	}
+	else if (value < entries_.size())
+		entries_.erase(entries_.begin() + value, entries_.end());
 }
 
 void StructuredScript::Objects::ArrayObject::init(){
@@ -259,14 +281,24 @@ void StructuredScript::Objects::ArrayObject::init(){
 				Query::ExceptionManager::combine("Negative size is not allowed!", expr)));
 		}
 
-		object->size(size);
-		return PrimitiveFactory::createVoid();
+		object->size(size, storage, exception, expr);
+		return Query::ExceptionManager::has(exception) ? nullptr : PrimitiveFactory::createVoid();
 	});
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::ArrayObject::add_(MemoryListType::iterator where, IType::Ptr type){
 	auto storage = (Primitive::memory_ == nullptr) ? nullptr : Primitive::memory_->storage();
 	return *entries_.emplace(entries_.end(), std::make_shared<StructuredScript::Storage::Memory>(storage, type, nullptr, nullptr));
+}
+
+void StructuredScript::Objects::ArrayObject::grow_(IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto memory = add_(entries_.end(), IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_ANY));
+	if (memory == nullptr){
+		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'[]': Could not grow array!", expr)));
+	}
+	else
+		dynamic_cast<IMemoryBackdoor *>(memory.get())->assign(PrimitiveFactory::createUndefined());
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::ArrayObject::class_;

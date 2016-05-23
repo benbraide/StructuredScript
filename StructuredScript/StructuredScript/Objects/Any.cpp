@@ -17,6 +17,23 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Any::base(){
 	return shared_from_this();
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Any::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (value == "&"){//Reference
+		if (memory_ == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+				"'" + value + "': Requires an lvalue operand!", expr)));
+		}
+
+		return PrimitiveFactory::createReference(memory_->ptr());
+	}
+
+	if (value == "*")//Copy
+		return clone(storage, exception, expr);
+
+	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+		"'" + value + "': Operands mismatch!", expr)));
+}
+
 StructuredScript::IType::Ptr StructuredScript::Objects::Any::type(){
 	return type_;
 }

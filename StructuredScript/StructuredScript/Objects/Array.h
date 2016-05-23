@@ -40,7 +40,7 @@ namespace StructuredScript{
 
 			virtual bool empty() override;
 
-			virtual void size(unsigned int value) override;
+			virtual void size(unsigned int value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual unsigned int size() override;
 
@@ -50,6 +50,8 @@ namespace StructuredScript{
 
 		protected:
 			IMemory::Ptr add_(MemoryListType::iterator where, IType::Ptr type);
+
+			void grow_(IStorage *storage, IExceptionManager *exception, INode *expr);
 
 			MemoryListType entries_;
 

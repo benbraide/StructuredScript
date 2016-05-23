@@ -32,7 +32,7 @@ namespace StructuredScript{
 
 			virtual bool empty() = 0;
 
-			virtual void size(unsigned int value) = 0;
+			virtual void size(unsigned int value, Storage *storage, ExceptionManager *exception, Node *expr) = 0;
 
 			virtual unsigned int size() = 0;
 

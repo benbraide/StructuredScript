@@ -17,7 +17,7 @@ StructuredScript::Objects::Object::~Object(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
-	auto function = findFunctionMemory("clone");
+	auto function = findOperatorMemory("*");
 	auto value = callFunction_(function, nullptr, false, "", true, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
@@ -97,6 +97,15 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Object::assign(const std:
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (value == "&" || value == "*"){
+		auto function = findOperatorMemory(value);
+		auto returnValue = callFunction_(function, nullptr, false, "", true, exception, expr);
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		return (returnValue == nullptr) ? Any::evaluateLeftUnary(value, storage, exception, expr) : returnValue;
+	}
+
 	auto function = findOperatorMemory(value);
 	return callFunction_(function, nullptr, false, value, false, exception, expr);
 }

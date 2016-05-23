@@ -26,6 +26,8 @@ namespace StructuredScript{
 
 			virtual Ptr base() override;
 
+			virtual Ptr evaluateLeftUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;
+
 			virtual IType::Ptr type() override;
 
 			virtual void setMemory(IMemory *memory) override;
