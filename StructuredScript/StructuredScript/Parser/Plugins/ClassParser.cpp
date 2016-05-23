@@ -14,6 +14,24 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 			"'class...': Expected an identifier!"));
 	}
 
+	INode::Ptr parents;
+	if (scanner.peek(well).value() == ":"){//Initializers
+		scanner.next(well);//Ignore
+
+		parents = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
+			auto value = next.value();
+			return (value != "{" && value != ";");
+		});
+
+		if (Query::ExceptionManager::has(exception))
+			return nullptr;
+
+		if (Query::Node::isEmpty(parents)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'class " + name->str() + " : {...': Bad expression!"));
+		}
+	}
+
 	if (!scanner.open(well, '{', '}')){
 		return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
 			"'class " + name->str() + "...': Bad expression!"));
@@ -88,5 +106,5 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 			"'class " + name->str() + "{...': Bad expression!"));
 	}
 
-	return std::make_shared<Nodes::ClassNode>(name, value);
+	return std::make_shared<Nodes::ClassNode>(name, parents, value);
 }

@@ -262,6 +262,8 @@ void StructuredScript::Objects::Object::construct(const IFunction::ArgListType &
 		}
 
 		self_ = this;//No constructor -- fully constructed
+		constructParents_(storage, exception, expr);
+
 		return;
 	}
 
@@ -269,8 +271,10 @@ void StructuredScript::Objects::Object::construct(const IFunction::ArgListType &
 	if (functionMemory != nullptr){
 		functionMemory->setStorage(this);
 		functionMemory->call(false, args, exception, expr);
-		if (!Query::ExceptionManager::has(exception))//Fully constructed
+		if (!Query::ExceptionManager::has(exception)){//Fully constructed
 			self_ = this;
+			constructParents_(storage, exception, expr);
+		}
 	}
 	else{
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -430,4 +434,15 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::callFu
 
 	return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 		"'" + value + "': Operands mismatch!", expr)));
+}
+
+void StructuredScript::Objects::Object::constructParents_(IStorage *storage, IExceptionManager *exception, INode *expr){
+	for (auto &parent : parents_){
+		auto object = dynamic_cast<Object *>(parent.second->object().get());
+		if (object->self_ == nullptr){//Construct unconstructed parents
+			object->construct({}, storage, exception, expr);
+			if (Query::ExceptionManager::has(exception))
+				return;
+		}
+	}
 }

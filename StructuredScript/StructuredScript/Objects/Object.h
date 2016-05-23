@@ -74,6 +74,8 @@ namespace StructuredScript{
 
 			Ptr callFunction_(IMemory::Ptr function, Ptr right, bool isRight, const std::string &value, bool silent, IExceptionManager *exception, INode *expr);
 
+			void constructParents_(IStorage *storage, IExceptionManager *exception, INode *expr);
+
 			Any *self_ = nullptr;
 			MemoryListType objects_;
 			ParentListType parents_;

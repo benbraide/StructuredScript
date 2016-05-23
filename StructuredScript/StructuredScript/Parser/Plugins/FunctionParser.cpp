@@ -31,6 +31,11 @@ StructuredScript::INode::Ptr StructuredScript::Parser::FunctionParser::parseCons
 
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
+
+		if (Query::Node::isEmpty(initializers)){
+			return Query::ExceptionManager::setAndReturnNode(exception, PrimitiveFactory::createString(
+				"'" + declaration_->str() + "(" + parameters->str() + ") : {...': Bad expression!"));
+		}
 	}
 
 	auto definition = parseDefinition_(parameters, well, scanner, parser, exception);

@@ -5,7 +5,10 @@ StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ClassNode::ptr(
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::ClassNode::clone(){
-	return std::make_shared<ClassNode>(name_->clone(), value_->clone());
+	if (parents_ == nullptr)
+		return std::make_shared<ClassNode>(name_->clone(), nullptr, value_->clone());
+
+	return std::make_shared<ClassNode>(name_->clone(), parents_->clone(), value_->clone());
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Nodes::ClassNode::evaluate(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -14,7 +17,14 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::ClassNode::evaluate(IStorag
 }
 
 std::string StructuredScript::Nodes::ClassNode::str(){
-	return ("class " + name_->str() + "{...}");
+	if (parents_ == nullptr)
+		return ("class " + name_->str() + "{...}");
+
+	auto name = name_->str();
+	if (name.empty())
+		return ("class : " + parents_->str() + "{...}");
+
+	return ("class " + name + " : " + parents_->str() + "{...}");
 }
 
 void StructuredScript::Nodes::ClassNode::attributes(IMemoryAttributes::Ptr attributes){}
@@ -97,7 +107,26 @@ std::string StructuredScript::Nodes::ClassNode::declName(){
 	return name_->str();
 }
 
-void StructuredScript::Nodes::ClassNode::getParents_(Class::ParentListType &parents, IStorage *storage, IExceptionManager *exception, INode *expr){}
+void StructuredScript::Nodes::ClassNode::getParents_(Class::ParentListType &parents, IStorage *storage, IExceptionManager *exception, INode *expr){
+	if (parents_ == nullptr)
+		return;
+
+	Query::Node::ListType list;
+	Query::Node::split(",", parents_, list);
+
+	for (auto parent : list){
+		auto resolver = dynamic_cast<ITypeResolver *>(parent.get());
+		auto type = (resolver == nullptr) ? nullptr : resolver->resolveType(storage);
+		if (type == nullptr){
+			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + parent->str() + "': Could not resolve type!", expr)));
+
+			return;
+		}
+
+		parents.push_back(type);
+	}
+}
 
 bool StructuredScript::Nodes::ClassNode::isStatic_(IDeclarationNode *declaration){
 	auto type = declaration->type();

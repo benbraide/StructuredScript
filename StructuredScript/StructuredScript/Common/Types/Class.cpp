@@ -39,7 +39,10 @@ StructuredScript::IAny::Ptr StructuredScript::Class::create(IStorage *storage, I
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		object->addParent(classParent->name_, std::make_shared<StructuredScript::Storage::Memory>(object.get(), parent, base, nullptr));
+		if (!object->addParent(classParent->name_, std::make_shared<StructuredScript::Storage::Memory>(object.get(), parent, base, nullptr))){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("'" + classParent->name_ + "': Type is already listed as a parent!", expr)));
+		}
 	}
 
 	return object;

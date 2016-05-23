@@ -123,7 +123,7 @@ void StructuredScript::Objects::Constructor::initialize(IObject *object, IStorag
 		
 		if (Query::ExceptionManager::has(exception))
 			return;
-	}//class{__constructor():v_(27){}__constructor(int v):v_(v){}__destructor(){echo"destroyed"}int v_;any vp{int get(){return v_}}}
+	}
 
 	for (auto &field : fields){//Initialize fields after base constructors
 		auto value = field.second.first->object();
@@ -131,8 +131,8 @@ void StructuredScript::Objects::Constructor::initialize(IObject *object, IStorag
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + field.first + "': Is already initialized!", expr)));
 
-			return;//class a{a():v_(27){}a(int v):v_(v){}~a(){echo"destroyed"}int v_;any vp{int get(){return v_}}}
-		}//class a{a():v_(27){}a(int v):v_(v){}int v_}
+			return;
+		}
 
 		value = field.second.second->evaluate(storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))

@@ -14,8 +14,8 @@ namespace StructuredScript{
 	namespace Nodes{
 		class ClassNode : public INode, public IClassNode, public IClassEntry{
 		public:
-			ClassNode(Ptr name, Ptr value)
-				: name_(name), value_(value){}
+			ClassNode(Ptr name, Ptr parents, Ptr value)
+				: name_(name), parents_(parents), value_(value){}
 
 			virtual Ptr ptr() override;
 
@@ -38,11 +38,12 @@ namespace StructuredScript{
 			virtual std::string declName() override;
 
 		protected:
-			virtual void getParents_(Class::ParentListType &parents, IStorage *storage, IExceptionManager *exception, INode *expr);
+			void getParents_(Class::ParentListType &parents, IStorage *storage, IExceptionManager *exception, INode *expr);
 
 			bool isStatic_(IDeclarationNode *declaration);
 
 			Ptr name_;
+			Ptr parents_;
 			Ptr value_;
 		};
 	}
