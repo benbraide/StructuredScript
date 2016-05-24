@@ -1,6 +1,6 @@
 #include "DecimalInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::DecimalInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::DecimalInteger::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -28,7 +28,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::DecimalInte
 	return Token(TokenType::TOKEN_TYPE_DECIMAL_INTEGER, well.get());
 }
 
-bool StructuredScript::Scanner::Plugins::DecimalInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::DecimalInteger::matches(ICharacterWell &well){
 	return (::isdigit(well.peek()) != 0);
 }
 

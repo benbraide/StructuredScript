@@ -1,6 +1,6 @@
 #include "OperatorIdentifier.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -11,7 +11,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	return Token(OperatorTokenType::type, token.value(), "operator ");
 }
 
-bool StructuredScript::Scanner::Plugins::OperatorIdentifier::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::OperatorIdentifier::matches(ICharacterWell &well){
 	return (well.get() == "operator");
 }
 
@@ -20,7 +20,7 @@ StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::Operato
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::get_(ICharacterWell &well,
-	TokenType type, const std::string &prefix, FilterType filter) const{
+	TokenType type, const std::string &prefix, FilterType filter){
 	well.fork();
 	
 	auto blank = skip_(well);
@@ -42,7 +42,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 }
 
 StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::getSymbol_(ICharacterWell &well,
-	TokenType type, const std::string &prefix, FilterType filter) const{
+	TokenType type, const std::string &prefix, FilterType filter){
 	well.fork();
 
 	auto blank = skip_(well);
@@ -58,7 +58,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIde
 	return Token(type, token.value(), prefix + " ");
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::skip_(ICharacterWell &well) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OperatorIdentifier::skip_(ICharacterWell &well){
 	auto blank = skipPlugin_.get(well);
 	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());

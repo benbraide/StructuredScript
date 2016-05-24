@@ -1,6 +1,6 @@
 #include "RealNumber.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RealNumber::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RealNumber::get(ICharacterWell &well, FilterType filter){
 	auto oct = octalInteger_.get(well, filter);
 	auto type = oct.type();
 
@@ -45,7 +45,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RealNumber:
 	return dec;
 }
 
-bool StructuredScript::Scanner::Plugins::RealNumber::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::RealNumber::matches(ICharacterWell &well){
 	return (well.peek() == '.' || decimalInteger_.matches(well));
 }
 

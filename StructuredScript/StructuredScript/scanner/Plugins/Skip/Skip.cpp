@@ -1,6 +1,6 @@
 #include "Skip.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Skip::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Skip::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -15,7 +15,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Skip::get(I
 	return multiLineComment_.get(well, filter);
 }
 
-bool StructuredScript::Scanner::Plugins::Skip::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::Skip::matches(ICharacterWell &well){
 	return (blank_.matches(well) || singleLineComment_.matches(well) || multiLineComment_.matches(well));
 }
 

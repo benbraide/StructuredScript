@@ -1,6 +1,6 @@
 #include "RadixInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RadixInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RadixInteger::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -38,7 +38,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::RadixIntege
 	return Token(TokenType::TOKEN_TYPE_RADIX_INTEGER, token.str(), radixStr + "r");
 }
 
-bool StructuredScript::Scanner::Plugins::RadixInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::RadixInteger::matches(ICharacterWell &well){
 	try{
 		auto radix = std::stoi(well.get());
 		if (radix < 2 || radix > 36)

@@ -1,6 +1,6 @@
 #include "Blank.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Blank::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Blank::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -34,7 +34,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Blank::get(
 	return Token(TokenType::TOKEN_TYPE_BLANK, well.get());
 }
 
-bool StructuredScript::Scanner::Plugins::Blank::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::Blank::matches(ICharacterWell &well){
 	return (::isspace(well.peek()) != 0);
 }
 

@@ -1,6 +1,6 @@
 #include "SignedDecimalInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedDecimalInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedDecimalInteger::get(ICharacterWell &well, FilterType filter){
 	if (decimalInteger_.matches(well) || (filter != nullptr && filter(well.peek()) == IScannerPlugin::INCLUDE))
 		return decimalInteger_.get(well, filter);
 
@@ -21,7 +21,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedDecim
 	return Token(TokenType::TOKEN_TYPE_SYMBOL, std::string(1, sign));
 }
 
-bool StructuredScript::Scanner::Plugins::SignedDecimalInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::SignedDecimalInteger::matches(ICharacterWell &well){
 	auto next = well.peek();
 	return (next == '+' || next == '-');
 }

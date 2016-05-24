@@ -16,11 +16,11 @@ namespace StructuredScript{
 			explicit StringCharacterWell(const std::string &value)
 				: value_(value){}
 
-			virtual char peek() const override;
+			virtual char peek() override;
 
-			virtual std::string peek(unsigned int length) const override;
+			virtual std::string peek(unsigned int length) override;
 
-			virtual std::string get() const override;
+			virtual std::string get() override;
 
 			virtual char next() override;
 
@@ -50,18 +50,14 @@ namespace StructuredScript{
 
 			virtual bool empty() const override;
 
-			virtual unsigned int getLineNumber() const override;
-
 			virtual unsigned int getStartIndex() const override;
 
 			virtual unsigned int getEndIndex() const override;
 
-			virtual std::string getOffset() const override;
-
 		protected:
 			ForkListType forks_;
 			std::string value_;
-			unsigned int start_ = 0, end_ = 0, line_ = 1;
+			unsigned int start_ = 0, end_ = 0;
 		};
 	}
 }

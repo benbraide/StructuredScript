@@ -17,18 +17,18 @@ namespace StructuredScript{
 				explicit OperatorIdentifier(ISymbols &symbols)
 					: symbolPlugin_(symbols){}
 
-				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
+				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) override;
 
-				virtual bool matches(const ICharacterWell &well) const override;
+				virtual bool matches(ICharacterWell &well) override;
 
 				virtual TokenType type() const override;
 
 			private:
-				Token get_(ICharacterWell &well, TokenType type, const std::string &prefix, FilterType filter) const;
+				Token get_(ICharacterWell &well, TokenType type, const std::string &prefix, FilterType filter);
 
-				Token getSymbol_(ICharacterWell &well, TokenType type, const std::string &prefix, FilterType filter) const;
+				Token getSymbol_(ICharacterWell &well, TokenType type, const std::string &prefix, FilterType filter);
 
-				Token skip_(ICharacterWell &well) const;
+				Token skip_(ICharacterWell &well);
 
 				Identifier identifierPlugin_;
 				Symbol symbolPlugin_;

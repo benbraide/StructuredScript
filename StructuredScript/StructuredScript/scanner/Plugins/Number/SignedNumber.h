@@ -11,14 +11,14 @@ namespace StructuredScript{
 		namespace Plugins{
 			class SignedNumber : public IScannerPlugin{
 			public:
-				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
+				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) override;
 
-				virtual bool matches(const ICharacterWell &well) const override;
+				virtual bool matches(ICharacterWell &well) override;
 
 				virtual TokenType type() const override;
 
 			private:
-				Token skip_(ICharacterWell &well) const;
+				Token skip_(ICharacterWell &well);
 
 				Number numberPlugin_;
 				Skip skipPlugin_;

@@ -1,6 +1,6 @@
 #include "SignedNumber.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumber::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumber::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -24,7 +24,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumbe
 	return Token(TokenType::TOKEN_TYPE_SYMBOL, std::string(1, sign));
 }
 
-bool StructuredScript::Scanner::Plugins::SignedNumber::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::SignedNumber::matches(ICharacterWell &well){
 	auto next = well.peek(2);
 	if (next.empty() || (next[0] != '+' && next[0] != '-'))
 		return false;
@@ -39,7 +39,7 @@ StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::SignedN
 	return TokenType::TOKEN_TYPE_REAL_NUMBER;
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumber::skip_(ICharacterWell &well) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SignedNumber::skip_(ICharacterWell &well){
 	auto blank = skipPlugin_.get(well);
 	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());

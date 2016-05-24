@@ -1,6 +1,6 @@
 #include "Identifier.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Identifier::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Identifier::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -28,7 +28,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Identifier:
 	return Token(TokenType::TOKEN_TYPE_IDENTIFIER, well.get());
 }
 
-bool StructuredScript::Scanner::Plugins::Identifier::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::Identifier::matches(ICharacterWell &well){
 	auto next = well.peek();
 	return (next == '_' || next == '$' || ::isalpha(next));
 }

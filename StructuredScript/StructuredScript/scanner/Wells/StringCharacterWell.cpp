@@ -1,14 +1,14 @@
 #include "StringCharacterWell.h"
 
-char StructuredScript::Scanner::StringCharacterWell::peek() const{
+char StructuredScript::Scanner::StringCharacterWell::peek(){
 	return (end_ < value_.size()) ? value_[end_] : '\0';
 }
 
-std::string StructuredScript::Scanner::StringCharacterWell::peek(unsigned int length) const{
+std::string StructuredScript::Scanner::StringCharacterWell::peek(unsigned int length){
 	return (end_ < value_.size()) ? value_.substr(end_, length) : "";
 }
 
-std::string StructuredScript::Scanner::StringCharacterWell::get() const{
+std::string StructuredScript::Scanner::StringCharacterWell::get(){
 	return value_.substr(start_, end_ - start_);
 }
 
@@ -102,18 +102,10 @@ bool StructuredScript::Scanner::StringCharacterWell::empty() const{
 	return value_.empty();
 }
 
-unsigned int StructuredScript::Scanner::StringCharacterWell::getLineNumber() const{
-	return line_;
-}
-
 unsigned int StructuredScript::Scanner::StringCharacterWell::getStartIndex() const{
 	return start_;
 }
 
 unsigned int StructuredScript::Scanner::StringCharacterWell::getEndIndex() const{
 	return end_;
-}
-
-std::string StructuredScript::Scanner::StringCharacterWell::getOffset() const{
-	return ("line " + std::to_string(line_) + ", character " + std::to_string(start_));
 }

@@ -1,6 +1,6 @@
 #include "HexadecimalInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::HexadecimalInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::HexadecimalInteger::get(ICharacterWell &well, FilterType filter){
 	if (matches(well))
 		well.step(2);//Skip '0x'
 	else if (filter != nullptr && filter(well.peek()) == IScannerPlugin::INCLUDE)
@@ -33,7 +33,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Hexadecimal
 	return Token(TokenType::TOKEN_TYPE_HEXADECIMAL_INTEGER, token.value(), "0x");
 }
 
-bool StructuredScript::Scanner::Plugins::HexadecimalInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::HexadecimalInteger::matches(ICharacterWell &well){
 	return (well.peek(2) == "0x");
 }
 

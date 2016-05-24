@@ -11,7 +11,7 @@ namespace StructuredScript{
 			template <TokenType Type, char Quote, bool CanEscape>
 			class GenericString : public IScannerPlugin{
 			public:
-				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override{
+				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) override{
 					if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 						return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -20,7 +20,7 @@ namespace StructuredScript{
 					well.step(static_cast<int>(prefix.size()));//Skip quote [and '@']
 					well.fork();
 
-					auto next = next_(well);
+					auto next = well.next();
 					if (next == '\0')//Missing closing quote
 						return Token(TokenType::TOKEN_TYPE_ERROR, prefix + well.get());
 
@@ -38,7 +38,7 @@ namespace StructuredScript{
 								escaped = false;
 						}
 
-						next = next_(well);
+						next = well.next();
 						if (next == '\0')//Missing closing quote
 							return Token(TokenType::TOKEN_TYPE_ERROR, prefix + well.get());
 
@@ -59,7 +59,7 @@ namespace StructuredScript{
 					return Token(Type, value, prefix, std::string(1, Quote));
 				}
 
-				virtual bool matches(const ICharacterWell &well) const override{
+				virtual bool matches(ICharacterWell &well) override{
 					if (CanEscape)
 						return (well.peek() == Quote);
 
@@ -68,19 +68,6 @@ namespace StructuredScript{
 
 				virtual TokenType type() const override{
 					return TokenType::TOKEN_TYPE_DOUBLY_QUOTED_STRING;
-				}
-
-			private:
-				char next_(ICharacterWell &well) const{
-					auto next = well.next();
-					while (next == '\0'){//Try loading more characters
-						if (!well.load())
-							break;
-
-						next = well.next();
-					}
-
-					return next;
 				}
 			};
 

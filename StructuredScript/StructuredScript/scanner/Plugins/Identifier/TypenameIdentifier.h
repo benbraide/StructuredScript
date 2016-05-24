@@ -14,20 +14,20 @@ namespace StructuredScript{
 		namespace Plugins{
 			class TypenameIdentifier : public IScannerPlugin{
 			public:
-				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
+				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) override;
 
-				virtual bool matches(const ICharacterWell &well) const override;
+				virtual bool matches(ICharacterWell &well) override;
 
 				virtual TokenType type() const override;
 
 			private:
-				Token get_(ICharacterWell &well, FilterType filter) const;
+				Token get_(ICharacterWell &well, FilterType filter);
 
-				Token getLong_(ICharacterWell &well, FilterType filter) const;
+				Token getLong_(ICharacterWell &well, FilterType filter);
 
-				Token getUnsigned_(ICharacterWell &well, FilterType filter) const;
+				Token getUnsigned_(ICharacterWell &well, FilterType filter);
 
-				Token skip_(ICharacterWell &well) const;
+				Token skip_(ICharacterWell &well);
 
 				Typename getTypename_(const std::string &value) const;
 

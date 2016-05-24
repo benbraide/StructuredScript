@@ -1,13 +1,13 @@
 #include "MultiLineComment.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::MultiLineComment::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::MultiLineComment::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
 	well.step(2);//Skip '/*'
 	well.fork();
 	
-	auto next = next_(well);
+	auto next = well.next();
 	if (next == '\0')//Missing closing '*/'
 		return Token(TokenType::TOKEN_TYPE_ERROR, "/*" + well.get());
 
@@ -18,7 +18,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::MultiLineCo
 		if (!hasErrors && filterState == IScannerPlugin::FAIL)
 			hasErrors = true;
 
-		next = next_(well);
+		next = well.next();
 		if (next == '\0')//Missing closing '*/'
 			return Token(TokenType::TOKEN_TYPE_ERROR, "/*" + well.get());
 
@@ -39,22 +39,10 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::MultiLineCo
 	return Token(TokenType::TOKEN_TYPE_MULTI_LINE_COMMENT, value, "/*", "*/");
 }
 
-bool StructuredScript::Scanner::Plugins::MultiLineComment::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::MultiLineComment::matches(ICharacterWell &well){
 	return (well.peek(2) == "/*");
 }
 
 StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::MultiLineComment::type() const{
 	return TokenType::TOKEN_TYPE_MULTI_LINE_COMMENT;
-}
-
-char StructuredScript::Scanner::Plugins::MultiLineComment::next_(ICharacterWell &well) const{
-	auto next = well.next();
-	while (next == '\0'){//Try loading more characters
-		if (!well.load())
-			break;
-
-		next = well.next();
-	}
-
-	return next;
 }

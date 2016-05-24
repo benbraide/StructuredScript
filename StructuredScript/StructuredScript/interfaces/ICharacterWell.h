@@ -11,11 +11,11 @@ namespace StructuredScript{
 		public:
 			virtual ~CharacterWell(){}
 
-			virtual char peek() const = 0;
+			virtual char peek() = 0;
 
-			virtual std::string peek(unsigned int length) const = 0;
+			virtual std::string peek(unsigned int length) = 0;
 
-			virtual std::string get() const = 0;
+			virtual std::string get() = 0;
 
 			virtual char next() = 0;
 
@@ -45,13 +45,9 @@ namespace StructuredScript{
 
 			virtual bool empty() const = 0;
 
-			virtual unsigned int getLineNumber() const = 0;
-
 			virtual unsigned int getStartIndex() const = 0;
 
 			virtual unsigned int getEndIndex() const = 0;
-
-			virtual std::string getOffset() const = 0;
 		};
 	}
 

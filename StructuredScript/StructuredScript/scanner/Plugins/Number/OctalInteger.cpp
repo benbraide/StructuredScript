@@ -1,6 +1,6 @@
 #include "OctalInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalInteger::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -30,7 +30,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::OctalIntege
 	return Token(TokenType::TOKEN_TYPE_OCTAL_INTEGER, token.value(), "0");
 }
 
-bool StructuredScript::Scanner::Plugins::OctalInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::OctalInteger::matches(ICharacterWell &well){
 	auto peek = well.peek(2);
 	if (peek.empty() || peek[0] != '0')
 		return false;

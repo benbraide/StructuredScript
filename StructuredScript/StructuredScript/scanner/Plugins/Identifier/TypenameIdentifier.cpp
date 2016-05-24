@@ -1,6 +1,6 @@
 #include "TypenameIdentifier.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::get(ICharacterWell &well, FilterType filter){
 	auto value = well.get();
 	auto type = getTypename_(value);
 
@@ -16,7 +16,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	return Token(TypenameTokenType::type, value);
 }
 
-bool StructuredScript::Scanner::Plugins::TypenameIdentifier::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::TypenameIdentifier::matches(ICharacterWell &well){
 	auto value = well.get();
 	return (value == "any" || value == "void" || value == "bool" || value == "bit" || value == "byte" || value == "char" || value == "short" ||
 		value == "int" || value == "long" || value == "float" || value == "double" || value == "string" || value == "unsigned");
@@ -26,7 +26,7 @@ StructuredScript::Scanner::TokenType StructuredScript::Scanner::Plugins::Typenam
 	return TokenType::TOKEN_TYPE_IDENTIFIER;
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::get_(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::get_(ICharacterWell &well, FilterType filter){
 	well.fork();
 
 	auto blank = skip_(well);
@@ -38,7 +38,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	return identifierPlugin_.get(well, filter);
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getLong_(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getLong_(ICharacterWell &well, FilterType filter){
 	auto token = get_(well, filter);
 	if (token.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, "long " + token.value());
@@ -60,7 +60,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	return Token(TypenameTokenType::type, "long");
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getUnsigned_(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::getUnsigned_(ICharacterWell &well, FilterType filter){
 	auto token = get_(well, filter);
 	if (token.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned " + token.value());
@@ -100,7 +100,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIde
 	return Token(TokenType::TOKEN_TYPE_ERROR, "unsigned");//unsigned -- ERROR
 }
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::skip_(ICharacterWell &well) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::TypenameIdentifier::skip_(ICharacterWell &well){
 	auto blank = skipPlugin_.get(well);
 	if (blank.type() == TokenType::TOKEN_TYPE_ERROR)
 		return Token(TokenType::TOKEN_TYPE_ERROR, well.get());

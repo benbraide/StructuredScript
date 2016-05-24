@@ -1,12 +1,14 @@
 #include "SingleLineComment.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SingleLineComment::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SingleLineComment::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
 	well.step(2);//Skip '//'
 	well.fork();
-	well.stepToEnd();
+
+	if (!well.stepTo('\n'))
+		well.stepToEnd();
 
 	auto value = well.get();
 	well.merge();
@@ -14,7 +16,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::SingleLineC
 	return Token(TokenType::TOKEN_TYPE_SINGLE_LINE_COMMENT, value, "//");
 }
 
-bool StructuredScript::Scanner::Plugins::SingleLineComment::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::SingleLineComment::matches(ICharacterWell &well){
 	return (well.peek(2) == "//");
 }
 

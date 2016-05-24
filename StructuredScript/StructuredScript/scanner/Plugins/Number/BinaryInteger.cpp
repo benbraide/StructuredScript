@@ -1,6 +1,6 @@
 #include "BinaryInteger.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::BinaryInteger::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::BinaryInteger::get(ICharacterWell &well, FilterType filter){
 	if (matches(well))
 		well.step(2);//Skip '0b'
 	else if (filter != nullptr && filter(well.peek()) == IScannerPlugin::INCLUDE)
@@ -29,7 +29,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::BinaryInteg
 	return Token(TokenType::TOKEN_TYPE_BINARY_INTEGER, token.value(), "0b");
 }
 
-bool StructuredScript::Scanner::Plugins::BinaryInteger::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::BinaryInteger::matches(ICharacterWell &well){
 	return (well.peek(2) == "0b");
 }
 

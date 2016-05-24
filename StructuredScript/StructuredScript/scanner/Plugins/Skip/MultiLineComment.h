@@ -10,14 +10,11 @@ namespace StructuredScript{
 		namespace Plugins{
 			class MultiLineComment : public IScannerPlugin{
 			public:
-				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) const override;
+				virtual Token get(ICharacterWell &well, FilterType filter = nullptr) override;
 
-				virtual bool matches(const ICharacterWell &well) const override;
+				virtual bool matches(ICharacterWell &well) override;
 
 				virtual TokenType type() const override;
-
-			private:
-				char next_(ICharacterWell &well) const;
 			};
 		}
 	}

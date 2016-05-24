@@ -1,6 +1,6 @@
 #include "Symbol.h"
 
-StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Symbol::get(ICharacterWell &well, FilterType filter) const{
+StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Symbol::get(ICharacterWell &well, FilterType filter){
 	if (!matches(well) && (filter == nullptr || filter(well.peek()) != IScannerPlugin::INCLUDE))
 		return Token(TokenType::TOKEN_TYPE_NONE, "");
 
@@ -38,7 +38,7 @@ StructuredScript::Scanner::Token StructuredScript::Scanner::Plugins::Symbol::get
 	return Token(TokenType::TOKEN_TYPE_SYMBOL, symbol);
 }
 
-bool StructuredScript::Scanner::Plugins::Symbol::matches(const ICharacterWell &well) const{
+bool StructuredScript::Scanner::Plugins::Symbol::matches(ICharacterWell &well){
 	auto next = well.peek();
 	return (next != '_' && next != '$' && ::ispunct(next));
 }

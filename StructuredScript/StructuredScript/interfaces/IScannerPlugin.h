@@ -24,7 +24,7 @@ namespace StructuredScript{
 			// Qualifier: const
 			// Parameter: ICharacterWell & well
 			//************************************
-			virtual Scanner::Token get(ICharacterWell &well, FilterType filter = nullptr) const = 0;
+			virtual Scanner::Token get(CharacterWell &well, FilterType filter = nullptr) = 0;
 
 			//************************************
 			// Method:    matches
@@ -34,7 +34,7 @@ namespace StructuredScript{
 			// Qualifier: const
 			// Parameter: const ICharacterWell & well
 			//************************************
-			virtual bool matches(const ICharacterWell &well) const = 0;
+			virtual bool matches(CharacterWell &well) = 0;
 
 			//************************************
 			// Method:    type
