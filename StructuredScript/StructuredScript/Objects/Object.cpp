@@ -167,71 +167,53 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::Object::addMemory(con
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	ListType list;
-
 	auto object = objects_.find(name);
-	if (object != objects_.end()){
-		if (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr)
-			return object->second;
+	if (object != objects_.end())
+		return object->second;//Target is a member object
 
-		list.push_back(object->second);
-	}
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findMemory(name, SEARCH_LOCAL);
+	if (memory != nullptr && dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
+		return memory;//Target is a static object
 
-	if (list.empty()){//Search parents and storage
-		if (searchScope == SEARCH_LOCAL)
-			return dynamic_cast<IStorage *>(type_.get())->findMemory(name, SEARCH_LOCAL);
-
-		for (auto parent : parents_){
-			auto object = dynamic_cast<IStorage *>(parent.second->object().get())->findMemory(name, SEARCH_FAMILY);
-			if (object != nullptr)
-				return object;
-		}
-
-		if (self_ != nullptr && self_ != this){
-			auto object = self_->findMemory(name, SEARCH_FAMILY);
-			if (object != nullptr)
-				return object;
-		}
-		
-		return dynamic_cast<IStorage *>(type_.get())->findMemory(name, searchScope);
-	}
+	ListType list;
+	if (memory != nullptr)
+		list.push_back(memory);
 
 	extendList_(list, name, searchScope);
+
 	return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
 
-	auto object = objects_.find(name);
-	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
-		list.push_back(object->second);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findFunctionMemory(name, SEARCH_LOCAL);//Search type
+	if (memory != nullptr)
+		list.push_back(memory);
 
 	extendList_(list, name, searchScope);
 	if (!list.empty())
 		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findFunctionMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
+	return nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findOperatorMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
-
 	extendOperatorList_(list, name, searchScope);
 	if (!list.empty())
 		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findOperatorMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
+	return nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
-
 	extendTypeOperatorList_(list, name, searchScope);
 	if (!list.empty())
 		return std::make_shared<StructuredScript::Storage::FunctionMemory>(list, this);
 
-	return (self_ == nullptr || self_ == this) ? nullptr : self_->findTypenameOperatorMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
+	return nullptr;
 }
 
 StructuredScript::IMemoryAttribute::Ptr *StructuredScript::Objects::Object::addMemoryAttribute(const std::string &name){
@@ -301,32 +283,28 @@ bool StructuredScript::Objects::Object::addParent(const std::string &name, IMemo
 }
 
 void StructuredScript::Objects::Object::extendList_(ListType &list, const std::string &name, unsigned short searchScope){
-	if (self_ != nullptr && self_ != this){
-		auto memory = self_->findFunctionMemory(name, SEARCH_FAMILY);
+	if (self_ != nullptr && self_ != this){//Search linked object
+		auto memory = self_->findFunctionMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
-
-	auto memory = dynamic_cast<IStorage *>(type_.get())->findFunctionMemory(name, SEARCH_LOCAL);
-	if (memory != nullptr)
-		list.push_back(memory);
 
 	if (searchScope == SEARCH_LOCAL)
-		return;
+		return;//Ignore parents & global
 
-	for (auto &parent : parents_){//Get all functions with same name
-		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
+	for (auto &parent : parents_){//Search parents
+		auto memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
 
-	if (searchScope == SEARCH_DEFAULT){//Get list from storage
-		if (type_->storage() != nullptr){
+	if (searchScope == SEARCH_DEFAULT){//Search global
+		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findFunctionMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}
-		else if (memory_->storage() != nullptr){
+		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findFunctionMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);
@@ -335,32 +313,32 @@ void StructuredScript::Objects::Object::extendList_(ListType &list, const std::s
 }
 
 void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, const std::string &name, unsigned short searchScope){
-	if (self_ != nullptr && self_ != this){
-		auto memory = self_->findOperatorMemory(name, SEARCH_FAMILY);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findOperatorMemory(name, SEARCH_LOCAL);//Search type
+	if (memory != nullptr)
+		list.push_back(memory);
+
+	if (self_ != nullptr && self_ != this){//Search linked object
+		memory = self_->findOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
 
-	auto memory = dynamic_cast<IStorage *>(type_.get())->findOperatorMemory(name, SEARCH_LOCAL);
-	if (memory != nullptr)
-		list.push_back(memory);
-
 	if (searchScope == SEARCH_LOCAL)
-		return;
+		return;//Ignore parents & global
 
-	for (auto &parent : parents_){//Get all functions with same name
+	for (auto &parent : parents_){//Search parents
 		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
 
-	if (searchScope == SEARCH_DEFAULT){//Get list from storage
-		if (type_->storage() != nullptr){
+	if (searchScope == SEARCH_DEFAULT){//Search global
+		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findOperatorMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}
-		else if (memory_->storage() != nullptr){
+		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findOperatorMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);
@@ -369,32 +347,32 @@ void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, cons
 }
 
 void StructuredScript::Objects::Object::extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope){
-	if (self_ != nullptr && self_ != this){
-		auto memory = self_->findTypenameOperatorMemory(name, SEARCH_FAMILY);
+	auto memory = dynamic_cast<IStorage *>(type_.get())->findTypenameOperatorMemory(name, SEARCH_LOCAL);//Search type
+	if (memory != nullptr)
+		list.push_back(memory);
+
+	if (self_ != nullptr && self_ != this){//Search linked object
+		memory = self_->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
 
-	auto memory = dynamic_cast<IStorage *>(type_.get())->findTypenameOperatorMemory(name, SEARCH_LOCAL);
-	if (memory != nullptr)
-		list.push_back(memory);
-
 	if (searchScope == SEARCH_LOCAL)
-		return;
+		return;//Ignore parents & global
 
-	for (auto &parent : parents_){//Get all functions with same name
+	for (auto &parent : parents_){//Search parents
 		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
 			list.push_back(memory);
 	}
 
-	if (searchScope == SEARCH_DEFAULT){//Get list from storage
-		if (type_->storage() != nullptr){
+	if (searchScope == SEARCH_DEFAULT){//Search global
+		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findTypenameOperatorMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);
 		}
-		else if (memory_->storage() != nullptr){
+		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findTypenameOperatorMemory(name);
 			if (memory != nullptr)
 				list.push_back(memory);

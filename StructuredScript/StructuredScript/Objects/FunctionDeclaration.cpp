@@ -115,7 +115,7 @@ int StructuredScript::Objects::FunctionDeclaration::score(bool rightUnary, IAny:
 
 	if (owner_ != nullptr){//Compare object types
 		auto type = (object == nullptr) ? nullptr : getObjectType_(object);
-		if (type == nullptr || !owner_->isEqual(type))//Exact type expected
+		if (type == nullptr || (!owner_->isEqual(type) && !type->isParent(owner_)))//Exact | Parent type expected
 			return -1;
 	}
 
