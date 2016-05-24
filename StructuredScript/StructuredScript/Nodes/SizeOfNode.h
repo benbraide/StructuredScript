@@ -5,6 +5,7 @@
 
 #include "../Common/ExceptionManagerQuery.h"
 #include "../Common/NodeQuery.h"
+#include "../Common/TypeQuery.h"
 #include "../Common/Factory.h"
 
 #include "../Interfaces/Objects/IPrimitiveObject.h"
