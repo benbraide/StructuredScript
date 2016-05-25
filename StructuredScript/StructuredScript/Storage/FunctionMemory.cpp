@@ -46,11 +46,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IA
 
 	auto existing = find_(function);
 	if (existing != list_.end()){//Replace existing only if existing is declaration and new is not
-		auto existingFunction = dynamic_cast<IFunction *>((*existing)->object().get());
+		auto existingFunction = dynamic_cast<IFunction *>(existing->value.get());
 		if (existingFunction->isDefined() || !functionObject->isDefined())
 			return nullptr;
 
-		auto attributes = (*existing)->attributes();
+		auto attributes = existing->memory->attributes();
 		if (attributes != nullptr && (attributes->hasAttribute("Locked") || attributes->hasAttribute("Call")))//Restricted | Defined
 			return nullptr;
 
@@ -70,22 +70,23 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IA
 		if (existingType->isAny() != newType->isAny() || !existingType->isEqual(newType))
 			return nullptr;//Types must be 'explicitly' equal
 
-		(*existing)->assign(function, nullptr, nullptr, nullptr);
-		return *existing;
+		existing->memory->assign(function, nullptr, nullptr, nullptr);
+		return existing->memory;
 	}
 
-	list_.push_back(std::make_shared<StructuredScript::Storage::Memory>(storage_, IGlobalStorage::globalStorage->getPrimitiveType(
-		Typename::TYPE_NAME_FUNCTION), nullptr, attributes));
+	auto info = list_.emplace(list_.end(), IStorage::MemoryInfo{ nullptr, nullptr });
+	auto memory = std::make_shared<StructuredScript::Storage::Memory>(&*info, storage_, IGlobalStorage::globalStorage->getPrimitiveType(
+		Typename::TYPE_NAME_FUNCTION), attributes);
 
-	//Assign function to memory
-	(*list_.rbegin())->assign(function, nullptr, nullptr, nullptr);
+	info->memory = memory;
+	memory->assign(function);//Assign function to memory
 
-	return *list_.rbegin();
+	return memory;
 }
 
 bool StructuredScript::Storage::FunctionMemory::remove(Memory::Ptr function){
 	for (auto item = list_.begin(); item != list_.end(); ++item){
-		if (*item == function){
+		if (item->memory == function){
 			list_.erase(item);
 			return true;
 		}
@@ -115,11 +116,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(b
 	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
-		auto functionBase = (*function)->object()->base();
+		auto functionBase = function->memory->object()->base();
 		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(rightUnary, object, args);
 		if (score > 0 && score >= max){
 			max = score;
-			selected = *function;
+			selected = function->memory;
 		}
 	}
 
@@ -134,11 +135,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(b
 	auto object = (objectStorage == nullptr) ? nullptr : objectStorage->ptr();
 
 	for (auto function = list_.rbegin(); function != list_.rend(); ++function){//Get function with highest score
-		auto functionBase = (*function)->object()->base();
+		auto functionBase = function->memory->object()->base();
 		auto score = dynamic_cast<IFunction *>(functionBase.get())->score(rightUnary, object, args);
 		if (score > 0 && score >= max){
 			max = score;
-			selected = *function;
+			selected = function->memory;
 		}
 	}
 
@@ -146,13 +147,13 @@ StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::find(b
 }
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::first(){
-	return list_.empty() ? nullptr : *list_.begin();
+	return list_.empty() ? nullptr : list_.begin()->memory;
 }
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::filterNonMembers(){
 	ListType members, nonMembers;
 	for (auto function : list_){
-		if (dynamic_cast<IFunction *>(function->object().get())->isMember())
+		if (dynamic_cast<IFunction *>(function.memory->object().get())->isMember())
 			members.push_back(function);
 		else
 			nonMembers.push_back(function);
@@ -174,7 +175,7 @@ unsigned int StructuredScript::Storage::FunctionMemory::count() const{
 
 void StructuredScript::Storage::FunctionMemory::getStaticMemories(ListType &list){
 	for (auto memory : list_){
-		auto type = memory->type();
+		auto type = memory.memory->type();
 		auto declaredType = dynamic_cast<IDeclaredType *>(type.get());
 
 		auto states = (declaredType == nullptr) ? StructuredScript::Storage::MemoryState::STATE_NONE : declaredType->states();
@@ -209,9 +210,9 @@ void StructuredScript::Storage::FunctionMemory::resolveArgList(INode::Ptr args, 
 
 void StructuredScript::Storage::FunctionMemory::init_(const ListType &components){
 	for (auto component : components){
-		auto functionMemory = dynamic_cast<FunctionMemory *>(component.get());
+		auto functionMemory = dynamic_cast<FunctionMemory *>(component.memory.get());
 		if (functionMemory == nullptr)
-			list_.push_back(component);
+			list_.push_back({ component.memory, component.memory->object() });
 		else
 			init_(functionMemory->list_);
 	}
@@ -219,7 +220,7 @@ void StructuredScript::Storage::FunctionMemory::init_(const ListType &components
 
 StructuredScript::Storage::FunctionMemory::ListType::iterator StructuredScript::Storage::FunctionMemory::find_(IAny::Ptr function){
 	for (auto item = list_.begin(); item != list_.end(); ++item){
-		auto functionBase = (*item)->object()->base();
+		auto functionBase = item->memory->object()->base();
 		auto functionObject = dynamic_cast<IFunction *>(functionBase.get());
 		if (functionObject != nullptr && functionObject->equals(function))
 			return item;

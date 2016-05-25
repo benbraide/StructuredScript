@@ -66,7 +66,7 @@ namespace StructuredScript{
 
 		static IAny::Ptr createStorageObject(IStorage *value);
 
-		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IMemory *target);
+		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IAny::Ptr target);
 
 		static IAny::Ptr createExpanded(IAny::Ptr value);
 

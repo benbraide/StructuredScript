@@ -17,7 +17,9 @@ namespace StructuredScript{
 	namespace Storage{
 		class Memory : public IMemory, public IMemoryBackdoor{
 		public:
-			Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes, bool assignMemory = true);
+			typedef std::weak_ptr<IAny> ValuePtr;
+
+			Memory(IStorage::MemoryInfo *info, IStorage *storage, IType::Ptr type, IMemoryAttributes::Ptr attributes);
 
 			virtual Ptr ptr() override;
 
@@ -40,7 +42,9 @@ namespace StructuredScript{
 		private:
 			IStorage *storage_;
 			IType::Ptr type_;
-			IAny::Ptr value_;
+			ValuePtr value_;
+
+			IStorage::MemoryInfo *info_;
 			IMemoryAttributes::Ptr attributes_;
 		};
 	}

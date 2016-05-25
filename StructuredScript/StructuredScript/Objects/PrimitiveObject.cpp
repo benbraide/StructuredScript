@@ -2,7 +2,7 @@
 
 StructuredScript::IStorage *StructuredScript::Objects::PrimitiveObject::parent(){
 	if (type_ == nullptr)
-		return (memory_ == nullptr) ? nullptr : memory_->storage();
+		return (*memory_ == nullptr) ? nullptr : (*memory_)->storage();
 
 	return type_->storage();
 }
@@ -26,7 +26,7 @@ StructuredScript::IType::Ptr StructuredScript::Objects::PrimitiveObject::findTyp
 	return (searchScope == SEARCH_DEFAULT) ? dynamic_cast<IStorage *>(type_.get())->findType(name) : nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::PrimitiveObject::addMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::PrimitiveObject::addMemory(const std::string &name){
 	auto object = objects_.find(name);
 	return (object == objects_.end()) ? &objects_[name] : nullptr;
 }
@@ -34,7 +34,7 @@ StructuredScript::IMemory::Ptr *StructuredScript::Objects::PrimitiveObject::addM
 StructuredScript::IMemory::Ptr StructuredScript::Objects::PrimitiveObject::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto object = objects_.find(name);
 	if (object != objects_.end())
-		return object->second;
+		return object->second.memory;
 
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findMemory(name, searchScope);
 	auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
@@ -52,7 +52,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::PrimitiveObject::findF
 	return memory;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::PrimitiveObject::addOperatorMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::PrimitiveObject::addOperatorMemory(const std::string &name){
 	return nullptr;
 }
 
@@ -64,7 +64,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::PrimitiveObject::findO
 	return memory;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::PrimitiveObject::addTypenameOperatorMemory(IType::Ptr name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::PrimitiveObject::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 

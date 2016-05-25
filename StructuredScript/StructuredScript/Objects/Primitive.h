@@ -69,7 +69,7 @@ namespace StructuredScript{
 			virtual Ptr prepForExpression_();
 
 			IType::Ptr type_;
-			IMemory *memory_ = nullptr;
+			IMemory::Ptr memory_;
 		};
 	}
 }

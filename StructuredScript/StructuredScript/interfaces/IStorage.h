@@ -22,6 +22,11 @@ namespace StructuredScript{
 			typedef std::shared_ptr<Any> AnyPtr;
 			typedef std::function<AnyPtr(Storage *storage, ExceptionManager *exception, Node *expr)> ExternalCallType;
 
+			struct MemoryInfo{
+				std::shared_ptr<Memory> memory;
+				std::shared_ptr<Any> value;
+			};
+
 			virtual ~Storage(){}
 
 			virtual Storage *parent() = 0;
@@ -34,17 +39,17 @@ namespace StructuredScript{
 
 			virtual std::shared_ptr<Type> findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> *addMemory(const std::string &name) = 0;
+			virtual MemoryInfo *addMemory(const std::string &name) = 0;
 
 			virtual std::shared_ptr<Memory> findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
 			virtual std::shared_ptr<Memory> findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> *addOperatorMemory(const std::string &name) = 0;
+			virtual MemoryInfo *addOperatorMemory(const std::string &name) = 0;
 
 			virtual std::shared_ptr<Memory> findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 
-			virtual std::shared_ptr<Memory> *addTypenameOperatorMemory(std::shared_ptr<Type> name) = 0;
+			virtual MemoryInfo *addTypenameOperatorMemory(std::shared_ptr<Type> name) = 0;
 
 			virtual std::shared_ptr<Memory> findTypenameOperatorMemory(std::shared_ptr<Type> name, unsigned short searchScope = SEARCH_DEFAULT) = 0;
 

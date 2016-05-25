@@ -14,7 +14,7 @@ namespace StructuredScript{
 	namespace Objects{
 		class Expansion : public Primitive, public IStorage, public IExpansion{
 		public:
-			typedef std::vector<IMemory::Ptr> MemoryListType;
+			typedef std::vector<MemoryInfo> MemoryListType;
 
 			Expansion(IType::Ptr type);
 
@@ -32,17 +32,17 @@ namespace StructuredScript{
 
 			virtual IType::Ptr findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(const std::string &name) override;
+			virtual MemoryInfo *addMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 			virtual IMemory::Ptr findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
+			virtual MemoryInfo *addOperatorMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addTypenameOperatorMemory(IType::Ptr name) override;
+			virtual MemoryInfo *addTypenameOperatorMemory(IType::Ptr name) override;
 
 			virtual IMemory::Ptr findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
@@ -61,7 +61,7 @@ namespace StructuredScript{
 			static void init();
 
 		private:
-			IMemory::Ptr length_;
+			MemoryInfo length_;
 			MemoryListType entries_;
 
 			static INode::Ptr lengthNode_;

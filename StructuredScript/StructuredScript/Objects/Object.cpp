@@ -28,29 +28,36 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::clone(
 	//Default clone
 	auto object = std::make_shared<Object>(type_);
 	for (auto &parent : parents_){
-		auto parentClone = parent.second->object()->clone(storage, exception, expr);
+		auto parentClone = parent.second.value->clone(storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		object->addParent(parent.first, std::make_shared<StructuredScript::Storage::Memory>(object.get(), parent.second->type(), parentClone,
-			parent.second->attributes()));//Add similar memory
+		auto memory = parent.second.memory;
+		auto info = object->addParent(parent.first);
+
+		auto newMemory = std::make_shared<StructuredScript::Storage::Memory>(info, object.get(), memory->type(), memory->attributes());
+		newMemory->assign(parentClone);
+		info->memory = newMemory;
 	}
 
 	for (auto &entry : objects_){
-		auto target = entry.second->object();
-		auto property = dynamic_cast<IProperty *>(target.get());
+		auto property = dynamic_cast<IProperty *>(entry.second.value.get());
 
 		Ptr objectClone;
 		if (property == nullptr)
-			objectClone = entry.second->object()->clone(storage, exception, expr);
+			objectClone = entry.second.value->clone(storage, exception, expr);
 		else//Clone property object
 			objectClone = property->propertyClone(storage, exception, expr);
 
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
-		object->objects_[entry.first] = std::make_shared<StructuredScript::Storage::Memory>(object.get(), entry.second->type(), objectClone,
-			entry.second->attributes());//Add similar memory
+		auto memory = entry.second.memory;
+		auto info = object->addMemory(entry.first);
+
+		auto newMemory = std::make_shared<StructuredScript::Storage::Memory>(info, object.get(), memory->type(), memory->attributes());
+		newMemory->assign(objectClone);
+		info->memory = newMemory;
 	}
 
 	object->self_ = object.get();//Signal full construction
@@ -116,6 +123,8 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateRightUnar
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateBinary(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	using StructuredScript::Storage::FunctionMemory;
+
 	auto rightBase = right->base();
 	if (rightBase == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
@@ -127,7 +136,7 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateBinary(co
 	if (rightObject != nullptr){//Get operators from 'right'
 		auto rightFunction = rightObject->findOperatorMemory(value);
 		if (function != nullptr && rightFunction != nullptr)
-			function = std::make_shared<StructuredScript::Storage::FunctionMemory>(StructuredScript::Storage::FunctionMemory::ListType{ function, rightFunction });
+			function = std::make_shared<FunctionMemory>(FunctionMemory::ListType{ {function, nullptr}, {rightFunction, nullptr} });
 		else if (rightFunction != nullptr)
 			function = rightFunction;
 	}
@@ -149,7 +158,7 @@ StructuredScript::IStorage *StructuredScript::Objects::Object::findStorage(const
 
 	if (searchScope != SEARCH_LOCAL){
 		for (auto &parent : parents_){
-			auto storage = dynamic_cast<IStorage *>(parent.second->object().get())->findStorage(name, SEARCH_FAMILY);
+			auto storage = dynamic_cast<IStorage *>(parent.second.value.get())->findStorage(name, SEARCH_FAMILY);
 			if (storage != nullptr)
 				return storage;
 		}
@@ -161,15 +170,14 @@ StructuredScript::IStorage *StructuredScript::Objects::Object::findStorage(const
 	return self_->findStorage(name, searchScope);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Object::addMemory(const std::string &name){
-	auto object = objects_.find(name);
-	return (object == objects_.end()) ? &objects_[name] : nullptr;
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Object::addMemory(const std::string &name){
+	return (objects_.find(name) == objects_.end()) ? &objects_[name] : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto object = objects_.find(name);
 	if (object != objects_.end())
-		return object->second;//Target is a member object
+		return object->second.memory;//Target is a member object
 
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findMemory(name, SEARCH_LOCAL);
 	if (memory != nullptr && dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)
@@ -177,7 +185,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(con
 
 	ListType list;
 	if (memory != nullptr)
-		list.push_back(memory);
+		list.push_back({ memory, nullptr });
 
 	extendList_(list, name, searchScope);
 
@@ -189,7 +197,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findFunctionMe
 
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findFunctionMemory(name, SEARCH_LOCAL);//Search type
 	if (memory != nullptr)
-		list.push_back(memory);
+		list.push_back({memory, nullptr});
 
 	extendList_(list, name, searchScope);
 	if (!list.empty())
@@ -266,48 +274,43 @@ void StructuredScript::Objects::Object::construct(const IFunction::ArgListType &
 
 StructuredScript::IObject *StructuredScript::Objects::Object::findDirectParent(const std::string &name){
 	auto parent = parents_.find(name);
-	return (parent == parents_.end()) ? nullptr : dynamic_cast<IObject *>(parent->second->object().get());
+	return (parent == parents_.end()) ? nullptr : dynamic_cast<IObject *>(parent->second.value.get());
 }
 
 void StructuredScript::Objects::Object::self(Any *self){
 	self_ = self;
 }
 
-bool StructuredScript::Objects::Object::addParent(const std::string &name, IMemory::Ptr parent){
-	if (parents_.find(name) == parents_.end()){
-		parents_[name] = parent;
-		return true;
-	}
-
-	return false;
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Object::addParent(const std::string &name){
+	return (parents_.find(name) == parents_.end()) ? &parents_[name] : nullptr;
 }
 
 void StructuredScript::Objects::Object::extendList_(ListType &list, const std::string &name, unsigned short searchScope){
 	if (self_ != nullptr && self_ != this){//Search linked object
 		auto memory = self_->findFunctionMemory(name, (searchScope == SEARCH_LOCAL) ? SEARCH_LOCAL : SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({memory, nullptr});
 	}
 
 	if (searchScope == SEARCH_LOCAL)
 		return;//Ignore parents & global
 
 	for (auto &parent : parents_){//Search parents
-		auto memory = dynamic_cast<IStorage *>(parent.second->object().get())->findFunctionMemory(name, SEARCH_FAMILY);
+		auto memory = dynamic_cast<IStorage *>(parent.second.value.get())->findFunctionMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({memory, nullptr});
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Search global
 		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findFunctionMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findFunctionMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 	}
 }
@@ -315,33 +318,33 @@ void StructuredScript::Objects::Object::extendList_(ListType &list, const std::s
 void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, const std::string &name, unsigned short searchScope){
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findOperatorMemory(name, SEARCH_LOCAL);//Search type
 	if (memory != nullptr)
-		list.push_back(memory);
+		list.push_back({ memory, nullptr });
 
 	if (self_ != nullptr && self_ != this){//Search linked object
 		memory = self_->findOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({ memory, nullptr });
 	}
 
 	if (searchScope == SEARCH_LOCAL)
 		return;//Ignore parents & global
 
 	for (auto &parent : parents_){//Search parents
-		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findOperatorMemory(name, SEARCH_FAMILY);
+		memory = dynamic_cast<IStorage *>(parent.second.value.get())->findOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({ memory, nullptr });
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Search global
 		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findOperatorMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findOperatorMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 	}
 }
@@ -349,33 +352,33 @@ void StructuredScript::Objects::Object::extendOperatorList_(ListType &list, cons
 void StructuredScript::Objects::Object::extendTypeOperatorList_(ListType &list, IType::Ptr name, unsigned short searchScope){
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findTypenameOperatorMemory(name, SEARCH_LOCAL);//Search type
 	if (memory != nullptr)
-		list.push_back(memory);
+		list.push_back({ memory, nullptr });
 
 	if (self_ != nullptr && self_ != this){//Search linked object
 		memory = self_->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({ memory, nullptr });
 	}
 
 	if (searchScope == SEARCH_LOCAL)
 		return;//Ignore parents & global
 
 	for (auto &parent : parents_){//Search parents
-		memory = dynamic_cast<IStorage *>(parent.second->object().get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
+		memory = dynamic_cast<IStorage *>(parent.second.value.get())->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back({ memory, nullptr });
 	}
 
 	if (searchScope == SEARCH_DEFAULT){//Search global
 		if (type_->storage() != nullptr){//Prefer type's storage
 			auto memory = type_->storage()->findTypenameOperatorMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 		else if (memory_->storage() != nullptr){//Type has no storage - try object's storage
 			auto memory = memory_->storage()->findTypenameOperatorMemory(name);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back({ memory, nullptr });
 		}
 	}
 }
@@ -416,7 +419,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::callFu
 
 void StructuredScript::Objects::Object::constructParents_(IStorage *storage, IExceptionManager *exception, INode *expr){
 	for (auto &parent : parents_){
-		auto object = dynamic_cast<Object *>(parent.second->object().get());
+		auto object = dynamic_cast<Object *>(parent.second.value.get());
 		if (object->self_ == nullptr){//Construct unconstructed parents
 			object->construct({}, storage, exception, expr);
 			if (Query::ExceptionManager::has(exception))

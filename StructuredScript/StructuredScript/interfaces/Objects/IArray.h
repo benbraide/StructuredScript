@@ -12,7 +12,7 @@ namespace StructuredScript{
 	namespace Interfaces{
 		class ArrayObject{
 		public:
-			typedef std::vector<Memory::Ptr> MemoryListType;
+			typedef std::vector<Storage::MemoryInfo> MemoryListType;
 
 			virtual ~ArrayObject(){}
 

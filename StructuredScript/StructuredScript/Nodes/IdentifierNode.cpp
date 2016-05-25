@@ -55,11 +55,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::IdentifierNode::resolveM
 	return (storage == nullptr) ? nullptr : storage->findMemory(value_, searchScope);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::IdentifierNode::addMemory(IStorage *storage){
 	return storage->addMemory(value_);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::IdentifierNode::addNonOperatorMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::IdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return storage->addMemory(value_);
 }
 
@@ -117,7 +117,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::OperatorIdentifierNode::
 	return resolveMemory_(type, storage, searchScope);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::OperatorIdentifierNode::addMemory(IStorage *storage){
 	if (storage == nullptr)
 		return nullptr;
 
@@ -134,7 +134,7 @@ StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode:
 	return (type == nullptr) ? nullptr : storage->addTypenameOperatorMemory(type);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::OperatorIdentifierNode::addNonOperatorMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::OperatorIdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return nullptr;
 }
 
@@ -180,11 +180,11 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::PrimitiveTypeIdentifierN
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addMemory(IStorage *storage){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addNonOperatorMemory(IStorage *storage){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Nodes::PrimitiveTypeIdentifierNode::addNonOperatorMemory(IStorage *storage){
 	return nullptr;
 }
 

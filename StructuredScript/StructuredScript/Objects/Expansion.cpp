@@ -27,7 +27,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Expansion::eva
 			Query::ExceptionManager::combine("Index is out of bounds!", expr)));
 	}
 
-	return entries_[index]->object();
+	return entries_[index].value;
 }
 
 StructuredScript::IStorage *StructuredScript::Objects::Expansion::parent(){
@@ -50,19 +50,19 @@ StructuredScript::IType::Ptr StructuredScript::Objects::Expansion::findType(cons
 	return dynamic_cast<IStorage *>(IGlobalStorage::globalStorage)->findType(name, searchScope);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Expansion::addMemory(const std::string &name){
-	return (name == "length" && length_ == nullptr) ? &length_ : nullptr;
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Expansion::addMemory(const std::string &name){
+	return (name == "length" && length_.memory == nullptr) ? &length_ : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
-	return (name == "length") ? length_ : nullptr;
+	return (name == "length") ? length_.memory : nullptr;
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::findFunctionMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Expansion::addOperatorMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Expansion::addOperatorMemory(const std::string &name){
 	return nullptr;
 }
 
@@ -70,7 +70,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::findOperato
 	return nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Expansion::addTypenameOperatorMemory(IType::Ptr name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Expansion::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 
@@ -96,13 +96,17 @@ bool StructuredScript::Objects::Expansion::remove(IMemory::Ptr target){
 
 void StructuredScript::Objects::Expansion::expand(IFunction::ArgListType &args){
 	for (auto entry : entries_)
-		args.push_back(entry->object());
+		args.push_back(entry.value);
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Expansion::add(){
-	if (memory_ == nullptr)
-		return *entries_.emplace(entries_.end(), std::make_shared<StructuredScript::Storage::Memory>(nullptr, type_, nullptr, nullptr));
-	return *entries_.emplace(entries_.end(), std::make_shared<StructuredScript::Storage::Memory>(memory_->storage(), type_, nullptr, memory_->attributes()));
+	auto storage = (memory_ == nullptr) ? nullptr : memory_->storage();
+	auto attributes = (memory_ == nullptr) ? nullptr : memory_->attributes();
+
+	auto info = entries_.emplace(entries_.end(), IStorage::MemoryInfo{ nullptr, nullptr });
+	auto memory = std::make_shared<StructuredScript::Storage::Memory>(&*info, storage, type_, attributes);
+
+	return (info->memory = memory);
 }
 
 void StructuredScript::Objects::Expansion::init(){

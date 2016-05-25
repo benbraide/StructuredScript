@@ -38,7 +38,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 
 	auto value = this->value();
 	if (value == nullptr)//Unnamed declaration
-		return createMemory_(storage, type);
+		return createMemory_(nullptr, storage, type);
 
 	auto adder = dynamic_cast<IMemoryAdder *>(value.get());
 	if (adder == nullptr){
@@ -48,15 +48,15 @@ StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::alloc
 		return nullptr;
 	}
 
-	auto memory = adder->addNonOperatorMemory(storage);
-	if (memory == nullptr || dynamic_cast<IFunctionMemory *>(memory->get()) != nullptr){//Failed to add memory
+	auto info = adder->addNonOperatorMemory(storage);
+	if (info == nullptr || dynamic_cast<IFunctionMemory *>(info->memory.get()) != nullptr){//Failed to add memory
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));
 
 		return nullptr;
 	}
 
-	return (*memory = createMemory_(storage, type));
+	return (info->memory = createMemory_(info, storage, type));
 }
 
 StructuredScript::IType::Ptr StructuredScript::Nodes::SharedDeclaration::resolveType_(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -77,13 +77,16 @@ StructuredScript::IType::Ptr StructuredScript::Nodes::SharedDeclaration::resolve
 	return classNode->create(storage, exception, expr);
 }
 
-StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::createMemory_(IStorage *storage, IType::Ptr type){
+StructuredScript::IMemory::Ptr StructuredScript::Nodes::SharedDeclaration::createMemory_(IStorage::MemoryInfo *info, IStorage *storage, IType::Ptr type){
 	auto expandedType = dynamic_cast<IExpandedType *>(type.get());
 	if (expandedType == nullptr)
-		return std::make_shared<Storage::Memory>(storage, type, nullptr, attributes());
+		return std::make_shared<Storage::Memory>(info, storage, type, attributes());
 
 	auto expansion = std::make_shared<Objects::Expansion>(dynamic_cast<IStackedType *>(expandedType)->value());
-	return std::make_shared<Storage::Memory>(storage, type, expansion, attributes());
+	auto memory = std::make_shared<Storage::Memory>(info, storage, type, attributes());
+	memory->assign(expansion);
+
+	return memory;
 }
 
 StructuredScript::Interfaces::Node::Ptr StructuredScript::Nodes::DeclarationNode::ptr(){

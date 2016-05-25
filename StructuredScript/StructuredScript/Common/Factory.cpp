@@ -132,7 +132,7 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createStorageObj
 	return std::make_shared<Objects::StorageObject>(value);
 }
 
-StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IAny::Ptr target){
 	return std::make_shared<Objects::IndexObject>(type, value, target);
 }
 

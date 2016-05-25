@@ -98,10 +98,10 @@ StructuredScript::IType::Ptr StructuredScript::Type::findType(const std::string 
 	return (searchScope == SEARCH_DEFAULT && storage_ != nullptr) ? storage_->findType(name, SEARCH_DEFAULT) : nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Type::addMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Type::addMemory(const std::string &name){
 	auto object = objects_.find(name);
 	if (object != objects_.end())//Check if it is a function memory
-		return (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr) ? nullptr : &object->second;
+		return (dynamic_cast<IFunctionMemory *>(object->second.memory.get()) == nullptr) ? nullptr : &object->second;
 
 	return &objects_[name];
 }
@@ -111,8 +111,8 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findMemory(const std::str
 
 	auto object = objects_.find(name);
 	if (object != objects_.end()){
-		if (dynamic_cast<IFunctionMemory *>(object->second.get()) == nullptr)
-			return object->second;
+		if (dynamic_cast<IFunctionMemory *>(object->second.memory.get()) == nullptr)
+			return object->second.memory;
 
 		list.push_back(object->second);
 	}
@@ -138,14 +138,14 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findFunctionMemory(const 
 	ListType list;
 
 	auto object = objects_.find(name);
-	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.get()) != nullptr)
+	if (object != objects_.end() && dynamic_cast<IFunctionMemory *>(object->second.memory.get()) != nullptr)
 		list.push_back(object->second);
 
 	extendList_(list, name, searchScope);
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Type::addOperatorMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Type::addOperatorMemory(const std::string &name){
 	return &operators_[name];
 }
 
@@ -160,7 +160,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Type::findOperatorMemory(const 
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Type::addTypenameOperatorMemory(IType::Ptr name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Type::addTypenameOperatorMemory(IType::Ptr name){
 	return &typeOperators_[name];
 }
 
@@ -226,14 +226,14 @@ void StructuredScript::Type::extendList_(ListType &list, const std::string &name
 
 			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findFunctionMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back(MemoryInfo{ memory, memory->object() });
 		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
 		auto memory = storage_->findFunctionMemory(name, SEARCH_DEFAULT);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back(MemoryInfo{ memory, memory->object() });
 	}
 }
 
@@ -245,14 +245,14 @@ void StructuredScript::Type::extendOperatorList_(ListType &list, const std::stri
 
 			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findOperatorMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back(MemoryInfo{ memory, memory->object() });
 		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
 		auto memory = storage_->findOperatorMemory(name, SEARCH_DEFAULT);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back(MemoryInfo{ memory, memory->object() });
 	}
 }
 
@@ -264,13 +264,13 @@ void StructuredScript::Type::extendTypeOperatorList_(ListType &list, IType::Ptr 
 
 			auto memory = (storageParent == nullptr) ? nullptr : storageParent->findTypenameOperatorMemory(name, SEARCH_FAMILY);
 			if (memory != nullptr)
-				list.push_back(memory);
+				list.push_back(MemoryInfo{ memory, memory->object() });
 		}
 	}
 
 	if (searchScope == SEARCH_DEFAULT && storage_ != nullptr){//Get list from storage
 		auto memory = storage_->findTypenameOperatorMemory(name, SEARCH_DEFAULT);
 		if (memory != nullptr)
-			list.push_back(memory);
+			list.push_back(MemoryInfo{ memory, memory->object() });
 	}
 }

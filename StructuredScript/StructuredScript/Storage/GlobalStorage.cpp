@@ -116,8 +116,17 @@ void StructuredScript::Storage::GlobalStorage::init(){
 	auto type = std::make_shared<DeclaredType>(bit, MemoryState(MemoryState::STATE_CONSTANT));
 	auto attributes = std::make_shared<MemoryAttributes>(MemoryAttributes::ListType{ std::make_pair("Locked", attributes_["Locked"]) });
 
-	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
-	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
+	auto info = bit->addMemory("zero");
+	auto memory = std::make_shared<Memory>(info, this, type, attributes);
+
+	memory->assign(PrimitiveFactory::createBit(false));
+	info->memory = memory;
+
+	info = bit->addMemory("one");
+	memory = std::make_shared<Memory>(info, this, type, attributes);
+
+	memory->assign(PrimitiveFactory::createBit(true));
+	info->memory = memory;
 
 	Globals::init();
 }

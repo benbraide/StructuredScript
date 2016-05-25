@@ -74,7 +74,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::evaluate
 	if (memory_ == nullptr)
 		return PrimitiveFactory::createBit(((value_ >> (static_cast<unsigned char>(7) - index)) & static_cast<unsigned char>(1)) != static_cast<unsigned char>(0));
 
-	return PrimitiveFactory::createIndexObject(type_, index, memory_);
+	return PrimitiveFactory::createIndexObject(type_, index, shared_from_this());
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Byte::getIndexValue(unsigned int index){

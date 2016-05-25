@@ -37,11 +37,11 @@ StructuredScript::IType::Ptr StructuredScript::Objects::Reference::type(){
 }
 
 void StructuredScript::Objects::Reference::setMemory(IMemory *memory){
-	memory_ = memory;
+	memory_ = (memory == nullptr) ? nullptr : memory->ptr();
 }
 
 StructuredScript::IMemory *StructuredScript::Objects::Reference::memory(){
-	return memory_;
+	return memory_.get();
 }
 
 bool StructuredScript::Objects::Reference::truth(IStorage *storage, IExceptionManager *exception, INode *expr){

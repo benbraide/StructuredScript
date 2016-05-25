@@ -42,9 +42,9 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addMemory(IStorage *storage) override;
 
-			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addNonOperatorMemory(IStorage *storage) override;
 
 			virtual bool use(IPureStorage *target, IStorage *storage) override;
 
@@ -80,9 +80,9 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addMemory(IStorage *storage) override;
 
-			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addNonOperatorMemory(IStorage *storage) override;
 
 			virtual bool use(IPureStorage *target, IStorage *storage) override;
 
@@ -103,9 +103,9 @@ namespace StructuredScript{
 
 			virtual IMemory::Ptr resolveMemory(IStorage *storage, unsigned short searchScope = IStorage::SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addMemory(IStorage *storage) override;
 
-			virtual IMemory::Ptr *addNonOperatorMemory(IStorage *storage) override;
+			virtual IStorage::MemoryInfo *addNonOperatorMemory(IStorage *storage) override;
 
 			virtual bool use(IPureStorage *target, IStorage *storage) override;
 		};

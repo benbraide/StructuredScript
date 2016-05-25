@@ -13,8 +13,8 @@ namespace StructuredScript{
 	namespace Objects{
 		class Object : public Any, public IObject{
 		public:
-			typedef std::map<std::string, IMemory::Ptr>	ParentListType;
-			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
+			typedef std::map<std::string, MemoryInfo>	ParentListType;
+			typedef std::map<std::string, MemoryInfo>	MemoryListType;
 
 			typedef StructuredScript::Storage::FunctionMemory::ListType ListType;
 
@@ -41,7 +41,7 @@ namespace StructuredScript{
 
 			virtual IStorage *findStorage(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(const std::string &name) override;
+			virtual MemoryInfo *addMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
@@ -63,7 +63,7 @@ namespace StructuredScript{
 
 			void self(Any *self);
 
-			bool addParent(const std::string &name, IMemory::Ptr parent);
+			MemoryInfo *addParent(const std::string &name);
 
 		protected:
 			void extendList_(ListType &list, const std::string &name, unsigned short searchScope);

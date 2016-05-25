@@ -40,7 +40,7 @@ namespace StructuredScript{
 				if (memory_ == nullptr)
 					return PrimitiveFactory::createByte(reinterpret_cast<unsigned char *>(&value_)[index]);
 
-				return PrimitiveFactory::createIndexObject(type_, index, memory_);
+				return PrimitiveFactory::createIndexObject(type_, index, shared_from_this());
 			}
 
 			virtual int rank() override{

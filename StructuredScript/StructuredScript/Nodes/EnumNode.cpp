@@ -30,14 +30,19 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::EnumNode::evaluate(IStorage
 				Query::ExceptionManager::combine("'" + item->str() + "': Expected an identifier!", expr)));
 		}
 
-		auto memory = type->addMemory(id->value());
-		if (memory == nullptr){//Duplicate
+		auto info = type->addMemory(id->value());
+		if (info == nullptr){//Duplicate
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 				Query::ExceptionManager::combine("'" + item->str() + "': Duplicate entry found!", expr)));
 		}
 
+		//Add static memory
 		auto value = PrimitiveFactory::createEnum(type, id->value(), index++);
-		*memory = std::make_shared<Storage::Memory>(storage, declType, value, nullptr, false);//Add static memory
+		auto memory = std::make_shared<Storage::Memory>(info, storage, declType, nullptr);
+
+		memory->assign(value);
+		info->memory = memory;
+		value->setMemory(nullptr);//Disable reference
 	}
 
 	auto added = storage->addType(idValue);

@@ -48,7 +48,7 @@ std::string StructuredScript::Nodes::EchoNode::str_(IAny::Ptr value, IStorage *s
 	if (arrayObject != nullptr){
 		std::string str;
 		for (auto entry : arrayObject->list()){
-			auto entryStr = str_(entry->object(), storage, exception, expr);
+			auto entryStr = str_(entry.value, storage, exception, expr);
 			if (Query::ExceptionManager::has(exception))
 				return "";
 

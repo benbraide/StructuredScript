@@ -11,9 +11,9 @@ namespace StructuredScript{
 		public:
 			virtual ~MemoryAdder(){}
 
-			virtual Memory::Ptr *addMemory(Storage *storage) = 0;
+			virtual Storage::MemoryInfo *addMemory(Storage *storage) = 0;
 
-			virtual Memory::Ptr *addNonOperatorMemory(Storage *storage) = 0;
+			virtual Storage::MemoryInfo *addNonOperatorMemory(Storage *storage) = 0;
 		};
 	}
 

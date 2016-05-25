@@ -8,19 +8,19 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::CallableNode::evaluate_(INo
 			Query::ExceptionManager::combine("'" + str() + "': Expected identifier after typename!", expr)));
 	}
 
-	auto memory = adder->addMemory(storage);
-	if (memory == nullptr){//Failed to add memory
+	auto info = adder->addMemory(storage);
+	if (info == nullptr){//Failed to add memory
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Could not allocate memory!", expr)));
 	}
 
-	if (*memory == nullptr)//Create new function memory
-		*memory = std::make_shared<Storage::FunctionMemory>(storage);
+	if (info->memory == nullptr)//Create new function memory
+		info->memory = std::make_shared<Storage::FunctionMemory>(storage);
 
 	auto function = create_(type, definition);
 	auto isRightUnary = (attributes_ == nullptr) ? false : (attributes_->hasAttribute("RightUnary") || attributes_->hasAttribute("UnaryRight"));
 
-	if (!function->init(isRightUnary, (*memory)->storage(), exception, expr)){//Error
+	if (!function->init(isRightUnary, info->memory->storage(), exception, expr)){//Error
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 
@@ -28,7 +28,7 @@ StructuredScript::IAny::Ptr StructuredScript::Nodes::CallableNode::evaluate_(INo
 			Query::ExceptionManager::combine("'" + str() + "': Failed to define function!", expr)));
 	}
 
-	if (dynamic_cast<IFunctionMemory *>(memory->get())->add(function, attributes_) == nullptr){
+	if (dynamic_cast<IFunctionMemory *>(info->memory.get())->add(function, attributes_) == nullptr){
 		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
 			Query::ExceptionManager::combine("'" + str() + "': Cannot duplicate function declaration/definition!", expr)));
 	}

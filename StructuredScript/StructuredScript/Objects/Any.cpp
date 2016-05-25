@@ -39,11 +39,11 @@ StructuredScript::IType::Ptr StructuredScript::Objects::Any::type(){
 }
 
 void StructuredScript::Objects::Any::setMemory(IMemory *memory){
-	memory_ = memory;
+	memory_ = (memory == nullptr) ? nullptr : memory->ptr();
 }
 
 StructuredScript::IMemory *StructuredScript::Objects::Any::memory(){
-	return memory_;
+	return memory_.get();
 }
 
 bool StructuredScript::Objects::Any::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -86,7 +86,7 @@ StructuredScript::IType::Ptr StructuredScript::Objects::Any::findType(const std:
 	return (searchScope == SEARCH_DEFAULT) ? dynamic_cast<IStorage *>(type_.get())->findType(name) : nullptr;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Any::addMemory(const std::string &name){
 	return nullptr;
 }
 
@@ -107,7 +107,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findFunctionMemor
 	return memory;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addOperatorMemory(const std::string &name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Any::addOperatorMemory(const std::string &name){
 	return nullptr;
 }
 
@@ -119,7 +119,7 @@ StructuredScript::IMemory::Ptr StructuredScript::Objects::Any::findOperatorMemor
 	return memory;
 }
 
-StructuredScript::IMemory::Ptr *StructuredScript::Objects::Any::addTypenameOperatorMemory(IType::Ptr name){
+StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Any::addTypenameOperatorMemory(IType::Ptr name){
 	return nullptr;
 }
 

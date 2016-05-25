@@ -8,7 +8,7 @@ StructuredScript::Objects::ArrayObject::ArrayObject()
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto object = std::make_shared<ArrayObject>();
 	for (auto entry : entries_){//Copy entries
-		object->append(entry->object(), storage, exception, expr);
+		object->append(entry.value, storage, exception, expr);
 		if (Query::ExceptionManager::has(exception))
 			return nullptr;
 	}
@@ -25,7 +25,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::e
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	return (*entries_.rbegin())->object();
+	return entries_.rbegin()->value;
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::evaluateBinary(const std::string &value, Ptr right, IStorage *storage,
@@ -57,11 +57,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::e
 		}
 	}
 
-	return entries_[index]->object();
+	return entries_[index].value;
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::ArrayObject::at(unsigned int index){
-	return (index < entries_.size()) ? entries_[index]->object() : nullptr;
+	return (index < entries_.size()) ? entries_[index].value : nullptr;
 }
 
 void StructuredScript::Objects::ArrayObject::append(IAny::Ptr value, IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -288,7 +288,11 @@ void StructuredScript::Objects::ArrayObject::init(){
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::ArrayObject::add_(MemoryListType::iterator where, IType::Ptr type){
 	auto storage = (Primitive::memory_ == nullptr) ? nullptr : Primitive::memory_->storage();
-	return *entries_.emplace(entries_.end(), std::make_shared<StructuredScript::Storage::Memory>(storage, type, nullptr, nullptr));
+
+	auto info = entries_.emplace(entries_.end(), IStorage::MemoryInfo{ nullptr, nullptr });
+	auto memory = std::make_shared<StructuredScript::Storage::Memory>(&*info, storage, type, nullptr);
+
+	return (info->memory = memory);
 }
 
 void StructuredScript::Objects::ArrayObject::grow_(IStorage *storage, IExceptionManager *exception, INode *expr){

@@ -198,7 +198,8 @@ void StructuredScript::Objects::FunctionObject::init(){
 		}
 
 		if (dynamic_cast<IFunctionMemory *>(object->value_.get()) == nullptr){
-			auto memory = std::make_shared<StructuredScript::Storage::FunctionMemory>(ListType{ object->value_ }, objectStorage);
+			ListType entry({ MemoryInfo{ object->value_, object->value_->object() } });
+			auto memory = std::make_shared<StructuredScript::Storage::FunctionMemory>(entry, objectStorage);
 			return std::make_shared<FunctionObject>(memory);
 		}
 

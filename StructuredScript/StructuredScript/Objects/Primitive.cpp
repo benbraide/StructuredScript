@@ -40,11 +40,11 @@ StructuredScript::IType::Ptr StructuredScript::Objects::Primitive::type(){
 }
 
 void StructuredScript::Objects::Primitive::setMemory(IMemory *memory){
-	memory_ = memory;
+	memory_ = (memory == nullptr) ? nullptr : memory->ptr();
 }
 
 StructuredScript::IMemory *StructuredScript::Objects::Primitive::memory(){
-	return memory_;
+	return memory_.get();
 }
 
 bool StructuredScript::Objects::Primitive::truth(IStorage *storage, IExceptionManager *exception, INode *expr){

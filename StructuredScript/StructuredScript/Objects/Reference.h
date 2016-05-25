@@ -42,7 +42,7 @@ namespace StructuredScript{
 
 		protected:
 			IMemory::Ptr value_;
-			IMemory *memory_ = nullptr;
+			IMemory::Ptr memory_;
 		};
 	}
 }

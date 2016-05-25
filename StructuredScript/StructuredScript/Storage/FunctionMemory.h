@@ -17,7 +17,7 @@ namespace StructuredScript{
 	namespace Storage{
 		class FunctionMemory : public IMemory, public IFunctionMemory{
 		public:
-			typedef std::list<Ptr> ListType;
+			typedef std::list<IStorage::MemoryInfo> ListType;
 
 			FunctionMemory(IStorage *storage)
 				: storage_(storage){}

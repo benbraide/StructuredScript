@@ -14,10 +14,10 @@ namespace StructuredScript{
 	namespace Objects{
 		class PrimitiveObject : public IStorage{
 		public:
-			typedef std::map<std::string, IMemory::Ptr>	MemoryListType;
+			typedef std::map<std::string, MemoryInfo>	MemoryListType;
 
-			PrimitiveObject(IType::Ptr type, IMemory *&memory)
-				: type_(type), memory_(memory){}
+			PrimitiveObject(IType::Ptr type, IMemory::Ptr &memory)
+				: type_(type), memory_(&memory){}
 
 			virtual IStorage *parent() override;
 
@@ -29,17 +29,17 @@ namespace StructuredScript{
 
 			virtual IType::Ptr findType(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addMemory(const std::string &name) override;
+			virtual MemoryInfo *addMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
 			virtual IMemory::Ptr findFunctionMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addOperatorMemory(const std::string &name) override;
+			virtual MemoryInfo *addOperatorMemory(const std::string &name) override;
 
 			virtual IMemory::Ptr findOperatorMemory(const std::string &name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
-			virtual IMemory::Ptr *addTypenameOperatorMemory(IType::Ptr name) override;
+			virtual MemoryInfo *addTypenameOperatorMemory(IType::Ptr name) override;
 
 			virtual IMemory::Ptr findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope = SEARCH_DEFAULT) override;
 
@@ -53,7 +53,7 @@ namespace StructuredScript{
 
 		private:
 			IType::Ptr type_;
-			IMemory *&memory_;
+			IMemory::Ptr *memory_;
 			MemoryListType objects_;
 		};
 	}

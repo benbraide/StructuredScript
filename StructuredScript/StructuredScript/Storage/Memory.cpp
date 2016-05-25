@@ -1,22 +1,23 @@
 #include "Memory.h"
 
-StructuredScript::Storage::Memory::Memory(IStorage *storage, IType::Ptr type, IAny::Ptr value, IMemoryAttributes::Ptr attributes, bool assignMemory /*= true*/)
-	: storage_(storage), type_(type), value_(value), attributes_(attributes){
-	if (assignMemory && value_ != nullptr)
-		value_->setMemory(this);
-}
+StructuredScript::Storage::Memory::Memory(IStorage::MemoryInfo *info, IStorage *storage, IType::Ptr type, IMemoryAttributes::Ptr attributes)
+	: info_(info), storage_(storage), type_(type), attributes_(attributes){}
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::Memory::ptr(){
 	return shared_from_this();
 }
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::Memory::clone(){
-	return std::make_shared<Memory>(storage_, type_, value_, attributes_, false);
+	auto memory = std::make_shared<Memory>(nullptr, storage_, type_, attributes_);
+	memory->value_ = value_.lock();
+
+	return memory;
 }
 
 void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto value = value_.lock();
 	if (attributes_ != nullptr){//Validate access
-		if (value_ != nullptr && !Query::Object::isUndefined(value_) && (attributes_->hasAttribute(""))){
+		if (value != nullptr && !Query::Object::isUndefined(value) && (attributes_->hasAttribute(""))){
 			Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 				"Cannot modify object!", expr)));
 
@@ -25,7 +26,7 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 	}
 
 	auto states = MemoryState(type_->states());
-	if ((states.isConstant() || states.isFinal()) && value_ != nullptr && !Query::Object::isUndefined(value_)){//Cannot assign to a const | final memory
+	if ((states.isConstant() || states.isFinal()) && value != nullptr && !Query::Object::isUndefined(value)){//Cannot assign to a const | final memory
 		Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 			"Cannot modify memory!", expr)));
 
@@ -102,14 +103,11 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 			return;
 	}
 
-	if (value_ != nullptr)//Unbind previous
-		value_->setMemory(nullptr);
-
-	(value_ = object)->setMemory(this);
+	assign(object);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Storage::Memory::object(){
-	return value_;
+	return value_.lock();
 }
 
 StructuredScript::Interfaces::Type::Ptr StructuredScript::Storage::Memory::type(){
@@ -129,8 +127,13 @@ void StructuredScript::Storage::Memory::setStorage(IStorage *storage){
 }
 
 void StructuredScript::Storage::Memory::assign(IAny::Ptr object){
-	if (value_ != nullptr)//Unbind previous
-		value_->setMemory(nullptr);
+	auto value = value_.lock();
+	if (value != nullptr)//Unbind previous
+		value->setMemory(nullptr);
 
-	(value_ = object)->setMemory(this);
+	value_ = object;
+	if (info_ != nullptr)
+		info_->value = object;
+
+	object->setMemory(this);
 }

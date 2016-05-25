@@ -9,7 +9,7 @@ namespace StructuredScript{
 	namespace Objects{
 		class IndexObject : public Primitive, public IIndexObject{
 		public:
-			IndexObject(IType::Ptr type, unsigned int value, IMemory *target)
+			IndexObject(IType::Ptr type, unsigned int value, Ptr target)
 				: Primitive(type), value_(value), target_(target){}
 
 			virtual Ptr base() override;
@@ -30,7 +30,7 @@ namespace StructuredScript{
 
 		protected:
 			unsigned int value_;
-			IMemory *target_;
+			Ptr target_;
 		};
 	}
 }

@@ -31,7 +31,7 @@ namespace StructuredScript{
 		private:
 			IType::Ptr resolveType_(IStorage *storage, IExceptionManager *exception, INode *expr);
 
-			IMemory::Ptr createMemory_(IStorage *storage, IType::Ptr type);
+			IMemory::Ptr createMemory_(IStorage::MemoryInfo *info, IStorage *storage, IType::Ptr type);
 		};
 
 		class DeclarationNode : public SharedDeclaration, public INode, public IDeclarationNode, public IClassEntry{
