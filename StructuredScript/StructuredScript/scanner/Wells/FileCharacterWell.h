@@ -25,6 +25,8 @@ namespace StructuredScript{
 
 			virtual bool load() override;
 
+			bool fail() const;
+
 		protected:
 			bool stepTo_(char target, unsigned int offset);
 

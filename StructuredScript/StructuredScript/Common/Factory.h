@@ -5,8 +5,7 @@
 
 #include "Typename.h"
 
-#include "../Interfaces/IAny.h"
-#include "../Interfaces/IMemory.h"
+#include "../Interfaces/INode.h"
 
 namespace StructuredScript{
 	class PrimitiveFactory{
@@ -60,6 +59,12 @@ namespace StructuredScript{
 		static IAny::Ptr createTypeObject(IType::Ptr value);
 
 		static IAny::Ptr createFunctionObject(IMemory::Ptr value);
+
+		static IAny::Ptr createNodeObject(INode::Ptr value);
+
+		static IAny::Ptr createMemoryObject(IMemory::Ptr value);
+
+		static IAny::Ptr createStorageObject(IStorage *value);
 
 		static IAny::Ptr createIndexObject(IType::Ptr type, unsigned int value, IMemory *target);
 

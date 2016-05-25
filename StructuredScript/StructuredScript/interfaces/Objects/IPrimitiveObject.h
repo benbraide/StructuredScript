@@ -132,6 +132,27 @@ namespace StructuredScript{
 
 			virtual std::string str() = 0;
 		};
+
+		class NodeObject{
+		public:
+			virtual ~NodeObject(){}
+
+			virtual Node::Ptr value() = 0;
+		};
+
+		class MemoryObject{
+		public:
+			virtual ~MemoryObject(){}
+
+			virtual Memory::Ptr value() = 0;
+		};
+
+		class StorageObject{
+		public:
+			virtual ~StorageObject(){}
+
+			virtual Storage *value() = 0;
+		};
 	}
 
 	typedef Interfaces::PrimitiveObject	IPrimitiveObject;
@@ -154,6 +175,9 @@ namespace StructuredScript{
 	typedef Interfaces::Expanded		IExpanded;
 	typedef Interfaces::Property		IProperty;
 	typedef Interfaces::Range			IRange;
+	typedef Interfaces::NodeObject		INodeObject;
+	typedef Interfaces::MemoryObject	IMemoryObject;
+	typedef Interfaces::StorageObject	IStorageObject;
 }
 
 #endif /* !STRUCTURED_SCRIPT_PRIMITIVE_OBJECT_INTERFACE_H */

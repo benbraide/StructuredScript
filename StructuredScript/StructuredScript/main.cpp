@@ -19,6 +19,7 @@ int main(){
 	StructuredScript::IGlobalStorage::globalStorage = &globalStorage;
 
 	globalStorage.init();
+	globalStorage.path("Includes");
 
 	std::string input;
 	StructuredScript::Parser::Parser parser;
@@ -32,17 +33,32 @@ int main(){
 		StructuredScript::Scanner::StringCharacterWell well(input);
 
 		auto node = parser.parse(well, scanner, &xManager);
-		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
-			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+		if (xManager.has()){
+			if (xManager.hasBreak())
+				std::cout << "'break' found outside loop!\n";
+			else if (xManager.hasContinue())
+				std::cout << "'continue' found outside loop!\n";
+			else if (xManager.hasReturn())
+				std::cout << "'return' found outside function!\n";
+			else
+				std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+
 			xManager.clear();
 			continue;
 		}
 
 		node->evaluate(&globalStorage, &xManager, nullptr);
-		if (StructuredScript::Query::ExceptionManager::has(&xManager)){
-			std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+		if (xManager.has()){
+			if (xManager.hasBreak())
+				std::cout << "'break' found outside loop!\n";
+			else if (xManager.hasContinue())
+				std::cout << "'continue' found outside loop!\n";
+			else if (xManager.hasReturn())
+				std::cout << "'return' found outside function!\n";
+			else
+				std::cout << xManager.get()->str(nullptr, nullptr, nullptr) << "\n";
+
 			xManager.clear();
-			continue;
 		}
 	}
 

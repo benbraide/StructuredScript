@@ -96,16 +96,6 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::getR
 		return value;
 	}
 	
-	if (Query::ExceptionManager::hasBreak(exception)){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'break' found outside loop!", expr)));
-	}
-	
-	if (Query::ExceptionManager::hasContinue(exception)){
-		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-			Query::ExceptionManager::combine("'continue' found outside loop!", expr)));
-	}
-	
 	return nullptr;
 }
 

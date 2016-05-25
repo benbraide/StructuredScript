@@ -5,7 +5,7 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::TypeObject::cl
 }
 
 std::string StructuredScript::Objects::TypeObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return value_->name();
+	return (value_ == nullptr) ? Primitive::str(storage, exception, expr) : value_->name();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Objects::TypeObject::value(){
@@ -13,6 +13,9 @@ StructuredScript::IType::Ptr StructuredScript::Objects::TypeObject::value(){
 }
 
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::TypeObject::evaluate_(const std::string &value, bool reversed, Ptr right, IExceptionManager *exception, INode *expr){
+	if (value_ == nullptr)
+		return Primitive::evaluate_(value, reversed, right, exception, expr);
+
 	auto rightBase = right->base();
 	auto alike = dynamic_cast<TypeObject *>(rightBase.get());
 	if (alike != nullptr){

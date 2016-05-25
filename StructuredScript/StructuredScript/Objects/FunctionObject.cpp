@@ -15,18 +15,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::FunctionObject
 	return std::make_shared<FunctionObject>(value_);
 }
 
-std::string StructuredScript::Objects::FunctionObject::str(IStorage *storage, IExceptionManager *exception, INode *expr){
-	Query::ExceptionManager::set(exception, PrimitiveFactory::createString(
-		Query::ExceptionManager::combine("Cannot get string value of object!", expr)));
-
-	return "";
-}
-
 void StructuredScript::Objects::FunctionObject::init(){
 	std::string lines = "class @function_type{";
 
-	lines += "@[Call(0), AssumeConstness]ref val any call(@[AssumeConstness]ref val any object, @[AssumeConstness]ref val any... args);";
-	lines += "@[Call(1), AssumeConstness]ref val any call_right(@[AssumeConstness]ref val any object);";
+	lines += "@[Call(0)]any call(@[AssumeConstness]ref val any object, @[AssumeConstness]ref val any... args);";
+	lines += "@[Call(1)]any call_right(@[AssumeConstness]ref val any object);";
 	lines += "@[Call(2)]function_type find(@[AssumeConstness]ref val any... args);";
 	lines += "@[Call(3)]function_type find_right();";
 	lines += "@[Call(4)]function_type first();";
@@ -34,7 +27,7 @@ void StructuredScript::Objects::FunctionObject::init(){
 	lines += "@[Call(6)]function_type bind(@[AssumeConstness]ref val any object);";
 	lines += "@[Call(7)]bool is_bound();";
 	lines += "@[Call(8)]bool is_collection();";
-	lines += "@[Call(9), AssumeConstness]ref val any operator()(@[AssumeConstness]ref val any... args)}";
+	lines += "@[Call(9)]any operator()(@[AssumeConstness]ref val any... args)}";
 
 	auto parsed = IGlobalStorage::globalStorage->parse(lines);
 

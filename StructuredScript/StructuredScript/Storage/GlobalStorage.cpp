@@ -82,8 +82,11 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	Objects::Expansion::init();
 	Objects::ArrayObject::init();
-
 	Objects::RangeBase::init();
+
+	Objects::NodeObject::init();
+	//Objects::MemoryObject::init();
+	Objects::StorageObject::init();
 
 	types_["primitive_type"] = std::make_shared<CompositePrimitiveType>(CompositePrimitiveType::ListType{
 		primitives_[Typename::TYPE_NAME_VOID],
@@ -115,6 +118,8 @@ void StructuredScript::Storage::GlobalStorage::init(){
 
 	*bit->addMemory("zero") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(false), attributes);
 	*bit->addMemory("one") = std::make_shared<Memory>(this, type, PrimitiveFactory::createBit(true), attributes);
+
+	Globals::init();
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::findType(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -151,6 +156,19 @@ StructuredScript::INode::Ptr StructuredScript::Storage::GlobalStorage::parse(con
 	Scanner::StringCharacterWell well(value);
 
 	return parser.parse(well, scanner, &xManager);
+}
+
+StructuredScript::Storage::GlobalStorage::ExternalCallType StructuredScript::Storage::GlobalStorage::findExternalCall(const std::string &name){
+	auto call = externalCalls_.find(name);
+	return (call == externalCalls_.end()) ? nullptr : call->second;
+}
+
+void StructuredScript::Storage::GlobalStorage::addExternalCall(const std::string &name, ExternalCallType value){
+	externalCalls_[name] = value;
+}
+
+void StructuredScript::Storage::GlobalStorage::path(const std::string &path){
+	Globals::path(path);
 }
 
 StructuredScript::IType::Ptr StructuredScript::Storage::GlobalStorage::getPrimitiveType(int rank){

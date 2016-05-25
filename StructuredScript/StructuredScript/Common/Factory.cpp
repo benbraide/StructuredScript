@@ -13,6 +13,9 @@
 #include "../Objects/StringObject.h"
 #include "../Objects/TypeObject.h"
 #include "../Objects/FunctionObject.h"
+#include "../Objects/NodeObject.h"
+#include "../Objects/MemoryObject.h"
+#include "../Objects/StorageObject.h"
 #include "../Objects/IndexObject.h"
 #include "../Objects/Expanded.h"
 #include "../Objects/Array.h"
@@ -115,6 +118,18 @@ StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createTypeObject
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createFunctionObject(IMemory::Ptr value){
 	return std::make_shared<Objects::FunctionObject>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createNodeObject(INode::Ptr value){
+	return std::make_shared<Objects::NodeObject>(value);
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createMemoryObject(IMemory::Ptr value){
+	return nullptr;
+}
+
+StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createStorageObject(IStorage *value){
+	return std::make_shared<Objects::StorageObject>(value);
 }
 
 StructuredScript::IAny::Ptr StructuredScript::PrimitiveFactory::createIndexObject(IType::Ptr type, unsigned int value, IMemory *target){

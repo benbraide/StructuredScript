@@ -59,6 +59,10 @@ bool StructuredScript::Scanner::FileCharacterWell::load(){
 	return true;
 }
 
+bool StructuredScript::Scanner::FileCharacterWell::fail() const{
+	return file_.fail();
+}
+
 bool StructuredScript::Scanner::FileCharacterWell::stepTo_(char target, unsigned int offset){
 	auto index = value_.find(target, offset);
 	if (index < value_.size()){

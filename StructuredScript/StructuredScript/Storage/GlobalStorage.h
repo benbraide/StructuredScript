@@ -29,18 +29,21 @@
 
 #include "../Objects/StringObject.h"
 #include "../Objects/FunctionObject.h"
+#include "../Objects/NodeObject.h"
+#include "../Objects/MemoryObject.h"
+#include "../Objects/StorageObject.h"
 #include "../Objects/Undefined.h"
 #include "../Objects/Array.h"
 #include "../Objects/Range.h"
 
-#include "../Scanner/Scanner.h"
-#include "../Parser/Parser.h"
+#include "../Misc/Globals.h"
 
 namespace StructuredScript{
 	namespace Storage{
 		class GlobalStorage : public Storage, public IGlobalStorage{
 		public:
-			typedef std::map<Typename, IType::Ptr> ListType;
+			typedef std::map<Typename, IType::Ptr>			ListType;
+			typedef std::map<std::string, ExternalCallType>	ExternalCallListType;
 
 			GlobalStorage()
 				: Storage(nullptr){}
@@ -55,8 +58,15 @@ namespace StructuredScript{
 
 			virtual INode::Ptr parse(const std::string &value) override;
 
+			virtual ExternalCallType findExternalCall(const std::string &name) override;
+
+			virtual void addExternalCall(const std::string &name, ExternalCallType value) override;
+
+			static void path(const std::string &path);
+
 		private:
 			ListType primitives_;
+			ExternalCallListType externalCalls_;
 		};
 	}
 }
