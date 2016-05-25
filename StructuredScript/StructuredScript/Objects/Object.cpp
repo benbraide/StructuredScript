@@ -176,8 +176,15 @@ StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Object::addMe
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto object = objects_.find(name);
-	if (object != objects_.end())
+	if (object != objects_.end()){
+		if (memory_ == nullptr){//Temp object
+			auto property = dynamic_cast<IProperty *>(object->second.value.get());
+			if (property != nullptr)
+				property->setOwner(ptr());
+		}
+
 		return object->second.memory;//Target is a member object
+	}
 
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findMemory(name, SEARCH_LOCAL);
 	if (memory != nullptr && dynamic_cast<IFunctionMemory *>(memory.get()) == nullptr)

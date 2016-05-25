@@ -19,6 +19,8 @@ namespace StructuredScript{
 		public:
 			String(const std::string &value);
 
+			virtual Ptr ptr() override;
+
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual bool truth(IStorage *storage, IExceptionManager *exception, INode *expr) override;

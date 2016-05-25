@@ -17,6 +17,8 @@ namespace StructuredScript{
 
 			explicit FunctionObject(IMemory::Ptr value);
 
+			virtual Ptr ptr() override;
+
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			static void init();

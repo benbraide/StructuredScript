@@ -12,6 +12,8 @@ namespace StructuredScript{
 		public:
 			RangeBase();
 
+			virtual Ptr ptr() override;
+
 			static void init();
 
 		protected:

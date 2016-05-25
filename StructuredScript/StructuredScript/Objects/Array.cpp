@@ -5,6 +5,10 @@ StructuredScript::Objects::ArrayObject::ArrayObject()
 	lengthNode_->evaluate(this, nullptr, nullptr);
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::ArrayObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	auto object = std::make_shared<ArrayObject>();
 	for (auto entry : entries_){//Copy entries

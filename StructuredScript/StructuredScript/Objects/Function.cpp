@@ -66,10 +66,10 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 		return PrimitiveFactory::createUndefined();
 	}
 
-	Storage::Memory converter(nullptr, nullptr, type_, memory_->attributes());//For converting return value
-	converter.assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
+	auto converter = std::make_shared<Storage::Memory>(nullptr, nullptr, type_, memory_->attributes());//For converting return value
+	converter->assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
 
-	return Query::ExceptionManager::has(exception) ? nullptr : converter.object();
+	return Query::ExceptionManager::has(exception) ? nullptr : converter->object();
 }
 
 StructuredScript::IStorage::ExternalCallType StructuredScript::Objects::Function::getExternalCall_(IStorage *storage, IExceptionManager *exception, INode *expr){

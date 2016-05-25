@@ -51,6 +51,8 @@ namespace StructuredScript{
 
 			virtual bool remove(IMemory::Ptr target) override;
 
+			virtual IAny::Ptr ptr() = 0;
+
 		private:
 			IType::Ptr type_;
 			IMemory::Ptr *memory_;

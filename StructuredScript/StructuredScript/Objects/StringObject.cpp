@@ -5,6 +5,10 @@ StructuredScript::Objects::String::String(const std::string &value)
 	lengthNode_->evaluate(this, nullptr, nullptr);
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::String::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return std::make_shared<String>(value_);
 }

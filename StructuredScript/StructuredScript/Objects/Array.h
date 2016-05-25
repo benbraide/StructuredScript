@@ -18,6 +18,8 @@ namespace StructuredScript{
 
 			explicit ArrayObject();
 
+			virtual Ptr ptr() override;
+
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual Ptr evaluateRightUnary(const std::string &value, IStorage *storage, IExceptionManager *exception, INode *expr) override;

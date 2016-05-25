@@ -6,6 +6,10 @@ StructuredScript::Objects::StorageObject::StorageObject(IStorage *value)
 	validNode_->evaluate(this, nullptr, nullptr);
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::StorageObject::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::StorageObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return std::make_shared<StorageObject>(value_);
 }

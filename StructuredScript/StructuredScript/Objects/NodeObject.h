@@ -18,6 +18,8 @@ namespace StructuredScript{
 			NodeObject(INode::Ptr value, IType::Ptr type)
 				: Primitive(type), Objects::PrimitiveObject(type, Primitive::memory_), value_(value){}
 
+			virtual Ptr ptr() override;
+
 			virtual Ptr clone(IStorage *storage, IExceptionManager *exception, INode *expr) override;
 
 			virtual INode::Ptr value() override;

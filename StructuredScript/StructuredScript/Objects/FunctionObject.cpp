@@ -11,6 +11,10 @@ StructuredScript::Objects::FunctionObject::FunctionObject(IMemory::Ptr value)
 	}
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::FunctionObject::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::FunctionObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return std::make_shared<FunctionObject>(value_);
 }

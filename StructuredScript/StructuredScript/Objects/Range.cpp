@@ -6,6 +6,10 @@ StructuredScript::Objects::RangeBase::RangeBase()
 	secondNode_->evaluate(this, nullptr, nullptr);
 }
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::RangeBase::ptr(){
+	return shared_from_this();
+}
+
 void StructuredScript::Objects::RangeBase::init(){
 	std::string lines = "class @range{";
 

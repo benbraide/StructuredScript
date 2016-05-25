@@ -34,7 +34,11 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Property::base
 	get_->setStorage(this);
 
 	ExceptionManager xManager;
-	return get_->call(false, {}, &xManager, nullptr);
+	auto value = get_->call(false, {}, &xManager, nullptr);
+	if (owner_ != nullptr)//Remove circular reference
+		owner_ = nullptr;
+
+	return value;
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Property::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
@@ -163,6 +167,10 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Property::propertyClone(I
 
 StructuredScript::IType::Ptr StructuredScript::Objects::Property::propertyType(){
 	return type_;
+}
+
+void StructuredScript::Objects::Property::setOwner(Ptr owner){
+	owner_ = owner;
 }
 
 void StructuredScript::Objects::Property::getMemory_(const std::string &name, IStorage *storage, FunctionMemoryType &target){

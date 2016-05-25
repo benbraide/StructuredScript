@@ -33,8 +33,15 @@ StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::PrimitiveObje
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::PrimitiveObject::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	auto object = objects_.find(name);
-	if (object != objects_.end())
+	if (object != objects_.end()){
+		if (*memory_ == nullptr){//Temp object
+			auto property = dynamic_cast<IProperty *>(object->second.value.get());
+			if (property != nullptr)
+				property->setOwner(ptr());
+		}
+
 		return object->second.memory;
+	}
 
 	auto memory = dynamic_cast<IStorage *>(type_.get())->findMemory(name, searchScope);
 	auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());

@@ -1,5 +1,9 @@
 #include "NodeObject.h"
 
+StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NodeObject::ptr(){
+	return shared_from_this();
+}
+
 StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::NodeObject::clone(IStorage *storage, IExceptionManager *exception, INode *expr){
 	return std::make_shared<NodeObject>(value_->clone(), Primitive::type_);
 }

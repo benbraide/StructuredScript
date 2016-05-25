@@ -58,9 +58,12 @@ namespace StructuredScript{
 
 			virtual IType::Ptr propertyType() override;
 
+			virtual void setOwner(Ptr owner) override;
+
 		protected:
 			void getMemory_(const std::string &name, IStorage *storage, FunctionMemoryType &target);
 
+			Ptr owner_;
 			FunctionMemoryType get_;
 			FunctionMemoryType set_;
 		};
