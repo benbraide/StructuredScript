@@ -38,10 +38,14 @@ void StructuredScript::Scanner::FileCharacterWell::step(int steps){
 		else
 			end_ -= static_cast<unsigned int>(-steps);
 	}
-	else if((end_ + steps) > value_.size() && !load())
-		end_ = value_.size();
+	else if ((end_ + steps) > value_.size()){//Overflow -- try loading more
+		if (load())
+			step(steps);
+		else
+			end_ = value_.size();
+	}
 	else
-		step(steps);
+		end_ += steps;
 }
 
 bool StructuredScript::Scanner::FileCharacterWell::stepTo(char target){

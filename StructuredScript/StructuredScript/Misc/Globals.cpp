@@ -39,8 +39,15 @@ void StructuredScript::Globals::init(){
 			index = path.find("//", index);
 		}
 
-		if (std::find(paths_.begin(), paths_.end(), path) == paths_.end())
-			return require_(path, storage, exception, expr);//Not in list - require
+		if (std::find(paths_.begin(), paths_.end(), path) == paths_.end()){//Not in list - require
+			auto value = require_(path, storage, exception, expr);
+			if (!Query::ExceptionManager::has(exception)){
+				paths_.push_back(path);//Add to list
+				return value;
+			}
+
+			return nullptr;
+		}
 
 		return PrimitiveFactory::createUndefined();//Already required
 	});
@@ -107,7 +114,7 @@ StructuredScript::IAny::Ptr StructuredScript::Globals::require_(const std::strin
 			Query::ExceptionManager::combine(xManager.get()->str(storage, exception, expr), expr)));
 	}
 
-	parsed->evaluate(storage, &xManager, expr);
+	parsed->evaluate(dynamic_cast<IStorage *>(IGlobalStorage::globalStorage), &xManager, expr);
 	if (xManager.hasReturn())
 		return xManager.get();
 

@@ -145,11 +145,21 @@ StructuredScript::IAny::Ptr StructuredScript::Objects::Object::evaluateBinary(co
 }
 
 bool StructuredScript::Objects::Object::truth(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return false;
+	auto function = findTypenameOperatorMemory(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_BOOLEAN));
+	auto value = callFunction_(function, nullptr, false, "", true, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	return (value == nullptr) ? false : value->truth(storage, exception, expr);
 }
 
 std::string StructuredScript::Objects::Object::str(IStorage *storage, IExceptionManager *exception, INode *expr){
-	return "";
+	auto function = findTypenameOperatorMemory(IGlobalStorage::globalStorage->getPrimitiveType(Typename::TYPE_NAME_STRING));
+	auto value = callFunction_(function, nullptr, false, "", true, exception, expr);
+	if (Query::ExceptionManager::has(exception))
+		return nullptr;
+
+	return (value == nullptr) ? "" : value->str(storage, exception, expr);
 }
 
 StructuredScript::IStorage *StructuredScript::Objects::Object::findStorage(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
@@ -175,6 +185,16 @@ StructuredScript::IStorage::MemoryInfo *StructuredScript::Objects::Object::addMe
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Objects::Object::findMemory(const std::string &name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
+	if (name == "self"){
+		if (memory_ != nullptr)
+			return memory_;
+
+		auto memory = std::make_shared<StructuredScript::Storage::Memory>(nullptr, nullptr, type_, nullptr);
+		memory->assign(shared_from_this());
+
+		return memory;
+	}
+
 	auto object = objects_.find(name);
 	if (object != objects_.end()){
 		if (memory_ == nullptr){//Temp object

@@ -60,16 +60,21 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Function::call
 	if (type_ == nullptr){
 		if (value != nullptr){
 			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("Invalid 'return' statement found in a constructor/destrcutor!", expr)));
+				Query::ExceptionManager::combine("Invalid 'return' statement found in a constructor/destructor!", expr)));
 		}
 
 		return PrimitiveFactory::createUndefined();
 	}
 
-	auto converter = std::make_shared<Storage::Memory>(nullptr, nullptr, type_, memory_->attributes());//For converting return value
-	converter->assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
+	IStorage::MemoryInfo info;
+	auto memory = (value == nullptr) ? nullptr : value->memory();
+	auto converter = std::make_shared<Storage::Memory>(&info, nullptr, type_, memory_->attributes());//For converting return value
 
-	return Query::ExceptionManager::has(exception) ? nullptr : converter->object();
+	converter->assign((value == nullptr) ? PrimitiveFactory::createVoid() : value, storage, exception, expr);
+	if (value != nullptr)//Restore memory
+		value->setMemory(memory);
+
+	return Query::ExceptionManager::has(exception) ? nullptr : info.value;
 }
 
 StructuredScript::IStorage::ExternalCallType StructuredScript::Objects::Function::getExternalCall_(IStorage *storage, IExceptionManager *exception, INode *expr){

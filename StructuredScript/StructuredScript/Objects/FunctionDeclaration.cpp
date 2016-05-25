@@ -288,6 +288,10 @@ int StructuredScript::Objects::FunctionDeclaration::score_(IType::Ptr type, unsi
 	if (target->isCompatibleWith(type))
 		return 1;
 
+	auto typeStorage = dynamic_cast<IStorage *>(type.get());
+	if (typeStorage != nullptr && typeStorage->findTypenameOperatorMemory(target->base(), IStorage::SEARCH_LOCAL) != nullptr)
+		return 1;
+
 	return 0;
 }
 

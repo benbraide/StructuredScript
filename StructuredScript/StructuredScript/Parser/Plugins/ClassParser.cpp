@@ -65,10 +65,29 @@ StructuredScript::INode::Ptr StructuredScript::Parser::ClassParser::parse(IChara
 		}
 		else if (next == nameStr || (nameStr.empty() && next == "__constructor")){//Constructor
 			scanner.next(well);//Ignore
+			
+			if (!nameStr.empty()){//Verify constructor
+				auto after = scanner.peek(well).value();
+				if (after.empty() || after[0] != '('){//Not constructor -- Parse line
+					scanner.save(Scanner::Token(Scanner::TokenType::TOKEN_TYPE_IDENTIFIER, next));//Return token
+					right = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{
+						return (next.value() != ";");
+					});
 
-			right = FunctionParser(std::make_shared<Nodes::IdentifierNode>(nameStr)).parseConstructor(well, scanner, parser, exception);
-			if (Query::ExceptionManager::has(exception))
-				return nullptr;
+					while (scanner.peek(well).value() == ";")//Skip ';'
+						scanner.next(well);
+				}
+				else{
+					right = FunctionParser(std::make_shared<Nodes::IdentifierNode>(nameStr)).parseConstructor(well, scanner, parser, exception);
+					if (Query::ExceptionManager::has(exception))
+						return nullptr;
+				}
+			}
+			else{
+				right = FunctionParser(std::make_shared<Nodes::IdentifierNode>(nameStr)).parseConstructor(well, scanner, parser, exception);
+				if (Query::ExceptionManager::has(exception))
+					return nullptr;
+			}
 		}
 		else{//Parse line
 			right = parser.expression(nullptr, well, scanner, exception, -1, [](const Scanner::Token &next) -> bool{

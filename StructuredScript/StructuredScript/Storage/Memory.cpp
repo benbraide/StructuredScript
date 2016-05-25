@@ -49,23 +49,32 @@ void StructuredScript::Storage::Memory::assign(IAny::Ptr object, IStorage *stora
 		return;
 	}
 
+	bool mustCast;
 	if (type_ != nullptr){//Validate assignment
 		auto compatibleType = type_->getCompatibleType(type);
 		if (compatibleType == nullptr){//Incompatible types -- use type as is
-			if (states.isReference()){//Compatible type required
+			if (states.isReference() && !states.isRValReference()){//Compatible type required
 				Query::ExceptionManager::set(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
 					"Incompatible types!", expr)));
 
 				return;
 			}
-			
+
+			mustCast = true;
 			compatibleType = type_;
 		}
+		else
+			mustCast = false;
 
 		if (states.isReference()){//Get reference
 			auto memory = object->memory();
 			if (states.isRValReference()){//Value | Reference
-				if (memory != nullptr){
+				if (mustCast){
+					object = object->cast(compatibleType->base(), storage, exception, expr);
+					if (Query::ExceptionManager::has(exception))
+						return;
+				}
+				else if (memory != nullptr){
 					auto objectType = memory->type();
 					auto objectStates = MemoryState((objectType == nullptr) ? MemoryState::STATE_NONE : objectType->states());
 					if (!objectStates.isRValReference()){//Only get reference if object is not an rvalue reference
