@@ -74,10 +74,6 @@ namespace StructuredScript{
 			virtual bool useTypenameOperator(IType::Ptr name, IMemory::Ptr value) override;
 
 		protected:
-			TypenameOperatorMemoryListType::iterator findTypeOperator_(IType::Ptr name);
-
-			UsedTypenameOperatorMemoryListType::iterator findUsedTypeOperator_(IType::Ptr name);
-
 			IStorage *parent_;
 			TypeListType types_;
 			MemoryAttributeListType attributes_;

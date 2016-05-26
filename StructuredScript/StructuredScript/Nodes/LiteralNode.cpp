@@ -63,6 +63,14 @@ std::string StructuredScript::Nodes::LiteralNode::str(){
 
 void StructuredScript::Nodes::LiteralNode::attributes(IMemoryAttributes::Ptr attributes){}
 
+StructuredScript::Scanner::Token StructuredScript::Nodes::LiteralNode::value(){
+	return value_;
+}
+
+void StructuredScript::Nodes::LiteralNode::value(const Scanner::Token &value){
+	value_ = value;
+}
+
 StructuredScript::IMemoryAttributes::Ptr StructuredScript::Nodes::LiteralNode::attributes(){
 	return nullptr;
 }

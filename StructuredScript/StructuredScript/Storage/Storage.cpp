@@ -169,14 +169,15 @@ StructuredScript::IStorage::MemoryInfo *StructuredScript::Storage::Storage::addT
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::Storage::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	FunctionMemory::ListType list;
+	for (auto &typeOperator : typeOperators_){
+		if (typeOperator.first->isEqual(name))
+			list.push_back(typeOperator.second);
+	}
 
-	auto object = findTypeOperator_(name);
-	if (object != typeOperators_.end())
-		list.push_back(object->second);
-
-	auto usedObject = findUsedTypeOperator_(name);
-	if (usedObject != usedTypeOperators_.end())
-		list.push_back({ usedObject->second, nullptr });
+	for (auto &typeOperator : usedTypeOperators_){
+		if (typeOperator.first->isEqual(name))
+			list.push_back({ typeOperator.second, nullptr });
+	}
 
 	for (auto item : usedStorages_){
 		auto memory = item->findTypenameOperatorMemory(name, IStorage::SEARCH_LOCAL);
@@ -228,47 +229,21 @@ bool StructuredScript::Storage::Storage::use(IStorage *storage){
 }
 
 bool StructuredScript::Storage::Storage::use(const std::string &name, IType::Ptr value){
-	if (usedTypes_.find(name) == usedTypes_.end())
-		usedTypes_[name] = value;
-
+	usedTypes_[name] = value;
 	return true;
 }
 
 bool StructuredScript::Storage::Storage::use(const std::string &name, IMemory::Ptr value){
-	if (usedObjects_.find(name) == usedObjects_.end())
-		usedObjects_[name] = value;
-
+	usedObjects_[name] = value;
 	return true;
 }
 
 bool StructuredScript::Storage::Storage::useOperator(const std::string &name, Memory::Ptr value){
-	if (usedOperators_.find(name) == usedOperators_.end())
-		usedOperators_[name] = value;
-
+	usedOperators_[name] = value;
 	return true;
 }
 
 bool StructuredScript::Storage::Storage::useTypenameOperator(IType::Ptr name, IMemory::Ptr value){
-	if (findUsedTypeOperator_(name) == usedTypeOperators_.end())
-		usedTypeOperators_[name] = value;
-
+	usedTypeOperators_[name] = value;
 	return true;
-}
-
-StructuredScript::Storage::Storage::TypenameOperatorMemoryListType::iterator StructuredScript::Storage::Storage::findTypeOperator_(IType::Ptr name){
-	for (auto item = typeOperators_.begin(); item != typeOperators_.end(); ++item){
-		if (item->first->isEqual(name))
-			return item;
-	}
-
-	return typeOperators_.end();
-}
-
-StructuredScript::Storage::Storage::UsedTypenameOperatorMemoryListType::iterator StructuredScript::Storage::Storage::findUsedTypeOperator_(IType::Ptr name){
-	for (auto item = usedTypeOperators_.begin(); item != usedTypeOperators_.end(); ++item){
-		if (item->first->isEqual(name))
-			return item;
-	}
-
-	return usedTypeOperators_.end();
 }

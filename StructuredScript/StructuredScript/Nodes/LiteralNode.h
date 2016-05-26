@@ -19,7 +19,7 @@
 
 namespace StructuredScript{
 	namespace Nodes{
-		class LiteralNode : public INode{
+		class LiteralNode : public INode, public ILiteralNode{
 		public:
 			explicit LiteralNode(const Scanner::Token &value)
 				: value_(value){}
@@ -35,6 +35,10 @@ namespace StructuredScript{
 			virtual void attributes(IMemoryAttributes::Ptr attributes) override;
 
 			virtual IMemoryAttributes::Ptr attributes() override;
+
+			virtual void value(const Scanner::Token &value) override;
+
+			virtual Scanner::Token value() override;
 
 		protected:
 			IAny::Ptr evaluateNumber_(IStorage *storage, IExceptionManager *exception, INode *expr);

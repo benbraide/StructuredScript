@@ -167,6 +167,16 @@ StructuredScript::INode::Ptr StructuredScript::Storage::GlobalStorage::parse(con
 	return parser.parse(well, scanner, &xManager);
 }
 
+StructuredScript::INode::Ptr StructuredScript::Storage::GlobalStorage::parseTerm(const std::string &value){
+	Parser::Parser parser;
+	Scanner::Scanner scanner;
+
+	ExceptionManager xManager;
+	Scanner::StringCharacterWell well(value);
+
+	return parser.term(well, scanner, &xManager);
+}
+
 StructuredScript::Storage::GlobalStorage::ExternalCallType StructuredScript::Storage::GlobalStorage::findExternalCall(const std::string &name){
 	auto call = externalCalls_.find(name);
 	return (call == externalCalls_.end()) ? nullptr : call->second;

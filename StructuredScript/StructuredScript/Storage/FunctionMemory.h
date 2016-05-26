@@ -67,6 +67,7 @@ namespace StructuredScript{
 
 			ListType::iterator find_(IAny::Ptr function);
 
+			IAny::Ptr owner_;
 			IStorage *storage_;
 			ListType list_;
 		};

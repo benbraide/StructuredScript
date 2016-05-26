@@ -116,10 +116,10 @@ StructuredScript::INode::Ptr StructuredScript::Parser::Parser::expression(INode:
 		node = term(well, scanner, exception, validator);
 		if (Query::ExceptionManager::has(exception) || Query::Node::isEmpty(node))
 			return node;
-
-		if (Query::Node::isBlock(node))
-			return node;
 	}
+
+	if (Query::Node::isBlock(node))
+		return node;
 
 	auto next = scanner.next(well);
 	if (next.isError())

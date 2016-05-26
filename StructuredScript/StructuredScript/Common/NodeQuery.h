@@ -7,6 +7,7 @@
 
 #include "../Interfaces/Nodes/IOperatorNode.h"
 #include "../Interfaces/Nodes/IEmptyNode.h"
+#include "../Interfaces/Nodes/ILiteralNode.h"
 #include "../Interfaces/Nodes/IIdentifierNode.h"
 #include "../Interfaces/Nodes/IDeclarationNode.h"
 #include "../Interfaces/Nodes/IFunctionNode.h"

@@ -166,10 +166,10 @@ StructuredScript::IStorage::MemoryInfo *StructuredScript::Type::addTypenameOpera
 
 StructuredScript::IMemory::Ptr StructuredScript::Type::findTypenameOperatorMemory(IType::Ptr name, unsigned short searchScope /*= SEARCH_DEFAULT*/){
 	ListType list;
-
-	auto object = typeOperators_.find(name);
-	if (object != typeOperators_.end())
-		list.push_back(object->second);
+	for (auto &typeOperator : typeOperators_){
+		if (typeOperator.first->isEqual(name))
+			list.push_back(typeOperator.second);
+	}
 
 	extendTypeOperatorList_(list, name, searchScope);
 	return list.empty() ? nullptr : std::make_shared<StructuredScript::Storage::FunctionMemory>(list);
@@ -198,7 +198,10 @@ StructuredScript::IMemoryAttribute::Ptr StructuredScript::Type::findMemoryAttrib
 
 StructuredScript::IStorage::ExternalCallType StructuredScript::Type::findExternalCall(const std::string &name){
 	auto call = externalCalls_.find(name);
-	return (call == externalCalls_.end()) ? nullptr : call->second;
+	if (call == externalCalls_.end())
+		return (storage_ == nullptr) ? nullptr : storage_->findExternalCall(name);
+
+	return call->second;
 }
 
 bool StructuredScript::Type::remove(IMemory::Ptr target){

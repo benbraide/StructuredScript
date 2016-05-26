@@ -58,6 +58,8 @@ namespace StructuredScript{
 
 			virtual INode::Ptr parse(const std::string &value) override;
 
+			virtual INode::Ptr parseTerm(const std::string &value) override;
+
 			virtual ExternalCallType findExternalCall(const std::string &name) override;
 
 			virtual void addExternalCall(const std::string &name, ExternalCallType value) override;

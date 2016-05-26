@@ -5,9 +5,12 @@ void StructuredScript::Globals::init(){
 
 	lines += "@[Call(0)]any require(const ref val string path);";
 	lines += "@[Call(1)]any require_once(const ref val string path);";
-	lines += "@[Call(2)]any parse(const ref val string value);";
-	lines += "@[Call(3)]any get_memory(const ref any object);";
-	lines += "@[Call(4)]any get_storage(const ref any object);";
+
+	lines += "@[Call(2)]any get_memory(const ref any object);";
+	lines += "@[Call(3)]any get_storage(const ref any object);";
+	lines += "@[Call(4)]any get_meta(const ref val any object);";
+	
+	lines += "@[Call(5)]bool has_property(const ref val any object, const ref val string value, bool family = false);";
 
 	lines += "any global_storage{ @[Call(9)]any get() }";
 	lines += "any current_storage{ @[Call(10)]any get() }";
@@ -52,24 +55,34 @@ void StructuredScript::Globals::init(){
 		return PrimitiveFactory::createUndefined();//Already required
 	});
 
-	IGlobalStorage::globalStorage->addExternalCall("2", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//parse
-		auto value = storage->findMemory("value")->object()->str(storage, exception, expr);
-		auto parsed = IGlobalStorage::globalStorage->parse(value);
-		if (parsed == nullptr){
-			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
-				Query::ExceptionManager::combine("There were errors while parsing!", expr)));
-		}
-
-		return PrimitiveFactory::createNodeObject(parsed);
-	});
-
-	IGlobalStorage::globalStorage->addExternalCall("3", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//get_memory
+	IGlobalStorage::globalStorage->addExternalCall("2", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//get_memory
 		auto memory = storage->findMemory("object")->object()->base()->memory();
 		return PrimitiveFactory::createMemoryObject((memory == nullptr) ? nullptr : memory->ptr());
 	});
 
-	IGlobalStorage::globalStorage->addExternalCall("4", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//get_storage
+	IGlobalStorage::globalStorage->addExternalCall("3", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//get_storage
 		return PrimitiveFactory::createStorageObject(storage->findMemory("object")->object()->base()->memory()->storage());
+	});
+
+	IGlobalStorage::globalStorage->addExternalCall("4", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//get_meta
+		return PrimitiveFactory::createStorageObject(storage->findMemory("object")->object()->base()->memory()->storage());
+	});
+
+	IGlobalStorage::globalStorage->addExternalCall("5", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//has_property
+		auto object = storage->findMemory("object")->object()->base();
+		auto objectStorage = dynamic_cast<IStorage *>(object.get());
+		if (objectStorage == nullptr)
+			return PrimitiveFactory::createBool(false);
+
+		auto family = storage->findMemory("family")->object()->truth(storage, exception, expr);
+		auto scope = family ? IStorage::SEARCH_FAMILY : IStorage::SEARCH_LOCAL;
+
+		auto memory = objectStorage->findMemory(storage->findMemory("value")->object()->str(storage, exception, expr), scope);
+		if (memory == nullptr)
+			return PrimitiveFactory::createBool(false);
+
+		auto functionMemory = dynamic_cast<IFunctionMemory *>(memory.get());
+		return PrimitiveFactory::createBool(functionMemory == nullptr || functionMemory->count() > 0u);
 	});
 
 	IGlobalStorage::globalStorage->addExternalCall("9", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{//global_storage.get
@@ -90,6 +103,46 @@ void StructuredScript::Globals::init(){
 		}
 
 		return PrimitiveFactory::createStorageObject(storage->parent());
+	});
+
+	IGlobalStorage::globalStorage->addExternalCall("String.Cast", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		auto value = dynamic_cast<IAny *>(dynamic_cast<IFunctionStorage *>(storage)->object())->str(storage, exception, expr);
+		auto parsed = IGlobalStorage::globalStorage->parseTerm(value);
+		if (parsed == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("There were errors while performing cast!", expr)));
+		}
+
+		auto literal = dynamic_cast<ILiteralNode *>(parsed.get());
+		if (literal == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("There were errors while performing cast!", expr)));
+		}
+
+		auto token = literal->value();
+		if (!Scanner::tokenIsNumberType(token.type())){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("There were errors while performing cast!", expr)));
+		}
+
+		if (Scanner::tokenIsIntegerType(token.type()))//Add 'long long' suffix
+			literal->value(Scanner::Token(token.type(), token.value(), "", "LL"));
+		else//Add 'long double' suffix
+			literal->value(Scanner::Token(token.type(), token.value(), "", "L"));
+
+		return parsed->evaluate(storage, exception, expr);
+	});
+
+	IGlobalStorage::globalStorage->addExternalCall("String.Node", [](IStorage *storage, IExceptionManager *exception, INode *expr) -> IAny::Ptr{
+		auto property = dynamic_cast<IFunctionStorage *>(storage)->object();
+		auto value = dynamic_cast<IAny *>(property->memory()->storage())->str(storage, exception, expr);
+		auto parsed = IGlobalStorage::globalStorage->parse(value);
+		if (parsed == nullptr){
+			return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(
+				Query::ExceptionManager::combine("There were errors while parsing!", expr)));
+		}
+
+		return PrimitiveFactory::createNodeObject(parsed);
 	});
 }
 

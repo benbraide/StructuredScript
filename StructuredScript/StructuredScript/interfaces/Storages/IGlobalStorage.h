@@ -16,6 +16,8 @@ namespace StructuredScript{
 
 			virtual Node::Ptr parse(const std::string &value) = 0;
 
+			virtual Node::Ptr parseTerm(const std::string &value) = 0;
+
 			virtual void addExternalCall(const std::string &name, Storage::ExternalCallType value) = 0;
 
 			static GlobalStorage *globalStorage;

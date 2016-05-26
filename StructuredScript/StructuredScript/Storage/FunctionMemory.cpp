@@ -3,6 +3,10 @@
 StructuredScript::Storage::FunctionMemory::FunctionMemory(const ListType &components, IStorage *storage /*= nullptr*/)
 	: storage_(storage){//Combine multiple function memories into one
 	init_(components);
+
+	auto owner = dynamic_cast<IAny *>(storage);
+	if (owner != nullptr)//Store strong reference for temp objects
+		owner_ = owner->ptr();
 }
 
 StructuredScript::Interfaces::Memory::Ptr StructuredScript::Storage::FunctionMemory::ptr(){
@@ -36,6 +40,8 @@ StructuredScript::IStorage *StructuredScript::Storage::FunctionMemory::storage()
 
 void StructuredScript::Storage::FunctionMemory::setStorage(IStorage *storage){
 	storage_ = storage;
+	auto owner = dynamic_cast<IAny *>(storage);
+	owner_ = (owner == nullptr) ? nullptr : owner->ptr();//Store strong reference for temp objects
 }
 
 StructuredScript::IMemory::Ptr StructuredScript::Storage::FunctionMemory::add(IAny::Ptr function, IMemoryAttributes::Ptr attributes){

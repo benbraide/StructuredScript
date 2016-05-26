@@ -70,15 +70,21 @@ StructuredScript::Interfaces::Any::Ptr StructuredScript::Objects::Object::cast(I
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
-	if (value != nullptr)
-		return value;
+	if (value != nullptr)//Confirm cast - useful when matching operator is a composite type
+		return type_->isEqual(value->type()) ? value : value->cast(type, storage, exception, expr);
 
 	return type_->isEqual(type) ? shared_from_this() : nullptr;
 }
 
 StructuredScript::IAny::Ptr StructuredScript::Objects::Object::assign(const std::string &value, Ptr right, IStorage *storage, IExceptionManager *exception, INode *expr){
+	auto rightBase = right->base();
+	if (rightBase == nullptr){
+		return Query::ExceptionManager::setAndReturnObject(exception, PrimitiveFactory::createString(Query::ExceptionManager::combine(
+			"'" + value + "': Operands mismatch!", expr)));
+	}
+
 	auto function = findOperatorMemory(value);
-	auto returnValue = callFunction_(function, nullptr, false, "", true, exception, expr);
+	auto returnValue = callFunction_(function, rightBase, false, "", true, exception, expr);
 	if (Query::ExceptionManager::has(exception))
 		return nullptr;
 
